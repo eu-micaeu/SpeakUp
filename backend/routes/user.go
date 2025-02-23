@@ -13,6 +13,8 @@ func UserRoutes(router *gin.Engine) {
 
 	{
 
+		userRoutes.POST("/login", handlers.Login)
+
 		userRoutes.POST("/create", handlers.CreateUser)
 
 		userRoutes.DELETE("/delete", handlers.DeleteUser)
