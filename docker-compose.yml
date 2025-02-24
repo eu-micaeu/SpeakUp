@@ -22,7 +22,6 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - GO_ENV=production
       - MONGO_CONNECTION_STRING=mongodb://mongoadmin:mongopassword@mongodb:27017/?authSource=admin
       - MONGO_DATABASE=speakup
     depends_on:
