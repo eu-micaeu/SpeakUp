@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  mongodb:
+    container_name: speakup-mongodb
+    image: mongo:6.0
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongoadmin
+      MONGO_INITDB_ROOT_PASSWORD: mongopassword
+      MONGODB_AUTH_MECHANISM: SCRAM-SHA-1
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    command: mongod --auth --bind_ip_all
+
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - GO_ENV=production
+      - MONGO_CONNECTION_STRING=mongodb://mongoadmin:mongopassword@mongodb:27017/?authSource=admin
+      - MONGO_DATABASE=speakup
+    depends_on:
+      - mongodb
+
+  ui-web:  # renamed from frontend for consistency
+    build:
+      context: ./frontend/web
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production  # added production env
+      - REACT_APP_API_URL=http://localhost:8080
+    depends_on:
+      - backend
+
+volumes:
+  mongo-data:  # renamed from mongodb_data for consistency
