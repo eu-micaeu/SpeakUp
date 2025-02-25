@@ -16,21 +16,24 @@ services:
     command: mongod --auth --bind_ip_all
 
   backend:
-    build: 
-      context: ./backend
+    build:
+      context: ./backend/go
       dockerfile: Dockerfile
+    container_name: backend
+    volumes:
+      - ./backend/go:/app
     ports:
       - "8080:8080"
     environment:
       - MONGO_CONNECTION_STRING=mongodb://mongoadmin:mongopassword@mongodb:27017/?authSource=admin
-      - MONGO_DATABASE=speakup
-    depends_on:
-      - mongodb
+      - JWT_KEY=secret
+    command: ["/go/bin/air"]
 
   ui-web:  # renamed from frontend for consistency
     build:
       context: ./frontend/web
       dockerfile: Dockerfile
+    container_name: frontend
     ports:
       - "3000:3000"
     environment:
