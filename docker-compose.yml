@@ -29,18 +29,22 @@ services:
       - JWT_KEY=secret
     command: ["/go/bin/air"]
 
-  ui-web:  # renamed from frontend for consistency
+  ui-web:
     build:
       context: ./frontend/web
       dockerfile: Dockerfile
     container_name: frontend
+    volumes:
+      - ./frontend/web:/app
+      - /app/node_modules
     ports:
       - "3000:3000"
     environment:
-      - NODE_ENV=production  # added production env
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
       - REACT_APP_API_URL=http://localhost:8080
     depends_on:
       - backend
 
 volumes:
-  mongo-data:  # renamed from mongodb_data for consistency
+  mongo-data:
