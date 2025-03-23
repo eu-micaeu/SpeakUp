@@ -1,38 +1,40 @@
 import './Login.css';
+import { useNavigate } from 'react-router-dom';
 
-import {login} from '../../utils/api';
+// Routes
+import { login } from '../../utils/api';
 
 function Login() {
 
+    const navigate = useNavigate();
+
+    const goToIndex = () => {
+        navigate('/');
+    };
+
     const handleLogin = async (event) => {
         event.preventDefault();
-        const email = event.target[0].value;
-        const password = event.target[1].value;
+        const email = event.target.email.value;
+        const password = event.target.password.value;
         const response = await login(email, password);
 
         if (response.message === 'Login successful') {
-            window.location.href = '/home';
+            navigate('/home');
         }
 
     }
-    
+
     return (
-
         <div className="pageLogin">
-
             <form onSubmit={handleLogin}>
-
-                <img src="./logo.png"></img>
-                <input type="text" placeholder="Email" />
-                <input type="password" placeholder="Password" />
+                <img src="./logo.png" onClick={goToIndex} alt="Logo da empresa" />
+                <input type="text" placeholder="Email" name="email" />
+                <input type="password" placeholder="Password" name="password" />
                 <button type="submit">Login</button>
 
                 <a href="#">Não possui conta? Faça o Registro aqui!</a>
-
             </form>
-
         </div>
-
     );
 }
 
