@@ -1,0 +1,48 @@
+.pageLogin form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    background-color: #000000;
+    height: 100vh;
+}
+
+.pageLogin form img{
+    margin: 25px;
+}
+
+.pageLogin form input {
+    width: 200px;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 5px;
+    border: none;
+}
+
+.pageLogin form button {
+    width: 220px;
+    font-family: 'Karla', sans-serif;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 5px;
+    border: none;
+    background-color: #2bff00;
+    color: #000000;
+    cursor: pointer;
+}
+
+.pageLogin form button:hover {
+    background-color: #2faa17;
+}
+
+.pageLogin form a{
+
+    color: #ffffff;
+    text-decoration: none;
+    font-family: 'Karla', sans-serif;
+    margin: 10px;
+    text-decoration: underline;
+    cursor: pointer;
+
+}

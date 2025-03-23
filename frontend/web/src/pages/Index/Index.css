@@ -1,0 +1,33 @@
+main{
+
+    height: 100vh;
+
+}
+
+main .cards{
+
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+    height: 100%;
+
+}
+
+main .cards .card{
+    width: 25%;
+    margin: 10px;
+    background-color: #000000;
+    color: #ffffff;
+    border-radius: 15px;
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+main .cards .card h2{
+    font-size: 1.5em;
+    margin: 10px;
+    text-align: center;
+}

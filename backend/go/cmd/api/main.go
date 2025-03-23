@@ -8,11 +8,15 @@ import (
 
 	"speakup/config"
 	"speakup/routes"
+	"speakup/middlewares"
 )
 
 func main() {
 
 	r := gin.Default()
+
+	// CORS
+	r.Use(middlewares.CorsMiddleware())
 
 	// Carregar variáveis de ambiente do arquivo .env
 	err := godotenv.Load()

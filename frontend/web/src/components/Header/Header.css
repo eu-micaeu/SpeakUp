@@ -1,0 +1,30 @@
+header{
+
+    background-color: #000;
+    padding: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    justify-content: space-between;
+
+}
+
+header button{
+
+    background-color: #fff;
+    color: #000;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    font-family: 'Karla', sans-serif;
+
+}
+
+header button:hover{
+
+    background-color: #000;
+    color: #fff;
+
+}
