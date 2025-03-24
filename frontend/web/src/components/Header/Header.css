@@ -10,7 +10,7 @@ header{
 }
 
 header button{
-
+    width: 100px;
     background-color: #fff;
     color: #000;
     padding: 10px 20px;

@@ -1,5 +1,4 @@
 import axios from 'axios';
-import Cookies from 'js-cookie';
 
 // Login
 export const login = async (email, password) => {
@@ -10,9 +9,17 @@ export const login = async (email, password) => {
     });
 
     const authToken = response.data.token;
-    Cookies.set('authToken', authToken);
+    localStorage.setItem('token', authToken);
 
     return response.data;
 
 }
 
+//Register
+export const register = async (userData) => {
+    
+    const response = await axios.post('http://localhost:8080/user', userData);
+
+    return response.data;
+
+}
