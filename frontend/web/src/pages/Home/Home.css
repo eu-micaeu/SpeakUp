@@ -1,0 +1,52 @@
+/* Home.css */
+.pageHome {
+    display: flex;
+    min-height: 100vh;
+    transition: margin-left 0.1s ease;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #000000;
+    padding: 20px;
+    position: relative;
+    transition: width 0.1s ease;
+}
+
+.mainContent {
+    flex: 1;
+    padding: 20px;
+    background-color: #fff;
+    transition: margin-left 0.1s ease;
+}
+
+.toggleButton {
+    background-color: transparent;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #fff;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.mainContent .toggleButton {
+    color: #000;
+    position: relative;
+    top: auto;
+    right: auto;
+}
+
+/* Hide sidebar smoothly */
+.sidebarHidden .sidebar {
+    width: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.sidebarHidden .mainContent {
+    margin-left: 0;
+}
+
+
