@@ -11,13 +11,14 @@
     padding: 20px;
     position: relative;
     transition: width 0.1s ease;
+    color: #ffffff;
 }
 
 .mainContent {
-    flex: 1;
     padding: 20px;
-    background-color: #fff;
+    background-color: #313131;
     transition: margin-left 0.1s ease;
+    width: 100%;
 }
 
 .toggleButton {
@@ -28,7 +29,7 @@
     color: #fff;
     position: absolute;
     top: 20px;
-    right: 20px;
+    left: 20px;
 }
 
 .mainContent .toggleButton {

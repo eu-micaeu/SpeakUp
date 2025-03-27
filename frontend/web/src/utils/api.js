@@ -16,3 +16,16 @@ export const login = async (email, password) => {
 
 }
 
+// Get chats by user id
+export const getChatsByUserId = async (userId) => {
+
+    const response = await axios.get(`http://localhost:8080/chat/user/${userId}`, {
+        headers: {
+            Authorization: `Bearer ${Cookies.get('authToken')}`
+        }
+    });
+
+    return response.data;
+
+}
+

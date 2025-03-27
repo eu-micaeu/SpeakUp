@@ -10,62 +10,118 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"go.mongodb.org/mongo-driver/bson"
 )
 
-// StartChat handles the creation of a new chat
-func StartChat(c *gin.Context) {
-    client := config.GetMongoClient()
+// CRUD operations for chat
 
-    var chat models.Chat
-    if err := c.ShouldBindJSON(&chat); err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-        return
-    }
-
-    collection := client.Database("speakup").Collection("chats")
-
-    chat.ID = uuid.ClockSequence()
-
-    chat.StartTime = time.Now().String()
-
-    _, err := collection.InsertOne(c, bson.M{
-        "id":              chat.ID,
-        "user_id":         chat.UserID,
-        "start_time":      chat.StartTime,
-        "end_time":        chat.EndTime,
-        "difficulty_level": chat.DifficultyLevel,
-        "topic":           chat.Topic,
-    })
-    if err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create chat"})
-        return
-    }
-
-    c.JSON(http.StatusOK, gin.H{"message": "Chat created successfully", "chat": chat})
-}
-
-// EndChat handles the deletion of a chat
-func EndChat(c *gin.Context) {
-	
-	client := config.GetMongoClient()
-
+// CreateChat creates a new chat
+func CreateChat(c *gin.Context) {
 	var chat models.Chat
 	if err := c.ShouldBindJSON(&chat); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	collection := client.Database("speakup").Collection("chats")
+	chat.ID = int(uuid.New().ID())
+	chat.StartTime = time.Now().Format(time.RFC3339)
 
-	_, err := collection.DeleteOne(c, bson.M{
-		"id": chat.ID,
-	})
+	db := config.GetMongoClient()
+	collection := db.Database("speakup").Collection("chats")
+	_, err := collection.InsertOne(c, chat)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create chat"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, chat)
+}
+
+// GetChat gets a chat by ID
+func GetChatById(c *gin.Context) {
+	id := c.Param("id")
+	db := config.GetMongoClient()
+	collection := db.Database("speakup").Collection("chats")
+	var chat models.Chat
+	err := collection.FindOne(c, map[string]string{"id": id}).Decode(&chat)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Chat not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, chat)
+}
+
+// GetChats gets all chats
+func GetChats(c *gin.Context) {
+	db := config.GetMongoClient()
+	collection := db.Database("speakup").Collection("chats")
+	cursor, err := collection.Find(c, map[string]string{})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get chats"})
+		return
+	}
+
+	var chats []models.Chat
+	if err := cursor.All(c, &chats); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get chats"})
+		return
+	}
+
+	c.JSON(http.StatusOK, chats)
+}
+
+// UpdateChat updates a chat by ID
+func UpdateChat(c *gin.Context) {
+	id := c.Param("id")
+	var chat models.Chat
+	if err := c.ShouldBindJSON(&chat); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	db := config.GetMongoClient()
+	collection := db.Database("speakup").Collection("chats")
+	_, err := collection.UpdateOne(c, map[string]string{"id": id}, chat)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update chat"})
+		return
+	}
+
+	c.JSON(http.StatusOK, chat)
+}
+
+// DeleteChat deletes a chat by ID
+func DeleteChat(c *gin.Context) {
+	id := c.Param("id")
+	db := config.GetMongoClient()
+	collection := db.Database("speakup").Collection("chats")
+	_, err := collection.DeleteOne(c, map[string]string{"id": id})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete chat"})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Chat deleted successfully"})
+}
 
+// Special operations for chat
+
+// GetChatsByUserId gets all chats by user ID
+func GetChatsByUserId(c *gin.Context) {
+	id := c.Param("id")
+	db := config.GetMongoClient()
+	collection := db.Database("speakup").Collection("chats")
+	cursor, err := collection.Find(c, map[string]string{"userid": id})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get chats"})
+		return
+	}
+
+	var chats []models.Chat
+	if err := cursor.All(c, &chats); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get chats"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"chats": chats})
 }
