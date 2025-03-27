@@ -11,7 +11,7 @@ func ChatRoutes(router *gin.Engine) {
     chatRoutes := router.Group("/chat")
     {
         // CRUD operations for chat
-        chatRoutes.POST("/", middlewares.AuthMiddleware(), handlers.CreateChat)
+        chatRoutes.POST("", middlewares.AuthMiddleware(), handlers.CreateChat)
         chatRoutes.GET("/:id", middlewares.AuthMiddleware(), handlers.GetChatById)
         chatRoutes.GET("/", middlewares.AuthMiddleware(), handlers.GetChats)
         chatRoutes.PUT("/:id", middlewares.AuthMiddleware(), handlers.UpdateChat)

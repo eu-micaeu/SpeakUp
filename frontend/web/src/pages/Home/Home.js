@@ -1,11 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './Home.css';
 
-import { getChatsByUserId } from '../../utils/api';
+import { getChatsByUserId, createChat } from '../../utils/api';
 
 function Home() {
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [chats, setChats] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [inputMessage, setInputMessage] = useState('');
+  const [currentChatId, setCurrentChatId] = useState(null); // ID do chat atual
+  const messagesEndRef = useRef(null);
 
   const toggleSidebar = () => {
     setIsSidebarVisible(!isSidebarVisible);
@@ -14,12 +18,62 @@ function Home() {
   useEffect(() => {
     const userId = 'c06718c9-c99c-4f18-aa99-3111e36a12c4';
     getChatsByUserId(userId).then((response) => {
-      setChats(response.chats);  
+      setChats(response.chats);
     }).catch(error => {
       console.error("Erro ao buscar chats:", error);
-      setChats([]);  
+      setChats([]);
     });
   }, []);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handleSendMessage = async () => {
+    if (inputMessage.trim() === '') return;
+    
+    // Se não há chat atual, cria um novo
+    if (!currentChatId) {
+      const firstWord = inputMessage.trim().split(' ')[0]; // Pega a primeira palavra
+      const topic = firstWord.length > 0 ? firstWord : "Novo Chat"; // Usa como tópico
+      
+      try {
+        const userId = '1a6033df-c42d-4d2a-be04-c19c81c5ed8d';
+        const newChat = await createChat(userId, topic);
+        
+        setCurrentChatId(newChat.id);
+        setChats([...chats, newChat]);
+      } catch (error) {
+        console.error("Erro ao criar chat:", error);
+        return;
+      }
+    }
+    
+    // Adiciona a mensagem
+    const newMessage = {
+      id: Date.now(),
+      text: inputMessage,
+      sender: 'user',
+      timestamp: new Date().toISOString(),
+      chatId: currentChatId
+    };
+    
+    setMessages([...messages, newMessage]);
+    setInputMessage('');
+    
+    // Aqui você pode adicionar a lógica para enviar a mensagem para o backend
+    // usando o currentChatId como referência
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSendMessage();
+    }
+  };
 
   return (
     <div className={`pageHome ${isSidebarVisible ? 'sidebarVisible' : 'sidebarHidden'}`}>
@@ -30,10 +84,16 @@ function Home() {
         <ul>
           {chats?.length > 0 ? (
             chats.map((chat) => (
-              <li key={chat.id}>{chat.topic}</li>
+              <li 
+                key={chat.id} 
+                className={chat.id === currentChatId ? 'active-chat' : ''}
+                onClick={() => setCurrentChatId(chat.id)}
+              >
+                {chat.topic}
+              </li>
             ))
           ) : (
-            <li>Nenhum chat disponível</li>
+            <ol>Sem chats, por ora</ol>
           )}
         </ul>
       </aside>
@@ -44,10 +104,30 @@ function Home() {
       )}
       <main className="mainContent">
         <h1>SpeakUp</h1>
-
+        <div className="chat-container">
+          <div className="messages">
+            {messages.filter(msg => msg.chatId === currentChatId).map((message) => (
+              <div key={message.id} className={`message ${message.sender}`}>
+                {message.text}
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
+          
+          <div className='chat-input'>
+            <input 
+              type="text" 
+              placeholder="Digite sua mensagem..." 
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              onKeyPress={handleKeyPress}
+            />
+            <button onClick={handleSendMessage}>Enviar</button>
+          </div>
+        </div>
       </main>
     </div>
   );
-}
+} 
 
 export default Home;

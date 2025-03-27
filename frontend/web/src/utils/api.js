@@ -15,6 +15,19 @@ export const login = async (email, password) => {
     return response.data;
 
 }
+// Create chat
+export const createChat = async (user_id, topic) => {
+    const response = await axios.post('http://localhost:8080/chat', {
+        user_id,
+        topic
+    }, {
+        headers: {
+            Authorization: `Bearer ${Cookies.get('authToken')}`
+        }
+    });
+
+    return response.data;
+}
 
 // Get chats by user id
 export const getChatsByUserId = async (userId) => {
