@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import './Home.css';
-import { getChatsByUserId, createChat, getMessagesByChatId, addMessageToChat } from '../../utils/api';
+import { getChatsByUserId, createChat, getMessagesByChatId, addMessageToChat, generateAIResponse } from '../../utils/api';
 
 function Home() {
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
@@ -45,7 +45,7 @@ function Home() {
       const formattedMessages = response.map(msg => ({
         id: msg.id,
         text: msg.content,
-        sender: 'user',
+        sender: msg.sender || 'user', // Assume 'user' como padrão se não houver sender
         timestamp: msg.timestamp,
         chatId: msg.chat_id
       }));
@@ -55,18 +55,18 @@ function Home() {
       setMessages([]);
     }
   };
-
+  
   const handleSendMessage = async () => {
     if (inputMessage.trim() === '') return;
     
     const messageContent = inputMessage.trim();
     setInputMessage('');
-    let tempMessage; // Declaramos a variável aqui para que seja acessível no bloco catch
+    let tempMessage;
+    let tempAIMessage;
   
     try {
       let chatId = currentChatId;
       
-      // Se não há chat atual, cria um novo
       if (!chatId) {
         const firstWord = messageContent.split(' ')[0];
         const topic = firstWord.length > 0 ? firstWord : "Novo Chat";
@@ -77,39 +77,63 @@ function Home() {
         setChats(prevChats => [...prevChats, newChat]);
       }
   
-      // Cria a mensagem temporária localmente
+      // Mensagem do usuário
       tempMessage = {
-        id: Date.now(), // ID temporário
+        id: Date.now(),
         text: messageContent,
-        sender: 'user',
+        sender: 'user', // Definido explicitamente como 'user'
         timestamp: new Date().toISOString(),
         chatId: chatId
       };
   
       setMessages(prevMessages => [...prevMessages, tempMessage]);
+      
+      // Salva a mensagem do usuário no backend
+      const savedMessage = await addMessageToChat(chatId, messageContent, 'user'); // Adiciona sender 'user'
   
-      // Envia a mensagem para o backend
-      const savedMessage = await addMessageToChat(chatId, messageContent);
-  
-      // Atualiza a mensagem local com os dados do servidor
       setMessages(prevMessages => [
-        ...prevMessages.filter(m => m.id !== tempMessage.id), // Remove a temporária
+        ...prevMessages.filter(m => m.id !== tempMessage.id),
         {
           id: savedMessage.id,
           text: savedMessage.content,
-          sender: 'user',
+          sender: savedMessage.sender || 'user', // Garante que o sender seja 'user'
           timestamp: savedMessage.timestamp,
           chatId: savedMessage.chat_id
         }
       ]);
   
+      // Resposta da IA
+      const aiResponse = await generateAIResponse(messageContent);
+      
+      tempAIMessage = {
+        id: Date.now() + 1,
+        text: aiResponse.response,
+        sender: 'ai', // Definido explicitamente como 'ai'
+        timestamp: new Date().toISOString(),
+        chatId: chatId
+      };
+  
+      setMessages(prevMessages => [...prevMessages, tempAIMessage]);
+      
+      // Salva a resposta da IA no backend com sender 'ai'
+      const savedAIMessage = await addMessageToChat(chatId, aiResponse.response, 'ai');
+  
+      setMessages(prevMessages => [
+        ...prevMessages.filter(m => m.id !== tempAIMessage.id),
+        {
+          id: savedAIMessage.id,
+          text: savedAIMessage.content,
+          sender: savedAIMessage.sender || 'ai', // Garante que o sender seja 'ai'
+          timestamp: savedAIMessage.timestamp,
+          chatId: savedAIMessage.chat_id
+        }
+      ]);
+  
     } catch (error) {
       console.error("Erro ao processar mensagem:", error);
-      // Remove a mensagem temporária em caso de erro
-      if (tempMessage) {
-        setMessages(prevMessages => prevMessages.filter(m => m.id !== tempMessage.id));
-      }
-      setInputMessage(messageContent); // Devolve a mensagem para o input
+      if (tempMessage) setMessages(prev => prev.filter(m => m.id !== tempMessage.id));
+      if (tempAIMessage) setMessages(prev => prev.filter(m => m.id !== tempAIMessage.id));
+      setInputMessage(messageContent);
     }
   };
 
@@ -128,8 +152,8 @@ function Home() {
         <ul>
           {chats?.length > 0 ? (
             chats.map((chat) => (
-              <li 
-                key={chat.id} 
+              <li
+                key={chat.id}
                 className={chat.id === currentChatId ? 'active-chat' : ''}
                 onClick={() => {
                   setCurrentChatId(chat.id);
@@ -144,13 +168,13 @@ function Home() {
           )}
         </ul>
       </aside>
-      
+
       {!isSidebarVisible && (
         <button className="toggleButton" onClick={toggleSidebar}>
           &#9776;
         </button>
       )}
-      
+
       <main className="mainContent">
         <h1>SpeakUp</h1>
         <div className="chat-container">
@@ -164,11 +188,11 @@ function Home() {
               ))}
             <div ref={messagesEndRef} />
           </div>
-          
+
           <div className='chat-input'>
-            <input 
-              type="text" 
-              placeholder="Digite sua mensagem..." 
+            <input
+              type="text"
+              placeholder="Digite sua mensagem..."
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={handleKeyPress}

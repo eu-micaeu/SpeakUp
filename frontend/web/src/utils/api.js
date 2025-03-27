@@ -3,7 +3,7 @@ import Cookies from 'js-cookie';
 
 // Login
 export const login = async (email, password) => {
-    
+
     const response = await axios.post('http://localhost:8080/user/login', {
         email,
         password
@@ -60,11 +60,12 @@ export const getMessagesByChatId = async (chatId) => {
 }
 
 // Add message to chat
-export const addMessageToChat = async (chat_id, content) => {
+export const addMessageToChat = async (chat_id, content, sender) => {
 
     const response = await axios.post(`http://localhost:8080/message`, {
         chat_id,
-        content
+        content,
+        sender
     }, {
         headers: {
             Authorization: `Bearer ${Cookies.get('authToken')}`
@@ -73,4 +74,22 @@ export const addMessageToChat = async (chat_id, content) => {
 
     return response.data;
 
+}
+
+// generate AI response
+export const generateAIResponse = async (message) => {
+    try {
+        const response = await axios.post(`http://localhost:8080/ai/generate-response`, {
+            message
+        }, {
+            headers: {
+                Authorization: `Bearer ${Cookies.get('authToken')}`
+            }
+        });
+
+        return response.data;
+    }
+    catch (error) {
+        console.log(error)
+    }
 }
