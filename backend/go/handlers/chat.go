@@ -22,7 +22,7 @@ func CreateChat(c *gin.Context) {
 		return
 	}
 
-	chat.ID = int(uuid.New().ID())
+	chat.ID = uuid.New().String()
 	chat.StartTime = time.Now().Format(time.RFC3339)
 
 	db := config.GetMongoClient()
