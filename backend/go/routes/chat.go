@@ -18,6 +18,6 @@ func ChatRoutes(router *gin.Engine) {
         chatRoutes.DELETE("/:id", middlewares.AuthMiddleware(), handlers.DeleteChat)
 
         // special routes
-        chatRoutes.GET("/user/:id", handlers.GetChatsByUserId)
+        chatRoutes.GET("/user", middlewares.AuthMiddleware(), handlers.GetChatsByUserId)
     }
 }

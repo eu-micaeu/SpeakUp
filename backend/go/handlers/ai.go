@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 	"os"
-	"time"
 
 	"speakup/models"
 
@@ -60,14 +59,11 @@ func DetectSpellingErrors(c *gin.Context) {
 
 	message.ID = uuid.New().String()
 
-	message.Timestamp = time.Now().String()
 
 	_, err := collection.InsertOne(c, bson.M{
 		"id":        message.ID,
-		"sender_id": message.SenderID,
 		"chat_id":   message.ChatID,
 		"content":   message.Content,
-		"timestamp": message.Timestamp,
 	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create message"})

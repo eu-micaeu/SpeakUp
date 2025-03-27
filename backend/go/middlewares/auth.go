@@ -12,21 +12,24 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-// CustomClaims defines the custom claims structure
 type CustomClaims struct {
 	UserID string `json:"user_id"`
+	Email  string `json:"email"`
 	jwt.StandardClaims
 }
 
 var jwtKey = []byte(os.Getenv("JWT_KEY"))
 
 // GenerateJWT generates a JWT token
-func GenerateJWT(email string) (string, error) {
+func GenerateJWT(id string, email string) (string, error) {
 	expirationTime := time.Now().Add(24 * time.Hour)
-
-	claims := &jwt.StandardClaims{
-		Subject:   email,
-		ExpiresAt: expirationTime.Unix(),
+	
+	claims := &CustomClaims{
+		UserID: id,
+		Email: email,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: expirationTime.Unix(),
+		},
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -76,6 +79,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 
 		c.Set("user_id", claims.UserID)
+		
 		c.Next()
 	}
 }
@@ -103,3 +107,12 @@ func VerifyToken(tokenString string, secret string) (*CustomClaims, error) {
 	return nil, errors.New("invalid token")
 }
 
+// GetUserIDFromContext gets the user ID from the context
+func GetUserIDFromContext(c *gin.Context) string {
+	userID, exists := c.Get("user_id")
+	if !exists {
+		return ""
+	}
+
+	return userID.(string)
+}

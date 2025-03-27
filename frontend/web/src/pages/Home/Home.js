@@ -8,7 +8,7 @@ function Home() {
   const [chats, setChats] = useState([]);
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
-  const [currentChatId, setCurrentChatId] = useState(null); // ID do chat atual
+  const [currentChatId, setCurrentChatId] = useState(null);
   const messagesEndRef = useRef(null);
 
   const toggleSidebar = () => {
@@ -16,8 +16,7 @@ function Home() {
   };
 
   useEffect(() => {
-    const userId = 'c06718c9-c99c-4f18-aa99-3111e36a12c4';
-    getChatsByUserId(userId).then((response) => {
+    getChatsByUserId().then((response) => {
       setChats(response.chats);
     }).catch(error => {
       console.error("Erro ao buscar chats:", error);
@@ -36,37 +35,38 @@ function Home() {
   const handleSendMessage = async () => {
     if (inputMessage.trim() === '') return;
     
+    let chatId = currentChatId;
+    
     // Se não há chat atual, cria um novo
-    if (!currentChatId) {
+    if (!chatId) {
       const firstWord = inputMessage.trim().split(' ')[0]; // Pega a primeira palavra
       const topic = firstWord.length > 0 ? firstWord : "Novo Chat"; // Usa como tópico
       
       try {
-        const userId = '1a6033df-c42d-4d2a-be04-c19c81c5ed8d';
-        const newChat = await createChat(userId, topic);
-        
-        setCurrentChatId(newChat.id);
-        setChats([...chats, newChat]);
+        const newChat = await createChat(topic);
+        chatId = newChat.id;
+        setCurrentChatId(chatId);
+        setChats(prevChats => [...prevChats, newChat]);
       } catch (error) {
         console.error("Erro ao criar chat:", error);
         return;
       }
     }
     
-    // Adiciona a mensagem
+    // Adiciona a mensagem ao chat atual (recém-criado ou existente)
     const newMessage = {
       id: Date.now(),
       text: inputMessage,
       sender: 'user',
       timestamp: new Date().toISOString(),
-      chatId: currentChatId
+      chatId: chatId
     };
     
-    setMessages([...messages, newMessage]);
+    setMessages(prevMessages => [...prevMessages, newMessage]);
     setInputMessage('');
     
     // Aqui você pode adicionar a lógica para enviar a mensagem para o backend
-    // usando o currentChatId como referência
+    // usando o chatId como referência
   };
 
   const handleKeyPress = (e) => {

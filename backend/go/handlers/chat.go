@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"speakup/models"
-
+	"speakup/middlewares"
 	"speakup/config"
 
 	"github.com/gin-gonic/gin"
@@ -23,6 +23,7 @@ func CreateChat(c *gin.Context) {
 	}
 
 	chat.ID = uuid.New().String()
+	chat.UserID = middlewares.GetUserIDFromContext(c)
 	chat.StartTime = time.Now().Format(time.RFC3339)
 
 	db := config.GetMongoClient()
@@ -108,7 +109,7 @@ func DeleteChat(c *gin.Context) {
 
 // GetChatsByUserId gets all chats by user ID
 func GetChatsByUserId(c *gin.Context) {
-	id := c.Param("id")
+	id := middlewares.GetUserIDFromContext(c)
 	db := config.GetMongoClient()
 	collection := db.Database("speakup").Collection("chats")
 	cursor, err := collection.Find(c, map[string]string{"userid": id})

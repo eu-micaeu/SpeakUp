@@ -16,9 +16,11 @@ export const login = async (email, password) => {
 
 }
 // Create chat
-export const createChat = async (user_id, topic) => {
+export const createChat = async (topic) => {
+
+    console.log(topic)
+
     const response = await axios.post('http://localhost:8080/chat', {
-        user_id,
         topic
     }, {
         headers: {
@@ -30,9 +32,9 @@ export const createChat = async (user_id, topic) => {
 }
 
 // Get chats by user id
-export const getChatsByUserId = async (userId) => {
+export const getChatsByUserId = async () => {
 
-    const response = await axios.get(`http://localhost:8080/chat/user/${userId}`, {
+    const response = await axios.get(`http://localhost:8080/chat/user`, {
         headers: {
             Authorization: `Bearer ${Cookies.get('authToken')}`
         }
