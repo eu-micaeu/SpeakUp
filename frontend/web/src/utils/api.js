@@ -44,3 +44,33 @@ export const getChatsByUserId = async () => {
 
 }
 
+// Get messages by chat id
+export const getMessagesByChatId = async (chatId) => {
+
+    const response = await axios.get(`http://localhost:8080/message/chat/${chatId}`, {
+        headers: {
+            Authorization: `Bearer ${Cookies.get('authToken')}`
+        }
+    });
+
+    console.log(response.data)
+
+    return response.data;
+
+}
+
+// Add message to chat
+export const addMessageToChat = async (chat_id, content) => {
+
+    const response = await axios.post(`http://localhost:8080/message`, {
+        chat_id,
+        content
+    }, {
+        headers: {
+            Authorization: `Bearer ${Cookies.get('authToken')}`
+        }
+    });
+
+    return response.data;
+
+}

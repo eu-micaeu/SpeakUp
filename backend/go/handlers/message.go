@@ -110,10 +110,10 @@ func DeleteMessage(c *gin.Context) {
 
 // GetMessagesByChatId is a handler function that gets all messages by chat ID
 func GetMessagesByChatId(c *gin.Context) {
-	chatId := c.Param("chatId")
+	chatId := c.Param("id")
 	db := config.GetMongoClient()
 	collection := db.Database("speakup").Collection("messages")
-	cursor, err := collection.Find(c, map[string]string{"chatId": chatId})
+	cursor, err := collection.Find(c, map[string]string{"chatid": chatId})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get messages"})
 		return
