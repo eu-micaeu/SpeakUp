@@ -36,6 +36,7 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
 		return
 	}
+	c.Set("authToken", token)
 	c.JSON(http.StatusOK, gin.H{"message": "Login successful", "token": token})
 }
 

@@ -14,10 +14,10 @@ function Home() {
   useEffect(() => {
     const userId = 'c06718c9-c99c-4f18-aa99-3111e36a12c4';
     getChatsByUserId(userId).then((response) => {
-      setChats(response.chats);  // Acessar a propriedade 'chats'
+      setChats(response.chats);  
     }).catch(error => {
       console.error("Erro ao buscar chats:", error);
-      setChats([]);  // Para evitar erro se a requisição falhar
+      setChats([]);  
     });
   }, []);
 
@@ -28,9 +28,13 @@ function Home() {
           &times;
         </button>
         <ul>
-          {chats.map((chat) => (
-            <li key={chat.id}>{chat.topic}</li>
-          ))}
+          {chats?.length > 0 ? (
+            chats.map((chat) => (
+              <li key={chat.id}>{chat.topic}</li>
+            ))
+          ) : (
+            <li>Nenhum chat disponível</li>
+          )}
         </ul>
       </aside>
       {!isSidebarVisible && (

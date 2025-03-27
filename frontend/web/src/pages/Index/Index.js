@@ -46,6 +46,8 @@ function Index() {
 
         </div>
 
+        <hr></hr>
+
         <h1>Idiomas disponiveis para o aprendizado:</h1>
 
         <div className="languages">
