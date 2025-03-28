@@ -18,7 +18,7 @@ export const login = async (email, password) => {
 //Register
 export const register = async (userData) => {
     
-    const response = await axios.post('http://localhost:8080/user', userData);
+    const response = await axios.post('http://localhost:8080/user/', userData);
 
     return response.data;
 
