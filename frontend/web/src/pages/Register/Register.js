@@ -25,10 +25,8 @@ function Register() {
                 email: event.target.email.value,
                 password: event.target.password.value
             };
-            console.log(userData);
+
             const response = await register(userData);
-            console.log(response);
-            console.log(response.message);
             if (response.message === 'User created successfully') {
                 navigate('/login');
             } else {

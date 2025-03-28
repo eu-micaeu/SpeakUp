@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Login.css';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Routes
 import { login } from '../../utils/api';
@@ -14,25 +16,31 @@ function Login() {
         navigate('/');
     };
 
-
+    const goToHome = () => {
+        navigate('/home');
+    }
 
     const handleLogin = async (event) => {
         event.preventDefault();
-        setIsLoading(true);
         setError('');
-
+        setIsLoading(true);
+        const email = event.target.email.value;
+        const password = event.target.password.value;
         try {
-            const email = event.target.email.value;
-            const password = event.target.password.value;
             const response = await login(email, password);
 
             if (response.message === 'Login successful') {
-                navigate('/home');
+                toast.success('Login successful!');
+                setTimeout(() => {
+                    goToHome();
+                }, 3000);
             } else {
-                setError('Email ou senha inválidos');
+                setError('Login failed. Please check your credentials.');
+                toast.error('Login failed. Please check your credentials.');
             }
         } catch (err) {
-            setError('Ocorreu um erro ao fazer login. Tente novamente.');
+            setError('An error occurred. Please try again.');
+            toast.error('An error occurred. Please try again.');
         } finally {
             setIsLoading(false);
         }
@@ -40,6 +48,7 @@ function Login() {
 
     return (
         <div className="pageLogin">
+            <ToastContainer />
             <form onSubmit={handleLogin}>
                 <div className="card">
                     <div className="text-center">
@@ -104,3 +113,4 @@ function Login() {
 }
 
 export default Login;
+

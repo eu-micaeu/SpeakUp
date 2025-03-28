@@ -9,7 +9,7 @@ import (
 func AIRoutes(router *gin.Engine) {
     aiRoutes := router.Group("/ai")
     {
-        aiRoutes.POST("/generate-response", handlers.GenerateResponse)
+        aiRoutes.POST("/generate-response", middlewares.AuthMiddleware(), handlers.GenerateResponse)
         aiRoutes.POST("/detect-spelling-errors", middlewares.AuthMiddleware(), handlers.DetectSpellingErrors)
     }
 }

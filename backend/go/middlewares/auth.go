@@ -2,28 +2,34 @@ package middlewares
 
 import (
 	"errors"
+	"fmt"
+	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 )
 
-// CustomClaims defines the custom claims structure
 type CustomClaims struct {
 	UserID string `json:"user_id"`
+	Email  string `json:"email"`
 	jwt.StandardClaims
 }
 
 var jwtKey = []byte(os.Getenv("JWT_KEY"))
 
 // GenerateJWT generates a JWT token
-func GenerateJWT(email string) (string, error) {
+func GenerateJWT(id string, email string) (string, error) {
 	expirationTime := time.Now().Add(24 * time.Hour)
-
-	claims := &jwt.StandardClaims{
-		Subject:   email,
-		ExpiresAt: expirationTime.Unix(),
+	
+	claims := &CustomClaims{
+		UserID: id,
+		Email: email,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: expirationTime.Unix(),
+		},
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -39,20 +45,41 @@ func GenerateJWT(email string) (string, error) {
 // AuthMiddleware is a middleware that checks if the request is authenticated
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		token := c.GetHeader("Authorization")
-		if token == "" {
-			c.JSON(401, gin.H{"error": "Unauthorized"})
+		// Get the Authorization header
+		authHeader := c.GetHeader("Authorization")
+		if authHeader == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header is required"})
 			c.Abort()
 			return
 		}
-		secret := os.Getenv("JWT_SECRET")
+
+		// Split the header to remove "Bearer " prefix if present
+		parts := strings.Split(authHeader, " ")
+		if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header format must be 'Bearer <token>'"})
+			c.Abort()
+			return
+		}
+
+		token := parts[1] // Get the actual token part
+
+		secret := os.Getenv("JWT_KEY")
+		if secret == "" {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "JWT secret not configured"})
+			c.Abort()
+			return
+		}
+
 		claims, err := VerifyToken(token, secret)
 		if err != nil {
-			c.JSON(401, gin.H{"error": "Unauthorized"})
+			fmt.Println("Token verification error:", err)
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 			c.Abort()
 			return
 		}
+
 		c.Set("user_id", claims.UserID)
+		
 		c.Next()
 	}
 }
@@ -80,3 +107,12 @@ func VerifyToken(tokenString string, secret string) (*CustomClaims, error) {
 	return nil, errors.New("invalid token")
 }
 
+// GetUserIDFromContext gets the user ID from the context
+func GetUserIDFromContext(c *gin.Context) string {
+	userID, exists := c.Get("user_id")
+	if !exists {
+		return ""
+	}
+
+	return userID.(string)
+}

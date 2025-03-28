@@ -106,3 +106,16 @@ a span {
 a span:hover {
     color: rgb(37, 99, 235);
 }
+
+.pageLogin form .logo{
+
+    transition: 1s ease all;
+
+}
+
+.pageLogin form .logo:hover{
+
+    transform: scale(1.1);
+    cursor: pointer;
+
+}
