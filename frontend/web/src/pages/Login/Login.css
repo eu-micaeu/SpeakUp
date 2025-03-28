@@ -46,3 +46,16 @@
     cursor: pointer;
 
 }
+
+.pageLogin form .logo{
+
+    transition: 1s ease all;
+
+}
+
+.pageLogin form .logo:hover{
+
+    transform: scale(1.1);
+    cursor: pointer;
+
+}

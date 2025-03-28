@@ -31,11 +31,12 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid password"})
 		return
 	}
-	token, err := middlewares.GenerateJWT(result.Email)
+	token, err := middlewares.GenerateJWT(result.ID, result.Email)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
 		return
 	}
+	c.Set("authToken", token)
 	c.JSON(http.StatusOK, gin.H{"message": "Login successful", "token": token})
 }
 

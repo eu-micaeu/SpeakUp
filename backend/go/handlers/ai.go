@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 	"os"
-	"time"
 
 	"speakup/models"
 
@@ -19,33 +18,53 @@ import (
 
 // GenerateResponse generates a response for the AI
 func GenerateResponse(c *gin.Context) {
-	var request struct {
-		Message string `json:"message"`
-	}
+    var request struct {
+        Message string `json:"message"`
+    }
 
-	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+    if err := c.ShouldBindJSON(&request); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
 
-	apiKey := os.Getenv("OPENAI_API_KEY")
-	client := openai.NewClient(apiKey)
-	resp, err := client.CreateChatCompletion(context.Background(), openai.ChatCompletionRequest{
-		Model: "gpt-3.5-turbo",
-		Messages: []openai.ChatCompletionMessage{
-			{
-				Role:    "user",
-				Content: request.Message,
-			},
-		},
-	})
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"response": resp.Choices[0].Message.Content})
+    apiKey := os.Getenv("OPENAI_API_KEY")
+    client := openai.NewClient(apiKey)
+
+    // Generate a response for the dialogue
+    dialogueResp, err := client.CreateChatCompletion(context.Background(), openai.ChatCompletionRequest{
+        Model: "gpt-3.5-turbo",
+        Messages: []openai.ChatCompletionMessage{
+            {
+                Role:    "user",
+                Content: request.Message,
+            },
+        },
+    })
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+
+    // Generate a correction for the message
+    correctionResp, err := client.CreateChatCompletion(context.Background(), openai.ChatCompletionRequest{
+        Model: "gpt-3.5-turbo",
+        Messages: []openai.ChatCompletionMessage{
+            {
+                Role:    "user",
+                Content: "(CORRIJA DE FORMA ORTOGRÁFICA)" + request.Message,
+            },
+        },
+    })
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+
+    // Combine the dialogue response and the correction
+    finalResponse := dialogueResp.Choices[0].Message.Content + "\n\nCorreção ortográfica: " + correctionResp.Choices[0].Message.Content
+
+    c.JSON(http.StatusOK, gin.H{"response": finalResponse})
 }
-
 // DetectSpellingErrors detects spelling errors in a message
 func DetectSpellingErrors(c *gin.Context) {
 	client := config.GetMongoClient()
@@ -60,14 +79,11 @@ func DetectSpellingErrors(c *gin.Context) {
 
 	message.ID = uuid.New().String()
 
-	message.Timestamp = time.Now().String()
 
 	_, err := collection.InsertOne(c, bson.M{
 		"id":        message.ID,
-		"sender_id": message.SenderID,
 		"chat_id":   message.ChatID,
 		"content":   message.Content,
-		"timestamp": message.Timestamp,
 	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create message"})
