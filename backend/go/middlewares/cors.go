@@ -7,7 +7,6 @@ import (
 
 func CorsMiddleware() gin.HandlerFunc {
 	config := cors.DefaultConfig()
-	config := cors.DefaultConfig()
 
 	config.AllowOrigins = []string{"http://localhost:3000"}                   // Permitir apenas a origem do frontend
 	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"} // Métodos permitidos
@@ -22,6 +21,5 @@ func CorsMiddleware() gin.HandlerFunc {
 	// Permitir credenciais (opcional se necessário)
 	config.AllowCredentials = true
 
-	return cors.New(config)
 	return cors.New(config)
 }
