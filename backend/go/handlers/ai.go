@@ -12,6 +12,9 @@ import (
 
 // GenerateResponse generates a response for the AI
 func GenerateResponseDialog(c *gin.Context) {
+
+    prompt := `Your name is SpeakUp. You are a helpful assistant. You will be given a message and you need to respond to it in a friendly manner. Your response should be clear and concise, and you should avoid using overly technical language. If the message is a question, provide a direct answer. If it is a statement, acknowledge it and provide any additional information that may be helpful.`
+
     var request struct {
         Message string `json:"message"`
     }
@@ -30,7 +33,7 @@ func GenerateResponseDialog(c *gin.Context) {
         Messages: []openai.ChatCompletionMessage{
             {
                 Role:    "user",
-                Content: request.Message,
+                Content: prompt + "Please pretend to be a friend and answer:" + request.Message,
             },
         },
     })
@@ -62,7 +65,7 @@ func GenerateResponseCorrection(c *gin.Context) {
         Messages: []openai.ChatCompletionMessage{
             {
                 Role:    "user",
-                Content: "(CORRIJA DE FORMA ORTOGRÁFICA) " + request.Message,
+                Content: "Please correct the spelling and grammar of the following text: " + request.Message,
             },
         },
     })

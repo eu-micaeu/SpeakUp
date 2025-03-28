@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { getChatsByUserId, createChat, getMessagesByChatId, addMessageToChat, generateAIResponseDialog, generateAIResponseCorrection } from '../../utils/api';
 import { useNavigate } from 'react-router-dom';
+import SendIcon from '@mui/icons-material/Send';
 
 // Estilos com styled-components
 const PageHome = styled.div`
@@ -322,6 +323,32 @@ function Home() {
         }
       ]);
 
+      // Resposta da IA - Correction
+      const aiCorrectionResponse = await generateAIResponseCorrection(messageContent);
+      const correctionMessage = {
+        id: Date.now() + 2,
+        text: aiCorrectionResponse.response,
+        sender: 'ai',
+        timestamp: new Date().toISOString(),
+        chatId: chatId,
+        type: 'correction'
+      };
+      setMessages(prevMessages => [...prevMessages, correctionMessage]);
+
+      // Salva a correção da IA no backend com sender 'ai'
+      const savedCorrectionMessage = await addMessageToChat(chatId, aiCorrectionResponse.response, 'ai', 'correction');
+      setMessages(prevMessages => [
+        ...prevMessages.filter(m => m.id !== correctionMessage.id),
+        {
+          id: savedCorrectionMessage.id,
+          text: savedCorrectionMessage.content,
+          sender: savedCorrectionMessage.sender || 'ai',
+          timestamp: savedCorrectionMessage.timestamp,
+          chatId: savedCorrectionMessage.chat_id,
+          type: 'correction'
+        }
+      ]);
+
       // Resposta da IA - Dialog
       const aiResponseDialog = await generateAIResponseDialog(messageContent);
 
@@ -348,32 +375,6 @@ function Home() {
           timestamp: savedAIMessage.timestamp,
           chatId: savedAIMessage.chat_id,
           type: 'response'
-        }
-      ]);
-
-      // Resposta da IA - Correction
-      const aiCorrectionResponse = await generateAIResponseCorrection(messageContent);
-      const correctionMessage = {
-        id: Date.now() + 2,
-        text: aiCorrectionResponse.response,
-        sender: 'ai',
-        timestamp: new Date().toISOString(),
-        chatId: chatId,
-        type: 'correction'
-      };
-      setMessages(prevMessages => [...prevMessages, correctionMessage]);
-
-      // Salva a correção da IA no backend com sender 'ai'
-      const savedCorrectionMessage = await addMessageToChat(chatId, aiCorrectionResponse.response, 'ai', 'correction');
-      setMessages(prevMessages => [
-        ...prevMessages.filter(m => m.id !== correctionMessage.id),
-        {
-          id: savedCorrectionMessage.id,
-          text: savedCorrectionMessage.content,
-          sender: savedCorrectionMessage.sender || 'ai',
-          timestamp: savedCorrectionMessage.timestamp,
-          chatId: savedCorrectionMessage.chat_id,
-          type: 'correction'
         }
       ]);
 
@@ -449,7 +450,10 @@ function Home() {
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={handleKeyPress}
             />
-            <button onClick={handleSendMessage}>Enviar</button>
+            <SendIcon
+              style={{ cursor: 'pointer', color: '#fff', marginTop: '20px' }}
+              onClick={handleSendMessage}
+            />
           </ChatInput>
         </ChatContainer>
       </MainContent>
