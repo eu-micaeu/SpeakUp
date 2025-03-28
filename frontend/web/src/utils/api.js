@@ -68,12 +68,13 @@ export const getMessagesByChatId = async (chatId) => {
 }
 
 // Add message to chat
-export const addMessageToChat = async (chat_id, content, sender) => {
+export const addMessageToChat = async (chat_id, content, sender, type) => {
 
     const response = await axios.post(`http://localhost:8080/message`, {
         chat_id,
         content,
-        sender
+        sender, 
+        type
     }, {
         headers: {
             Authorization: `Bearer ${Cookies.get('authToken')}`
@@ -84,10 +85,28 @@ export const addMessageToChat = async (chat_id, content, sender) => {
 
 }
 
-// generate AI response
-export const generateAIResponse = async (message) => {
+// generate AI response dialog
+export const generateAIResponseDialog = async (message) => {
     try {
-        const response = await axios.post(`http://localhost:8080/ai/generate-response`, {
+        const response = await axios.post(`http://localhost:8080/ai/generate-response-dialog`, {
+            message
+        }, {
+            headers: {
+                Authorization: `Bearer ${Cookies.get('authToken')}`
+            }
+        });
+
+        return response.data;
+    }
+    catch (error) {
+        console.log(error)
+    }
+}
+
+// generate AI response correction
+export const generateAIResponseCorrection = async (message) => {
+    try {
+        const response = await axios.post(`http://localhost:8080/ai/generate-response-correction`, {
             message
         }, {
             headers: {
