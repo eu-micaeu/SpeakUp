@@ -15,6 +15,14 @@ export const login = async (email, password) => {
     return response.data;
 
 }
+
+export const register = async (userData) => {
+     
+    const response = await axios.post('http://localhost:8080/user/', userData);
+
+    return response.data;
+
+}
 // Create chat
 export const createChat = async (topic) => {
 

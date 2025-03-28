@@ -17,7 +17,7 @@ function Index() {
         <div className="cards">
 
           <div className="card">
-            <img src="./chat.png"></img>
+            <img src="./chat.png" alt="Ícone de chat representando conversação"></img>
             <p>
               SpeakUp é uma plataforma inovadora que utiliza inteligência artificial para auxiliar no aprendizado de novos idiomas de maneira eficiente e personalizada.
               Com foco na melhoria contínua, a IA analisa seus textos em tempo real, identificando erros de digitação e gramaticais.
@@ -27,7 +27,7 @@ function Index() {
           </div>
 
           <div className="card">
-            <img src="./ia.png"></img>
+            <img src="./ia.png" alt="Ícone representando Inteligência Artificial"></img>
             <p>O SpeakUp é uma plataforma de ensino de idiomas que utiliza inteligência artificial para oferecer uma experiência de aprendizado personalizada e eficiente.
               A IA analisa seus textos em tempo real, identificando erros de digitação e gramaticais, e destaca as correções necessárias para que você aprenda com cada interação.
               Além disso, a ferramenta oferece explicações detalhadas sobre o que foi corrigido e o motivo, permitindo que você compreenda melhor as regras gramaticais e melhore suas habilidades linguísticas.
@@ -36,7 +36,7 @@ function Index() {
           </div>
 
           <div className="card">
-            <img src="./mic.png"></img>
+            <img src="./mic.png" alt="Ícone de microfone para reconhecimento de voz"></img>
             <p>
               Atualmente em fase de desenvolvimento e implementação, trará uma inovadora funcionalidade de reconhecimento de voz.
               Com essa ferramenta, você poderá utilizar o microfone para captar as palavras que pronunciar enquanto pratica o idioma. A inteligência artificial do SpeakUp analisará sua fala em tempo real, identificando erros de pronúncia e realizando correções instantaneamente.
@@ -52,11 +52,11 @@ function Index() {
         <div className="languages">
 
           <div className="language">
-            <img src="./EUA.png"></img>
+            <img src="./EUA.png" alt="Bandeira dos Estados Unidos"></img>
           </div>
 
           <div className="language">
-            <img src="./japao.png"></img>
+            <img src="./japao.png" alt="Bandeira do Japão"></img>
           </div>
 
         </div>

@@ -1,4 +1,4 @@
-.pageLogin form {
+.pageRegister form {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -7,6 +7,7 @@
     padding: 1rem;
     height: 100vh;
 }
+
 
 .card {
     width: 100%;
@@ -63,7 +64,6 @@ input::placeholder {
 }
 
 button {
-    width: 100%;
     padding: 0.75rem;
     margin: 1.5rem 0;
     border-radius: 0.375rem;
@@ -105,17 +105,4 @@ a span {
 
 a span:hover {
     color: rgb(37, 99, 235);
-}
-
-.pageLogin form .logo{
-
-    transition: 1s ease all;
-
-}
-
-.pageLogin form .logo:hover{
-
-    transform: scale(1.1);
-    cursor: pointer;
-
 }
