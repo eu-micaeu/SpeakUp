@@ -6,12 +6,17 @@
 }
 
 .sidebar {
-  width: 250px;
+  width: 300px;
   background-color: #000000;
   padding: 20px;
   position: relative;
   transition: width 0.1s ease;
   color: #ffffff;
+}
+
+.sidebar ol{
+  padding: 0;
+  text-align: center;
 }
 
 .sidebar ul {
@@ -149,6 +154,7 @@
 .chat-container{
   width: 60%;
 }
+
 .chat-input {
   display: flex;
   gap: 10px;
@@ -156,14 +162,22 @@
 
 .chat-input input {
   flex: 1;
-  padding: 8px;
-  border: 1px solid #ccc;
+  padding: 20px;
   width: 100%;
+  border: none;
+  font-size: 1rem;
   border-radius: 4px;
+  background-color: #3d3d3d;
+  color: #fff;
+}
+
+.chat-input input:focus {
+  outline: none;
 }
 
 .chat-input button {
-  padding: 8px 16px;
+  font-size: 0.8rem;
+  padding: 20px;
   background-color: #4CAF50;
   color: white;
   border: none;
@@ -173,4 +187,33 @@
 
 .chat-input button:hover {
   background-color: #45a049;
+}
+
+.btLogout {
+  border: none;
+  border-top: 2px solid #ff0000;
+  color: #ff0000;
+  background-color: transparent;
+  padding: 10px;
+  font-size: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  font-family: 'Karla', sans-serif;
+}
+
+.btLogout:hover {
+  background-color: #ff0000;
+  color: #000000;
+}
+
+.divSpeakUp {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  margin-bottom: 25px;
 }

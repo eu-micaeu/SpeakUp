@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import './Home.css';
 import { getChatsByUserId, createChat, getMessagesByChatId, addMessageToChat, generateAIResponse } from '../../utils/api';
+import { useNavigate } from 'react-router-dom';
+
 
 function Home() {
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
@@ -9,6 +11,11 @@ function Home() {
   const [inputMessage, setInputMessage] = useState('');
   const [currentChatId, setCurrentChatId] = useState(null);
   const messagesEndRef = useRef(null);
+  const navigate = useNavigate();
+
+  const goToIndex = () => {
+    navigate('/');
+  };
 
   const toggleSidebar = () => {
     setIsSidebarVisible(!isSidebarVisible);
@@ -55,28 +62,28 @@ function Home() {
       setMessages([]);
     }
   };
-  
+
   const handleSendMessage = async () => {
     if (inputMessage.trim() === '') return;
-    
+
     const messageContent = inputMessage.trim();
     setInputMessage('');
     let tempMessage;
     let tempAIMessage;
-  
+
     try {
       let chatId = currentChatId;
-      
+
       if (!chatId) {
         const firstWord = messageContent.split(' ')[0];
         const topic = firstWord.length > 0 ? firstWord : "Novo Chat";
-        
+
         const newChat = await createChat(topic);
         chatId = newChat.id;
         setCurrentChatId(chatId);
         setChats(prevChats => [...prevChats, newChat]);
       }
-  
+
       // Mensagem do usuário
       tempMessage = {
         id: Date.now(),
@@ -85,12 +92,12 @@ function Home() {
         timestamp: new Date().toISOString(),
         chatId: chatId
       };
-  
+
       setMessages(prevMessages => [...prevMessages, tempMessage]);
-      
+
       // Salva a mensagem do usuário no backend
       const savedMessage = await addMessageToChat(chatId, messageContent, 'user'); // Adiciona sender 'user'
-  
+
       setMessages(prevMessages => [
         ...prevMessages.filter(m => m.id !== tempMessage.id),
         {
@@ -101,10 +108,10 @@ function Home() {
           chatId: savedMessage.chat_id
         }
       ]);
-  
+
       // Resposta da IA
       const aiResponse = await generateAIResponse(messageContent);
-      
+
       tempAIMessage = {
         id: Date.now() + 1,
         text: aiResponse.response,
@@ -112,12 +119,12 @@ function Home() {
         timestamp: new Date().toISOString(),
         chatId: chatId
       };
-  
+
       setMessages(prevMessages => [...prevMessages, tempAIMessage]);
-      
+
       // Salva a resposta da IA no backend com sender 'ai'
       const savedAIMessage = await addMessageToChat(chatId, aiResponse.response, 'ai');
-  
+
       setMessages(prevMessages => [
         ...prevMessages.filter(m => m.id !== tempAIMessage.id),
         {
@@ -128,7 +135,7 @@ function Home() {
           chatId: savedAIMessage.chat_id
         }
       ]);
-  
+
     } catch (error) {
       console.error("Erro ao processar mensagem:", error);
       if (tempMessage) setMessages(prev => prev.filter(m => m.id !== tempMessage.id));
@@ -167,6 +174,7 @@ function Home() {
             <ol>Sem chats, por ora</ol>
           )}
         </ul>
+        <button className='btLogout' onClick={goToIndex}>Sair</button>
       </aside>
 
       {!isSidebarVisible && (
@@ -176,7 +184,10 @@ function Home() {
       )}
 
       <main className="mainContent">
-        <h1>SpeakUp</h1>
+        <div className='divSpeakUp'>
+          <img src='./logo.png' width={75}></img>
+          <h1>SpeakUp</h1>
+        </div>
         <div className="chat-container">
           <div className="messages">
             {messages
