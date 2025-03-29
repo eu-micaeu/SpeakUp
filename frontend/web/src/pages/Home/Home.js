@@ -1,10 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { getChatsByUserId, createChat, getMessagesByChatId, addMessageToChat, generateAIResponseDialog, generateAIResponseCorrection } from '../../utils/api';
 import { useNavigate } from 'react-router-dom';
 import SendIcon from '@mui/icons-material/Send';
 
-// Estilos com styled-components
 const PageHome = styled.div`
   display: flex;
   height: 100vh;
@@ -214,8 +213,8 @@ const DivSpeakUp = styled.div`
   margin-bottom: 25px;
 `;
 
-// Componente Home
 function Home() {
+
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [chats, setChats] = useState([]);
   const [messages, setMessages] = useState([]);
@@ -227,6 +226,15 @@ function Home() {
   const goToIndex = () => {
     navigate('/');
   };
+
+  const clearCookies = () => {
+    document.cookie.split(";").forEach((c) => {
+      document.cookie = c
+        .replace(/^ +/, "")
+        .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+    });
+  };
+      
 
   const toggleSidebar = () => {
     setIsSidebarVisible(!isSidebarVisible);
@@ -296,10 +304,13 @@ function Home() {
         setChats(prevChats => [...prevChats, newChat]);
       }
 
-      // Mensagem do usuário
+      // Mensagem do usuário e correção da IA combinadas
+      const aiCorrectionResponse = await generateAIResponseCorrection(messageContent);
+      const combinedMessageContent = `${messageContent}\n\nCorreção: ${aiCorrectionResponse.response}`;
+
       tempMessage = {
         id: Date.now(),
-        text: messageContent,
+        text: combinedMessageContent,
         sender: 'user',
         timestamp: new Date().toISOString(),
         chatId: chatId,
@@ -308,8 +319,8 @@ function Home() {
 
       setMessages(prevMessages => [...prevMessages, tempMessage]);
 
-      // Salva a mensagem do usuário no backend
-      const savedMessage = await addMessageToChat(chatId, messageContent, 'user', 'request');
+      // Salva a mensagem combinada no backend
+      const savedMessage = await addMessageToChat(chatId, combinedMessageContent, 'user', 'request');
 
       setMessages(prevMessages => [
         ...prevMessages.filter(m => m.id !== tempMessage.id),
@@ -320,32 +331,6 @@ function Home() {
           timestamp: savedMessage.timestamp,
           chatId: savedMessage.chat_id,
           type: 'request'
-        }
-      ]);
-
-      // Resposta da IA - Correction
-      const aiCorrectionResponse = await generateAIResponseCorrection(messageContent);
-      const correctionMessage = {
-        id: Date.now() + 2,
-        text: aiCorrectionResponse.response,
-        sender: 'ai',
-        timestamp: new Date().toISOString(),
-        chatId: chatId,
-        type: 'correction'
-      };
-      setMessages(prevMessages => [...prevMessages, correctionMessage]);
-
-      // Salva a correção da IA no backend com sender 'ai'
-      const savedCorrectionMessage = await addMessageToChat(chatId, aiCorrectionResponse.response, 'ai', 'correction');
-      setMessages(prevMessages => [
-        ...prevMessages.filter(m => m.id !== correctionMessage.id),
-        {
-          id: savedCorrectionMessage.id,
-          text: savedCorrectionMessage.content,
-          sender: savedCorrectionMessage.sender || 'ai',
-          timestamp: savedCorrectionMessage.timestamp,
-          chatId: savedCorrectionMessage.chat_id,
-          type: 'correction'
         }
       ]);
 
@@ -413,10 +398,10 @@ function Home() {
               </li>
             ))
           ) : (
-            <ol>Sem chats, por ora</ol>
+            <ol>Crie um chat!</ol>
           )}
         </ul>
-        <BtLogout onClick={goToIndex}>Sair</BtLogout>
+        <BtLogout onClick={() => { goToIndex(); clearCookies(); }}>Sair</BtLogout>
       </Sidebar>
 
       <MainContent $sidebarVisible={isSidebarVisible}>
@@ -436,7 +421,17 @@ function Home() {
               .filter(msg => msg.chatId === currentChatId || msg.chat_id === currentChatId)
               .map((message) => (
                 <Message key={message.id} className={`${message.sender} ${message.type}`}>
-                  {message.text || message.content}
+                  {(message.text || message.content).split('\n\n').map((line, index) => (
+                    <React.Fragment key={index}>
+                      {index === 1 && <hr />}
+                      {index === 1 ? (
+                        <span style={{ color: '#1eff00' }}>{line.replace('Correção: ', '')}</span>
+                      ) : (
+                        line
+                      )}
+                      {index < (message.text || message.content).split('\n\n').length - 1 && <br />}
+                    </React.Fragment>
+                  ))}
                 </Message>
               ))}
             <div ref={messagesEndRef} />
