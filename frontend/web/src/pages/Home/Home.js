@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { getChatsByUserId, createChat, getMessagesByChatId, addMessageToChat, generateAIResponseDialog, generateAIResponseCorrection } from '../../utils/api';
 import { useNavigate } from 'react-router-dom';
@@ -304,10 +304,13 @@ function Home() {
         setChats(prevChats => [...prevChats, newChat]);
       }
 
-      // Mensagem do usuário
+      // Mensagem do usuário e correção da IA combinadas
+      const aiCorrectionResponse = await generateAIResponseCorrection(messageContent);
+      const combinedMessageContent = `${messageContent}\n\nCorreção: ${aiCorrectionResponse.response}`;
+
       tempMessage = {
         id: Date.now(),
-        text: messageContent,
+        text: combinedMessageContent,
         sender: 'user',
         timestamp: new Date().toISOString(),
         chatId: chatId,
@@ -316,8 +319,8 @@ function Home() {
 
       setMessages(prevMessages => [...prevMessages, tempMessage]);
 
-      // Salva a mensagem do usuário no backend
-      const savedMessage = await addMessageToChat(chatId, messageContent, 'user', 'request');
+      // Salva a mensagem combinada no backend
+      const savedMessage = await addMessageToChat(chatId, combinedMessageContent, 'user', 'request');
 
       setMessages(prevMessages => [
         ...prevMessages.filter(m => m.id !== tempMessage.id),
@@ -328,32 +331,6 @@ function Home() {
           timestamp: savedMessage.timestamp,
           chatId: savedMessage.chat_id,
           type: 'request'
-        }
-      ]);
-
-      // Resposta da IA - Correction
-      const aiCorrectionResponse = await generateAIResponseCorrection(messageContent);
-      const correctionMessage = {
-        id: Date.now() + 2,
-        text: aiCorrectionResponse.response,
-        sender: 'ai',
-        timestamp: new Date().toISOString(),
-        chatId: chatId,
-        type: 'correction'
-      };
-      setMessages(prevMessages => [...prevMessages, correctionMessage]);
-
-      // Salva a correção da IA no backend com sender 'ai'
-      const savedCorrectionMessage = await addMessageToChat(chatId, aiCorrectionResponse.response, 'ai', 'correction');
-      setMessages(prevMessages => [
-        ...prevMessages.filter(m => m.id !== correctionMessage.id),
-        {
-          id: savedCorrectionMessage.id,
-          text: savedCorrectionMessage.content,
-          sender: savedCorrectionMessage.sender || 'ai',
-          timestamp: savedCorrectionMessage.timestamp,
-          chatId: savedCorrectionMessage.chat_id,
-          type: 'correction'
         }
       ]);
 
@@ -444,7 +421,17 @@ function Home() {
               .filter(msg => msg.chatId === currentChatId || msg.chat_id === currentChatId)
               .map((message) => (
                 <Message key={message.id} className={`${message.sender} ${message.type}`}>
-                  {message.text || message.content}
+                  {(message.text || message.content).split('\n\n').map((line, index) => (
+                    <React.Fragment key={index}>
+                      {index === 1 && <hr />}
+                      {index === 1 ? (
+                        <span style={{ color: '#1eff00' }}>{line.replace('Correção: ', '')}</span>
+                      ) : (
+                        line
+                      )}
+                      {index < (message.text || message.content).split('\n\n').length - 1 && <br />}
+                    </React.Fragment>
+                  ))}
                 </Message>
               ))}
             <div ref={messagesEndRef} />
