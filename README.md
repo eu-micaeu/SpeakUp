@@ -1,6 +1,4 @@
-<div align="center">
-  <img src="./frontend/web/public/logo.png">
-</div>
+<img src="./frontend/web/public/logo.png">
 
 # SpeakUp
 
@@ -25,9 +23,9 @@ Dessa forma, você não apenas corrige suas falhas, mas também aprende com cada
 
 ### GoLang
 
-<div align="center">
-  <img src="https://go.dev/blog/go-brand/Go-Logo/PNG/Go-Logo_Blue.png" alt="GoLang" width="200">
-</div>
+<br>
+
+<img src="https://go.dev/blog/go-brand/Go-Logo/PNG/Go-Logo_Blue.png" alt="GoLang" width="200">
 
 <br>
 
@@ -37,9 +35,9 @@ GoLang, ou Go, é uma linguagem de programação desenvolvida pela Google, proje
 
 ### ReactJS
 
-<div align="center">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/862px-React-icon.svg.png" alt="ReactJs" width="150">
-</div>
+<br>
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/862px-React-icon.svg.png" alt="ReactJs" width="150">
 
 <br>
 
@@ -49,9 +47,9 @@ ReactJS é uma biblioteca JavaScript desenvolvida pelo Facebook para a criação
 
 ### Docker
 
-<div align="center">
-  <img src="https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/97_Docker_logo_logos-512.png" alt="Docker" width="200">
-</div>
+<br>
+
+<img src="https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/97_Docker_logo_logos-512.png" alt="Docker" width="200">
 
 <br>
 
@@ -61,9 +59,9 @@ Docker é uma plataforma que permite empacotar e isolar aplicações em contêin
 
 ### MongoDB
 
-<div align="center">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/MongoDB_Logo.svg/1200px-MongoDB_Logo.svg.png" alt="MongoDB" width="200">
-</div>
+<br>
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/MongoDB_Logo.svg/1200px-MongoDB_Logo.svg.png" alt="MongoDB" width="200">
 
 <br>
 
