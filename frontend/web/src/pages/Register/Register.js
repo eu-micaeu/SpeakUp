@@ -1,8 +1,124 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
 // Routes
 import { register } from '../../utils/api';
+
+const PageRegister = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(17, 24, 39);
+    color: white;
+    padding: 1rem;
+    height: 100vh;
+`;
+
+const Form = styled.form`
+    /* Estilos para o formulário */
+`;
+
+const Card = styled.div`
+    width: 100%;
+    max-width: 28rem;
+    padding: 2rem;
+    background-color: rgb(31, 41, 55);
+    border-radius: 0.5rem;
+`;
+
+const TextCenter = styled.div`
+    text-align: center;
+`;
+
+const Logo = styled.img`
+    height: 3rem;
+    margin: 0 auto 1rem;
+    cursor: pointer;
+`;
+
+const Title = styled.h2`
+    font-size: 1.875rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+`;
+
+const Subtitle = styled.p`
+    color: rgb(156, 163, 175);
+    margin-bottom: 2rem;
+`;
+
+const ErrorMessage = styled.div`
+    background-color: rgb(239, 68, 68);
+    color: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+`;
+
+const InputContainer = styled.div`
+    margin-bottom: 1.5rem;
+`;
+
+const InputLabel = styled.label`
+    display: block;
+    font-size: 0.875rem;
+    color: rgb(209, 213, 219);
+    margin-bottom: 0.25rem;
+`;
+
+const Input = styled.input`
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 0.375rem;
+    background-color: rgb(55, 65, 81);
+    border: 1px solid rgb(75, 85, 99);
+    color: white;
+    box-sizing: border-box; /* Garante que padding e border não aumentem a largura */
+
+    &::placeholder {
+        color: rgb(156, 163, 175);
+    }
+`;
+
+const Button = styled.button`
+    padding: 0.75rem;
+    margin: 1.5rem 0;
+    border-radius: 0.375rem;
+    border: none;
+    background-color: rgb(59, 130, 246);
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    box-sizing: border-box; /* Garante que padding e border não aumentem a largura */
+
+    &:hover:not(:disabled) {
+        background-color: rgb(37, 99, 235);
+    }
+
+    &:disabled {
+        opacity: 0.75;
+        cursor: not-allowed;
+    }
+`;
+
+const StyledLink = styled(Link)`
+    display: block;
+    margin-top: 10px;
+    text-align: center;
+    color: rgb(156, 163, 175);
+    text-decoration: none;
+    font-size: 0.875rem;
+
+    span {
+        color: rgb(59, 130, 246);
+        font-weight: 500;
+    }
+
+    span:hover {
+        color: rgb(37, 99, 235);
+    }
+`;
 
 function Register() {
     const navigate = useNavigate();
@@ -39,80 +155,76 @@ function Register() {
     }
 
     return (
-        <div className="pageRegister">
-            <form onSubmit={handleRegister}>
-                <div className="card">
-                    <div className="text-center">
-                        <img 
-                            src="./logo.png" 
-                            onClick={goToIndex} 
-                            alt="SpeakUp Logo" 
+        <PageRegister>
+            <Form onSubmit={handleRegister}>
+                <Card>
+                    <TextCenter>
+                        <Logo
+                            src="./logo.png"
+                            onClick={goToIndex}
+                            alt="SpeakUp Logo"
                         />
-                        <h2>Crie sua conta</h2>
-                        <p>Entre para continuar a conversa</p>
-                    </div>
+                        <Title>Crie sua conta</Title>
+                        <Subtitle>Entre para continuar a conversa</Subtitle>
+                    </TextCenter>
 
                     {error && (
-                        <div className="error-message">
+                        <ErrorMessage>
                             {error}
-                        </div>
+                        </ErrorMessage>
                     )}
 
-                    <div className="input-container">
-                        <label htmlFor="name" className="input-label">
+                    <InputContainer>
+                        <InputLabel htmlFor="name">
                             Nome
-                        </label>
-                        <input 
-                            type="text" 
-                            id="name" 
-                            name="name" 
-                            placeholder="Digite seu nome" 
-                            required 
+                        </InputLabel>
+                        <Input
+                            type="text"
+                            id="name"
+                            name="name"
+                            placeholder="Digite seu nome"
+                            required
                         />
-                    </div>
+                    </InputContainer>
 
-                    <div className="input-container">
-                        <label htmlFor="email" className="input-label">
+                    <InputContainer>
+                        <InputLabel htmlFor="email">
                             Email
-                        </label>
-                        <input 
-                            type="email" 
-                            id="email" 
-                            name="email" 
-                            placeholder="Digite seu email" 
-                            required 
+                        </InputLabel>
+                        <Input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="Digite seu email"
+                            required
                         />
-                    </div>
+                    </InputContainer>
 
-                    <div className="input-container">
-                        <label htmlFor="password" className="input-label">
+                    <InputContainer>
+                        <InputLabel htmlFor="password">
                             Senha
-                        </label>
-                        <input 
-                            type="password" 
-                            id="password" 
-                            name="password" 
-                            placeholder="Digite sua senha" 
-                            required 
+                        </InputLabel>
+                        <Input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Digite sua senha"
+                            required
                         />
-                    </div>
+                    </InputContainer>
 
-                    <button 
-                        type="submit" 
-                        className="btn-primary"
+                    <Button
+                        type="submit"
                         disabled={isLoading}
                     >
                         {isLoading ? 'Carregando...' : 'Cadastrar'}
-                    </button>
+                    </Button>
 
-                    <Link to="/login" className="link">Já tem uma conta? Entre agora!</Link>
-                </div>
-            </form>
-
-        </div>
+                    <StyledLink to="/login">Já tem uma conta? Entre agora!</StyledLink>
+                </Card>
+            </Form>
+        </PageRegister>
     );
-
-
 }
 
 export default Register;
