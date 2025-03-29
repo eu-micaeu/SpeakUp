@@ -1,70 +1,94 @@
-import './Index.css';
-
-// Components
+import styled from 'styled-components';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
+
+const cardData = [
+  {
+    imgSrc: './chat.png',
+    alt: 'Ícone de chat representando conversação',
+    content: 'Plataforma inovadora que utiliza IA para auxiliar no aprendizado de idiomas. Analisa textos em tempo real, identificando e corrigindo erros com explicações detalhadas para um aprendizado contínuo.'
+  },
+  {
+    imgSrc: './ia.png',
+    alt: 'Ícone representando Inteligência Artificial',
+    content: 'Oferece experiência personalizada com análise em tempo real de erros gramaticais e de digitação. Fornece correções com explicações para melhor compreensão das regras linguísticas.'
+  },
+  {
+    imgSrc: './mic.png',
+    alt: 'Ícone de microfone para reconhecimento de voz',
+    content: 'Em breve: funcionalidade de reconhecimento de voz para análise de pronúncia em tempo real, com feedback detalhado para aprimoramento dinâmico.'
+  }
+];
+
+// Styled components
+const Main = styled.main`
+  background-color: #313131;
+  padding: 0;
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const Title = styled.h1`
+  text-align: center;
+  font-size: 3em;
+  padding: 50px 0;
+  margin: 0;
+  color: #fff;
+`;
+
+const CardsContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 0 20px;
+  width: 60%;
+`;
+
+const Card = styled.div`
+  width: 30%;
+  padding: 30px;
+  background-color: #000;
+  color: #fff;
+  border-radius: 15px;
+  transition: all 0.3s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+`;
+
+const CardContent = styled.p`
+  font-size: 1em;
+  margin: 20px 10px;
+  text-align: justify;
+  line-height: 1.6em;
+`;
 
 function Index() {
   return (
     <>
-
       <Header />
+      
+      <Main>
+        <Title>SpeakUp</Title>
+        
+        <CardsContainer>
+          {cardData.map((card, index) => (
+            <Card key={index}>
+              <img src={card.imgSrc} alt={card.alt} width={75} height={75} />
+              <CardContent>{card.content}</CardContent>
+            </Card>
+          ))}
+        </CardsContainer>
 
-      <main>
-
-        <h1>SpeakUp</h1>
-
-        <div className="cards">
-
-          <div className="card">
-            <img src="./chat.png" alt="Ícone de chat representando conversação"></img>
-            <p>
-              SpeakUp é uma plataforma inovadora que utiliza inteligência artificial para auxiliar no aprendizado de novos idiomas de maneira eficiente e personalizada.
-              Com foco na melhoria contínua, a IA analisa seus textos em tempo real, identificando erros de digitação e gramaticais.
-              A cada erro encontrado, a ferramenta destaca as correções necessárias, oferecendo explicações detalhadas sobre o que foi corrigido e o motivo.
-              Dessa forma, você não apenas corrige suas falhas, mas também aprende com cada interação, desenvolvendo suas habilidades linguísticas de maneira prática e envolvente.
-            </p>
-          </div>
-
-          <div className="card">
-            <img src="./ia.png" alt="Ícone representando Inteligência Artificial"></img>
-            <p>O SpeakUp é uma plataforma de ensino de idiomas que utiliza inteligência artificial para oferecer uma experiência de aprendizado personalizada e eficiente.
-              A IA analisa seus textos em tempo real, identificando erros de digitação e gramaticais, e destaca as correções necessárias para que você aprenda com cada interação.
-              Além disso, a ferramenta oferece explicações detalhadas sobre o que foi corrigido e o motivo, permitindo que você compreenda melhor as regras gramaticais e melhore suas habilidades linguísticas.
-              Com o SpeakUp, você pode praticar o idioma de forma prática e envolvente, corrigindo suas falhas e aprimorando suas habilidades com a ajuda da inteligência artificial.
-            </p>
-          </div>
-
-          <div className="card">
-            <img src="./mic.png" alt="Ícone de microfone para reconhecimento de voz"></img>
-            <p>
-              Atualmente em fase de desenvolvimento e implementação, trará uma inovadora funcionalidade de reconhecimento de voz.
-              Com essa ferramenta, você poderá utilizar o microfone para captar as palavras que pronunciar enquanto pratica o idioma. A inteligência artificial do SpeakUp analisará sua fala em tempo real, identificando erros de pronúncia e realizando correções instantaneamente.
-              Além disso, fornecerá um feedback detalhado sobre as áreas em que você pode melhorar, permitindo um aprendizado mais dinâmico e interativo.
-            </p>
-          </div>
-
-        </div>
-
-
-        <h1>Idiomas disponiveis para o aprendizado:</h1>
-
-        <div className="languages">
-
-          <div className="language">
-            <img src="./EUA.png" alt="Bandeira dos Estados Unidos"></img>
-          </div>
-
-          <div className="language">
-            <img src="./japao.png" alt="Bandeira do Japão"></img>
-          </div>
-
-        </div>
-
-      </main>
-
+      </Main>
+      
       <Footer />
-
     </>
   );
 }

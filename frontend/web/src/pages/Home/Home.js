@@ -4,7 +4,6 @@ import { getChatsByUserId, createChat, getMessagesByChatId, addMessageToChat, ge
 import { useNavigate } from 'react-router-dom';
 import SendIcon from '@mui/icons-material/Send';
 
-// Estilos com styled-components
 const PageHome = styled.div`
   display: flex;
   height: 100vh;
@@ -214,8 +213,8 @@ const DivSpeakUp = styled.div`
   margin-bottom: 25px;
 `;
 
-// Componente Home
 function Home() {
+
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [chats, setChats] = useState([]);
   const [messages, setMessages] = useState([]);
@@ -227,6 +226,15 @@ function Home() {
   const goToIndex = () => {
     navigate('/');
   };
+
+  const clearCookies = () => {
+    document.cookie.split(";").forEach((c) => {
+      document.cookie = c
+        .replace(/^ +/, "")
+        .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+    });
+  };
+      
 
   const toggleSidebar = () => {
     setIsSidebarVisible(!isSidebarVisible);
@@ -413,10 +421,10 @@ function Home() {
               </li>
             ))
           ) : (
-            <ol>Sem chats, por ora</ol>
+            <ol>Crie um chat!</ol>
           )}
         </ul>
-        <BtLogout onClick={goToIndex}>Sair</BtLogout>
+        <BtLogout onClick={() => { goToIndex(); clearCookies(); }}>Sair</BtLogout>
       </Sidebar>
 
       <MainContent $sidebarVisible={isSidebarVisible}>
