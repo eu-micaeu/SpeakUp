@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { getChatsByUserId, createChat, deleteChat ,getMessagesByChatId, addMessageToChat, generateAIResponseDialog, generateAIResponseCorrection } from '../../utils/api';
+import { getChatsByUserId, createChat, deleteChat, getMessagesByChatId, addMessageToChat, generateAIResponseDialog, generateAIResponseCorrection } from '../../utils/api';
 import { useNavigate } from 'react-router-dom';
 import SendIcon from '@mui/icons-material/Send';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -171,6 +171,8 @@ const ChatInput = styled.div`
   display: flex;
   gap: 10px;
   width: 100%;
+  justify-content: space-between;
+  align-items: center;
 
   input {
     flex: 1;
@@ -199,27 +201,6 @@ const ChatInput = styled.div`
     &:hover {
       background-color: #45a049;
     }
-  }
-`;
-
-const BtLogout = styled.button`
-  border: none;
-  border-top: 2px solid #ff0000;
-  color: #ff0000;
-  background-color: transparent;
-  padding: 10px;
-  font-size: 20px;
-  cursor: pointer;
-  font-weight: bold;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  font-family: 'Karla', sans-serif;
-
-  &:hover {
-    background-color: #ff0000;
-    color: #000000;
   }
 `;
 
@@ -457,11 +438,11 @@ function Home() {
           )}
           <BtCreateChat onClick={() => { setCurrentChatId(null); setMessages([]); setIsSidebarVisible(false) }}>+</BtCreateChat>
         </ul>
-        
-        <LogoutIcon 
-          onClick={() => { goToIndex(); clearCookies(); }} 
-          style={{color: "#ff0000", cursor: "pointer"}} 
-          onMouseEnter={(e) => e.target.style.color = "#ffffff"} 
+
+        <LogoutIcon
+          onClick={() => { goToIndex(); clearCookies(); }}
+          style={{ color: "#ff0000", cursor: "pointer" }}
+          onMouseEnter={(e) => e.target.style.color = "#ffffff"}
           onMouseLeave={(e) => e.target.style.color = "#ff0000"}
         >
           Sair
@@ -513,9 +494,12 @@ function Home() {
             <SendIcon
               onKeyDown={handleKeyPress}
               onClick={handleSendMessage}
+              style={{ color: "#00ff00", cursor: "pointer" }}
+              onMouseEnter={(e) => e.target.style.color = "#ffffff"}
+              onMouseLeave={(e) => e.target.style.color = "#00ff00"}
             />
           </ChatInput>
-          
+
         </ChatContainer>
       </MainContent>
     </PageHome>

@@ -6,24 +6,23 @@ import styled from 'styled-components';
 import { register } from '../../utils/api';
 
 const PageRegister = styled.div`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: rgb(17, 24, 39);
-    color: white;
-    padding: 1rem;
-    height: 100vh;
+
 `;
 
 const Form = styled.form`
-    /* Estilos para o formulário */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(0, 0, 0);
+    color: white;
+    height: 100vh;
 `;
 
 const Card = styled.div`
     width: 100%;
     max-width: 28rem;
     padding: 2rem;
-    background-color: rgb(31, 41, 55);
+    background-color: rgb(31, 31, 31);
     border-radius: 0.5rem;
 `;
 
@@ -82,15 +81,16 @@ const Input = styled.input`
 `;
 
 const Button = styled.button`
+    width: 100%;
     padding: 0.75rem;
-    margin: 1.5rem 0;
+    margin: 0 0 1.5rem 0;
     border-radius: 0.375rem;
     border: none;
-    background-color: rgb(59, 130, 246);
+    background-color: rgb(53, 53, 53);
     color: white;
     cursor: pointer;
     transition: background-color 0.2s;
-    box-sizing: border-box; /* Garante que padding e border não aumentem a largura */
+    box-sizing: border-box;
 
     &:hover:not(:disabled) {
         background-color: rgb(37, 99, 235);
