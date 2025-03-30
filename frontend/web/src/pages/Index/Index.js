@@ -43,12 +43,12 @@ const CardsContainer = styled.div`
   justify-content: center;
   gap: 20px;
   padding: 0 20px;
-  width: 60%;
+  width: 80%;
 `;
 
 const Card = styled.div`
   width: 30%;
-  padding: 30px;
+  padding: 40px;
   background-color: #000;
   color: #fff;
   border-radius: 15px;

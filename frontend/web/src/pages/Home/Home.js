@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { getChatsByUserId, createChat, getMessagesByChatId, addMessageToChat, generateAIResponseDialog, generateAIResponseCorrection } from '../../utils/api';
+import { getChatsByUserId, createChat, deleteChat, getMessagesByChatId, addMessageToChat, generateAIResponseDialog, generateAIResponseCorrection } from '../../utils/api';
 import { useNavigate } from 'react-router-dom';
 import SendIcon from '@mui/icons-material/Send';
+import DeleteIcon from '@mui/icons-material/Delete';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 const PageHome = styled.div`
   display: flex;
@@ -17,6 +19,9 @@ const Sidebar = styled.aside`
   transition: margin-left 0.3s ease;
   color: #ffffff;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 
   ol {
     padding: 0;
@@ -39,6 +44,9 @@ const Sidebar = styled.aside`
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
     &:hover {
       background-color: #424242;
@@ -47,6 +55,16 @@ const Sidebar = styled.aside`
     &.active-chat {
       background-color: #4CAF50;
     }
+  }
+
+  ul li svg {
+    margin-left: 10px;
+    color: #fff;
+    cursor: pointer;
+  }
+
+  ul li svg:hover {
+    color:rgb(255, 0, 0);
   }
 `;
 
@@ -153,6 +171,8 @@ const ChatInput = styled.div`
   display: flex;
   gap: 10px;
   width: 100%;
+  justify-content: space-between;
+  align-items: center;
 
   input {
     flex: 1;
@@ -184,23 +204,21 @@ const ChatInput = styled.div`
   }
 `;
 
-const BtLogout = styled.button`
+const BtCreateChat = styled.button`
   border: none;
-  border-top: 2px solid #ff0000;
-  color: #ff0000;
+  border: 2px solid #4CAF50;
+  border-radius: 10px;
+  color: #4CAF50;
   background-color: transparent;
   padding: 10px;
-  font-size: 20px;
+  font-size: 16px;
   cursor: pointer;
   font-weight: bold;
-  position: absolute;
-  bottom: 0;
-  left: 0;
+  margin: 20px 0;
   width: 100%;
   font-family: 'Karla', sans-serif;
-
   &:hover {
-    background-color: #ff0000;
+    background-color: #4CAF50;
     color: #000000;
   }
 `;
@@ -234,7 +252,7 @@ function Home() {
         .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
     });
   };
-      
+
 
   const toggleSidebar = () => {
     setIsSidebarVisible(!isSidebarVisible);
@@ -356,7 +374,7 @@ function Home() {
         {
           id: savedAIMessage.id,
           text: savedAIMessage.content,
-          sender: savedAIMessage.sender || 'ai', 
+          sender: savedAIMessage.sender || 'ai',
           timestamp: savedAIMessage.timestamp,
           chatId: savedAIMessage.chat_id,
           type: 'response'
@@ -368,6 +386,20 @@ function Home() {
       if (tempMessage) setMessages(prev => prev.filter(m => m.id !== tempMessage.id));
       if (tempAIMessage) setMessages(prev => prev.filter(m => m.id !== tempAIMessage.id));
       setInputMessage(messageContent);
+    }
+  };
+
+  const handleDeleteChat = async (chatId) => {
+    try {
+      await deleteChat(chatId);
+      setChats(prevChats => prevChats.filter(chat => chat.id !== chatId));
+      if (currentChatId === chatId) {
+        setCurrentChatId(null);
+        setMessages([]);
+        loadChatMessages(null);
+      }
+    } catch (error) {
+      console.error("Erro ao excluir chat:", error);
     }
   };
 
@@ -395,13 +427,27 @@ function Home() {
                 }}
               >
                 {chat.topic || "Chat sem título"}
+                <DeleteIcon onClick={(e) => {
+                  e.stopPropagation();
+                  handleDeleteChat(chat.id);
+                }}>Excluir</DeleteIcon>
               </li>
             ))
           ) : (
             <ol>Crie um chat!</ol>
           )}
+          <BtCreateChat onClick={() => { setCurrentChatId(null); setMessages([]); setIsSidebarVisible(false) }}>+</BtCreateChat>
         </ul>
-        <BtLogout onClick={() => { goToIndex(); clearCookies(); }}>Sair</BtLogout>
+
+        <LogoutIcon
+          onClick={() => { goToIndex(); clearCookies(); }}
+          style={{ color: "#ff0000", cursor: "pointer" }}
+          onMouseEnter={(e) => e.target.style.color = "#ffffff"}
+          onMouseLeave={(e) => e.target.style.color = "#ff0000"}
+        >
+          Sair
+        </LogoutIcon>
+
       </Sidebar>
 
       <MainContent $sidebarVisible={isSidebarVisible}>
@@ -410,7 +456,7 @@ function Home() {
             &#9776;
           </ToggleButton>
         )}
-        
+
         <DivSpeakUp>
           <img src='./logo.png' width={75} alt="SpeakUp Logo" />
           <h1>SpeakUp</h1>
@@ -446,10 +492,14 @@ function Home() {
               onKeyPress={handleKeyPress}
             />
             <SendIcon
-              style={{ cursor: 'pointer', color: '#fff', marginTop: '20px' }}
+              onKeyDown={handleKeyPress}
               onClick={handleSendMessage}
+              style={{ color: "#00ff00", cursor: "pointer" }}
+              onMouseEnter={(e) => e.target.style.color = "#ffffff"}
+              onMouseLeave={(e) => e.target.style.color = "#00ff00"}
             />
           </ChatInput>
+
         </ChatContainer>
       </MainContent>
     </PageHome>

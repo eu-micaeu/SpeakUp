@@ -26,8 +26,6 @@ export const register = async (userData) => {
 // Create chat
 export const createChat = async (topic) => {
 
-    console.log(topic)
-
     const response = await axios.post('http://localhost:8080/chat', {
         topic
     }, {
@@ -36,6 +34,17 @@ export const createChat = async (topic) => {
         }
     });
 
+    return response.data;
+}
+
+// Delete chat
+export const deleteChat = async (chatId) => {
+
+    const response = await axios.delete(`http://localhost:8080/chat/${chatId}`, {
+        headers: {
+            Authorization: `Bearer ${Cookies.get('authToken')}`
+        }
+    });
     return response.data;
 }
 
