@@ -25,7 +25,7 @@ Dessa forma, você não apenas corrige suas falhas, mas também aprende com cada
 
 <br>
 
-<img src="https://go.dev/blog/go-brand/Go-Logo/PNG/Go-Logo_Blue.png" alt="GoLang" width="200">
+<img src="https://go.dev/blog/go-brand/Go-Logo/PNG/Go-Logo_Blue.png" alt="GoLang" width="150">
 
 <br>
 
@@ -37,7 +37,7 @@ GoLang, ou Go, é uma linguagem de programação desenvolvida pela Google, proje
 
 <br>
 
-<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/862px-React-icon.svg.png" alt="ReactJs" width="150">
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/862px-React-icon.svg.png" alt="ReactJs" width="100">
 
 <br>
 
@@ -49,7 +49,7 @@ ReactJS é uma biblioteca JavaScript desenvolvida pelo Facebook para a criação
 
 <br>
 
-<img src="https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/97_Docker_logo_logos-512.png" alt="Docker" width="200">
+<img src="https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/97_Docker_logo_logos-512.png" alt="Docker" width="150">
 
 <br>
 
@@ -61,7 +61,7 @@ Docker é uma plataforma que permite empacotar e isolar aplicações em contêin
 
 <br>
 
-<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/MongoDB_Logo.svg/1200px-MongoDB_Logo.svg.png" alt="MongoDB" width="200">
+<img src="https://images.icon-icons.com/2415/PNG/512/mongodb_original_wordmark_logo_icon_146425.png" alt="MongoDB" width="150">
 
 <br>
 
