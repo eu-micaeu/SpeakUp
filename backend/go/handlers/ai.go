@@ -57,7 +57,7 @@ func GenerateResponseCorrection(c *gin.Context) {
 	connector := connectors.NewGeminiConnector()
 
 	// Generate a correction for the dialogue
-	correctionResp, err := connector.GenerateResponse(context.Background(), "Please correct the spelling and grammar of the following text in one alternative: "+request.Message)
+	correctionResp, err := connector.GenerateResponse(context.Background(), "Please correct the spelling and grammar of the following text, without prompts, correct the sentence/word and that's it!: "+request.Message)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

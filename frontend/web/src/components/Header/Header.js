@@ -12,7 +12,6 @@ const HeaderContainer = styled.header`
 `;
 
 const Logo = styled.img`
-  /* Add any specific styles for the logo if needed */
   width: 40px;
   margin: 20px;
 `;
@@ -29,7 +28,7 @@ function Header() {
       <Logo src="logo.png" alt="Logo" />
       <LoginIcon sx={{ color: "rgb(0, 255, 0)", margin: "20px", fontSize: "2rem", cursor: "pointer" }}
       onMouseEnter={(e) => e.target.style.color = "#fff"}
-      onMouseLeave={(e) => e.target.style.color = "#rgb(0, 255, 0)"}
+      onMouseLeave={(e) => e.target.style.color = "rgb(0, 255, 0)"}
       onClick={handleLoginClick} />
     </HeaderContainer>
   );

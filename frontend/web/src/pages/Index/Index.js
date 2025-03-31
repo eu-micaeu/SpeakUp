@@ -51,7 +51,7 @@ const CardsContainer = styled.div`
 `;
 
 const Card = styled.div`
-  width: 25%;
+  width: 50%;
   height: 60%;
   padding: 40px;
   background-color: #000;
