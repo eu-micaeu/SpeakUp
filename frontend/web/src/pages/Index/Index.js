@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
+import { useState, useEffect } from 'react';
 
 const cardData = [
   {
@@ -41,22 +42,34 @@ const Title = styled.h1`
 const CardsContainer = styled.div`
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: 20px;
   padding: 0 20px;
   width: 80%;
+  position: relative;
+  height: 400px;
 `;
 
 const Card = styled.div`
-  width: 30%;
+  width: 25%;
+  height: 60%;
   padding: 40px;
   background-color: #000;
   color: #fff;
-  border-radius: 15px;
-  transition: all 0.3s;
+  border-radius: 10px;
+  transition: all 0.5s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
-
+  position: absolute;
+  opacity: 0;
+  transform: scale(0.9);
+  
+  &.active {
+    opacity: 1;
+    transform: scale(1);
+  }
+  
   &:hover {
     transform: scale(1.05);
   }
@@ -69,7 +82,33 @@ const CardContent = styled.p`
   line-height: 1.6em;
 `;
 
+const DotsContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 10px 0;
+`;
+
+const Dot = styled.div`
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: ${props => props.active ? '#fff' : '#666'};
+  cursor: pointer;
+  transition: background-color 0.3s;
+`;
+
 function Index() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % cardData.length);
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <>
       <Header />
@@ -79,13 +118,25 @@ function Index() {
         
         <CardsContainer>
           {cardData.map((card, index) => (
-            <Card key={index}>
+            <Card 
+              key={index}
+              className={index === currentIndex ? 'active' : ''}
+            >
               <img src={card.imgSrc} alt={card.alt} width={75} height={75} />
               <CardContent>{card.content}</CardContent>
             </Card>
           ))}
         </CardsContainer>
 
+        <DotsContainer>
+          {cardData.map((_, index) => (
+            <Dot 
+              key={index} 
+              active={index === currentIndex}
+              onClick={() => setCurrentIndex(index)}
+            />
+          ))}
+        </DotsContainer>
       </Main>
       
       <Footer />
