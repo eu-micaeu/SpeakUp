@@ -4,75 +4,64 @@ import (
 	"context"
 	"net/http"
 	"os"
+	"path/filepath"
+
+	"speakup/connectors"
 
 	"github.com/gin-gonic/gin"
-
-	openai "github.com/sashabaranov/go-openai"
 )
 
 // GenerateResponse generates a response for the AI
 func GenerateResponseDialog(c *gin.Context) {
+	// Ler o prompt de um arquivo externo
+	promptPath := filepath.Join("prompts", "prompt1.txt")
+	promptBytes, err := os.ReadFile(promptPath)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load prompt: " + err.Error()})
+		return
+	}
+	prompt := string(promptBytes)
 
-    prompt := `Your name is SpeakUp. You are a helpful assistant. You will be given a message and you need to respond to it in a friendly manner. Your response should be clear and concise, and you should avoid using overly technical language. If the message is a question, provide a direct answer. If it is a statement, acknowledge it and provide any additional information that may be helpful.`
+	var request struct {
+		Message string `json:"message"`
+	}
 
-    var request struct {
-        Message string `json:"message"`
-    }
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
-    if err := c.ShouldBindJSON(&request); err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-        return
-    }
+	connector := connectors.NewGeminiConnector()
 
-    apiKey := os.Getenv("OPENAI_API_KEY")
-    client := openai.NewClient(apiKey)
+	// Generate a response for the dialogue
+	dialogueResp, err := connector.GenerateResponse(context.Background(), prompt+"Please pretend to be a friend and answer:"+request.Message)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 
-    // Generate a response for the dialogue
-    dialogueResp, err := client.CreateChatCompletion(context.Background(), openai.ChatCompletionRequest{
-        Model: "gpt-3.5-turbo",
-        Messages: []openai.ChatCompletionMessage{
-            {
-                Role:    "user",
-                Content: prompt + "Please pretend to be a friend and answer:" + request.Message,
-            },
-        },
-    })
-    if err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-        return
-    }
-
-    c.JSON(http.StatusOK, gin.H{"response": dialogueResp.Choices[0].Message.Content})
+	c.JSON(http.StatusOK, gin.H{"response": dialogueResp})
 }
 
 // GenerateResponseCorrection generates a correction for the AI
 func GenerateResponseCorrection(c *gin.Context) {
-    var request struct {
-        Message string `json:"message"`
-    }
+	var request struct {
+		Message string `json:"message"`
+	}
 
-    if err := c.ShouldBindJSON(&request); err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-        return
-    }
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
-    apiKey := os.Getenv("OPENAI_API_KEY")
-    client := openai.NewClient(apiKey)
+	connector := connectors.NewGeminiConnector()
 
-    // Generate a correction for the dialogue
-    correctionResp, err := client.CreateChatCompletion(context.Background(), openai.ChatCompletionRequest{
-        Model: "gpt-3.5-turbo",
-        Messages: []openai.ChatCompletionMessage{
-            {
-                Role:    "user",
-                Content: "Please correct the spelling and grammar of the following text: " + request.Message,
-            },
-        },
-    })
-    if err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-        return
-    }
+	// Generate a correction for the dialogue
+	correctionResp, err := connector.GenerateResponse(context.Background(), "Please correct the spelling and grammar of the following text in one alternative: "+request.Message)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 
-    c.JSON(http.StatusOK, gin.H{"response": correctionResp.Choices[0].Message.Content})
+	c.JSON(http.StatusOK, gin.H{"response": correctionResp})
 }
