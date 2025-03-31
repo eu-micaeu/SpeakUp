@@ -21,7 +21,7 @@ func NewOpenAIConnector() *OpenAIConnector {
 	}
 }
 
-func (o *OpenAIConnector) GenerateResponse(ctx context.Context, prompt string) (string, error) {
+func (o *OpenAIConnector) GenerateResponse(ctx context.Context, message string) (string, error) {
 	resp, err := o.client.CreateChatCompletion(
 		ctx,
 		openai.ChatCompletionRequest{
@@ -29,7 +29,7 @@ func (o *OpenAIConnector) GenerateResponse(ctx context.Context, prompt string) (
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role:    "user",
-					Content: prompt,
+					Content: message,
 				},
 			},
 		},

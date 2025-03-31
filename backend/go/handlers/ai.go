@@ -31,7 +31,7 @@ func GenerateResponseDialog(c *gin.Context) {
 		return
 	}
 
-	connector := connectors.NewOpenAIConnector()
+	connector := connectors.NewGeminiConnector()
 
 	// Generate a response for the dialogue
 	dialogueResp, err := connector.GenerateResponse(context.Background(), prompt+"Please pretend to be a friend and answer:"+request.Message)
@@ -54,10 +54,10 @@ func GenerateResponseCorrection(c *gin.Context) {
 		return
 	}
 
-	connector := connectors.NewOpenAIConnector()
+	connector := connectors.NewGeminiConnector()
 
 	// Generate a correction for the dialogue
-	correctionResp, err := connector.GenerateResponse(context.Background(), "Please correct the spelling and grammar of the following text: "+request.Message)
+	correctionResp, err := connector.GenerateResponse(context.Background(), "Please correct the spelling and grammar of the following text in one alternative: "+request.Message)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
