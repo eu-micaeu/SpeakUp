@@ -14,14 +14,13 @@ const PageHome = styled.div`
 const Sidebar = styled.aside`
   width: ${props => props.$isVisible ? '300px' : '0'};
   background-color: #000000;
-  padding: ${props => props.$isVisible ? '20px' : '0'};
   position: relative;
-  transition: margin-left 0.3s ease;
   color: #ffffff;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  transition: width 0.3s ease-in-out;
 
   ol {
     padding: 0;
@@ -31,11 +30,15 @@ const Sidebar = styled.aside`
   ul {
     margin: 50px 0;
     padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    list-style: none;
   }
 
   ul li {
     list-style: none;
-    margin: 20px 0 0 0;
     text-align: center;
     padding: 10px;
     background-color: #313131;
@@ -47,6 +50,8 @@ const Sidebar = styled.aside`
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin: 10px 0;
+    width: 180px;
 
     &:hover {
       background-color: #424242;
@@ -189,20 +194,8 @@ const ChatInput = styled.div`
     }
   }
 
-  button {
-    font-size: 0.8rem;
-    padding: 20px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-
-    &:hover {
-      background-color: #45a049;
-    }
-  }
 `;
+
 
 const BtCreateChat = styled.button`
   border: none;
@@ -215,7 +208,7 @@ const BtCreateChat = styled.button`
   cursor: pointer;
   font-weight: bold;
   margin: 20px 0;
-  width: 100%;
+  width: 200px;
   font-family: 'Karla', sans-serif;
   &:hover {
     background-color: #4CAF50;
@@ -427,10 +420,12 @@ function Home() {
                 }}
               >
                 {chat.topic || "Chat sem título"}
-                <DeleteIcon onClick={(e) => {
+                <DeleteIcon 
+                onClick={(e) => {
                   e.stopPropagation();
                   handleDeleteChat(chat.id);
-                }}>Excluir</DeleteIcon>
+                }}
+                ></DeleteIcon>
               </li>
             ))
           ) : (
@@ -441,7 +436,7 @@ function Home() {
 
         <LogoutIcon
           onClick={() => { goToIndex(); clearCookies(); }}
-          style={{ color: "#ff0000", cursor: "pointer" }}
+          style={{ color: "#ff0000", cursor: "pointer", margin: "20px" }}
           onMouseEnter={(e) => e.target.style.color = "#ffffff"}
           onMouseLeave={(e) => e.target.style.color = "#ff0000"}
         >
@@ -494,9 +489,9 @@ function Home() {
             <SendIcon
               onKeyDown={handleKeyPress}
               onClick={handleSendMessage}
-              style={{ color: "#00ff00", cursor: "pointer" }}
-              onMouseEnter={(e) => e.target.style.color = "#ffffff"}
-              onMouseLeave={(e) => e.target.style.color = "#00ff00"}
+              style={{ color: "#fff", cursor: "pointer" }}
+              onMouseEnter={(e) => e.target.style.color = "rgb(187, 187, 187)"}
+              onMouseLeave={(e) => e.target.style.color = "#fff"}
             />
           </ChatInput>
 
