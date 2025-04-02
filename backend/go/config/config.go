@@ -2,7 +2,6 @@ package config
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -36,7 +35,6 @@ func ConnectMongoDB() {
 		log.Fatalf("Falha ao pingar o MongoDB: %v", err)
 	}
 
-	fmt.Println("Conectado ao MongoDB!")
 }
 
 func GetMongoClient() *mongo.Client {

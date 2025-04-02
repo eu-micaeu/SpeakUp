@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -37,7 +36,6 @@ func GenerateResponseDialog(c *gin.Context) {
 
 	// Generate a response for the dialogue
 	dialogueResp, err := connector.GenerateResponse(context.Background(), prompt + request.Message + "Answer me in this language: " + middlewares.GetLanguageFromContext(c))
-	fmt.Println(dialogueResp)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -67,9 +65,6 @@ func GenerateResponseCorrection(c *gin.Context) {
 	}
 
 	connector := connectors.NewOpenAIConnector()
-
-	fmt.Println(middlewares.GetLanguageFromContext(c))
-	fmt.Println(middlewares.GetUserIDFromContext(c))
 
 	// Generate a correction for the dialogue
 	correctionResp, err := connector.GenerateResponse(context.Background(), prompt + request.Message)

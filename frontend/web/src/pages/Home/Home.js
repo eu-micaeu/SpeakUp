@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { 
-  getChatsByUserId, 
-  createChat, 
-  deleteChat, 
-  getMessagesByChatId, 
-  addMessageToChat, 
-  generateAIResponseDialog, 
-  generateAIResponseCorrection, 
+import {
+  getChatsByUserId,
+  createChat,
+  deleteChat,
+  getMessagesByChatId,
+  addMessageToChat,
+  generateAIResponseDialog,
+  generateAIResponseCorrection,
   generateAIResponseTranslation,
   generateAIResponseTopic
 } from '../../utils/api';
@@ -15,6 +15,8 @@ import { useNavigate } from 'react-router-dom';
 import SendIcon from '@mui/icons-material/Send';
 import DeleteIcon from '@mui/icons-material/Delete';
 import LogoutIcon from '@mui/icons-material/Logout';
+import PersonIcon from '@mui/icons-material/Person';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 const PageHome = styled.div`
   display: flex;
@@ -264,7 +266,6 @@ function Home() {
     });
   };
 
-
   const toggleSidebar = () => {
     setIsSidebarVisible(!isSidebarVisible);
   };
@@ -325,7 +326,7 @@ function Home() {
       let chatId = currentChatId;
 
       if (!chatId) {
-        
+
         const topicResponse = await generateAIResponseTopic(messageContent);
 
         const newChat = await createChat(topicResponse.response);
@@ -429,6 +430,13 @@ function Home() {
 
   return (
     <PageHome>
+
+      <PersonIcon
+        style={{ color: "#fff", cursor: "pointer", position: "absolute", top: "20px", right: "20px", fontSize: "30px" }}
+        onMouseEnter={(e) => e.target.style.color = "rgb(187, 187, 187)"}
+        onMouseLeave={(e) => e.target.style.color = "#fff"}
+      ></PersonIcon>
+
       <Sidebar $isVisible={isSidebarVisible}>
         <ToggleButton onClick={toggleSidebar} $sidebarVisible={isSidebarVisible}>
           &times;
@@ -521,6 +529,13 @@ function Home() {
           </Messages>
 
           <ChatInput>
+            <SettingsIcon
+              onKeyDown={handleKeyPress}
+              onClick={handleSendMessage}
+              style={{ color: "#fff", cursor: "pointer" }}
+              onMouseEnter={(e) => e.target.style.color = "rgb(187, 187, 187)"}
+              onMouseLeave={(e) => e.target.style.color = "#fff"}
+            />
             <input
               type="text"
               placeholder="Digite sua mensagem..."
@@ -538,6 +553,7 @@ function Home() {
           </ChatInput>
 
         </ChatContainer>
+        <p>O SpeakUp ainda está em Beta, poderá ter erros nas respostas e/ou correções.</p>
       </MainContent>
     </PageHome>
   );
