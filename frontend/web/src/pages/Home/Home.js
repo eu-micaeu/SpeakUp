@@ -354,7 +354,7 @@ function Home() {
       ]);
 
       // Resposta da IA - Dialog
-      const aiResponseDialog = await generateAIResponseDialog(messageContent);
+      const aiResponseDialog = await generateAIResponseDialog(aiCorrectionResponse.response);
       // Obter tradução apenas da resposta da IA
       const aiTranslation = await generateAIResponseTranslation(aiResponseDialog.response);
 

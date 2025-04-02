@@ -151,7 +151,7 @@ function Register() {
         try {
 
             const userData = {
-                name: event.target.name.value,
+                first_name: event.target.first_name.value,
                 email: event.target.email.value,
                 password: event.target.password.value,
                 language: event.target.language.value,
@@ -198,13 +198,13 @@ function Register() {
                     )}
 
                     <InputContainer>
-                        <InputLabel htmlFor="nome">
+                        <InputLabel htmlFor="first_name">
                             Nome
                         </InputLabel>
                         <Input
-                            type="nome"
-                            id="nome"
-                            name="nome"
+                            type="first_name"
+                            id="first_name"
+                            name="first_name"
                             placeholder="Digite seu nome"
                             required
                         />

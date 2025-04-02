@@ -66,7 +66,7 @@ func GenerateResponseCorrection(c *gin.Context) {
 		return
 	}
 
-	connector := connectors.NewGeminiConnector()
+	connector := connectors.NewOpenAIConnector()
 
 	fmt.Println(middlewares.GetLanguageFromContext(c))
 	fmt.Println(middlewares.GetUserIDFromContext(c))
