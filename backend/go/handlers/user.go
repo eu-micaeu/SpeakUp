@@ -31,7 +31,7 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid password"})
 		return
 	}
-	token, err := middlewares.GenerateJWT(result.ID, result.Email)
+	token, err := middlewares.GenerateJWT(result.ID, result.Email, result.Language)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
 		return
@@ -62,6 +62,7 @@ func CreateUser(c *gin.Context) {
 		"last_name":  user.LastName,
 		"email":      user.Email,
 		"password":   user.Password,
+		"language":   user.Language,
 	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
@@ -98,6 +99,8 @@ func UpdateUser(c *gin.Context) {
 		"first_name": user.FirstName,
 		"last_name":  user.LastName,
 		"email":      user.Email,
+		"password":   user.Password,
+		"language":   user.Language,
 	}})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})

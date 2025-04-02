@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { getChatsByUserId, createChat, deleteChat, getMessagesByChatId, addMessageToChat, generateAIResponseDialog, generateAIResponseCorrection } from '../../utils/api';
+import { getChatsByUserId, createChat, deleteChat, getMessagesByChatId, addMessageToChat, generateAIResponseDialog, generateAIResponseCorrection, generateAIResponseTranslation } from '../../utils/api';
 import { useNavigate } from 'react-router-dom';
 import SendIcon from '@mui/icons-material/Send';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -159,6 +159,7 @@ const Message = styled.div`
     background-color: #242424;
     margin-right: auto;
     width: 75%;
+    position: relative;
   }
 
   &.ai.correction {
@@ -170,6 +171,13 @@ const Message = styled.div`
     margin: 10px 0;
   }
 
+  .translation {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #555;
+    font-style: italic;
+    color: #aaa;
+  }
 `;
 
 const ChatInput = styled.div`
@@ -195,7 +203,6 @@ const ChatInput = styled.div`
   }
 
 `;
-
 
 const BtCreateChat = styled.button`
   border: none;
@@ -294,6 +301,7 @@ function Home() {
     }
   };
 
+  // Dentro do componente Home, modifique a função handleSendMessage para incluir a tradução:
   const handleSendMessage = async () => {
     if (inputMessage.trim() === '') return;
 
@@ -315,7 +323,7 @@ function Home() {
         setChats(prevChats => [...prevChats, newChat]);
       }
 
-      // Mensagem do usuário e correção da IA combinadas
+      // Mensagem do usuário e correção da IA (sem tradução)
       const aiCorrectionResponse = await generateAIResponseCorrection(messageContent);
       const combinedMessageContent = `${messageContent}\n\nCorreção: ${aiCorrectionResponse.response}`;
 
@@ -330,7 +338,7 @@ function Home() {
 
       setMessages(prevMessages => [...prevMessages, tempMessage]);
 
-      // Salva a mensagem combinada no backend
+      // Salva a mensagem do usuário no backend
       const savedMessage = await addMessageToChat(chatId, combinedMessageContent, 'user', 'request');
 
       setMessages(prevMessages => [
@@ -347,10 +355,14 @@ function Home() {
 
       // Resposta da IA - Dialog
       const aiResponseDialog = await generateAIResponseDialog(messageContent);
+      // Obter tradução apenas da resposta da IA
+      const aiTranslation = await generateAIResponseTranslation(aiResponseDialog.response);
+
+      const aiResponseWithTranslation = `${aiResponseDialog.response}\n\n[TRANSLATION]: ${aiTranslation.response}`;
 
       tempAIMessage = {
         id: Date.now() + 1,
-        text: aiResponseDialog.response,
+        text: aiResponseWithTranslation,
         sender: 'ai',
         timestamp: new Date().toISOString(),
         chatId: chatId,
@@ -359,8 +371,8 @@ function Home() {
 
       setMessages(prevMessages => [...prevMessages, tempAIMessage]);
 
-      // Salva a resposta da IA no backend com sender 'ai'
-      const savedAIMessage = await addMessageToChat(chatId, aiResponseDialog.response, 'ai', 'response');
+      // Salva a resposta da IA com tradução no backend
+      const savedAIMessage = await addMessageToChat(chatId, aiResponseWithTranslation, 'ai', 'response');
 
       setMessages(prevMessages => [
         ...prevMessages.filter(m => m.id !== tempAIMessage.id),
@@ -381,6 +393,8 @@ function Home() {
       setInputMessage(messageContent);
     }
   };
+
+  // Mantenha a mesma renderização de mensagens do exemplo anterior
 
   const handleDeleteChat = async (chatId) => {
     try {
@@ -420,11 +434,11 @@ function Home() {
                 }}
               >
                 {chat.topic || "Chat sem título"}
-                <DeleteIcon 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDeleteChat(chat.id);
-                }}
+                <DeleteIcon
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteChat(chat.id);
+                  }}
                 ></DeleteIcon>
               </li>
             ))
@@ -462,17 +476,34 @@ function Home() {
               .filter(msg => msg.chatId === currentChatId || msg.chat_id === currentChatId)
               .map((message) => (
                 <Message key={message.id} className={`${message.sender} ${message.type}`}>
-                  {(message.text || message.content).split('\n\n').map((line, index) => (
-                    <React.Fragment key={index}>
-                      {index === 1 && <hr />}
-                      {index === 1 ? (
-                        <span style={{ color: '#1eff00' }}>{line.replace('Correção: ', '')}</span>
-                      ) : (
-                        line
-                      )}
-                      {index < (message.text || message.content).split('\n\n').length - 1 && <br />}
-                    </React.Fragment>
-                  ))}
+                  {(message.text || message.content).split('\n\n').map((line, index, lines) => {
+                    // Verifica se é a linha de tradução
+                    if (line.startsWith('[TRANSLATION]: ')) {
+                      return (
+                        <div key={index} className="translation">
+                          <strong>Tradução:</strong> {line.replace('[TRANSLATION]: ', '')}
+                        </div>
+                      );
+                    }
+
+                    // Verifica se é a linha de correção
+                    if (index === 1 && line.startsWith('Correção: ')) {
+                      return (
+                        <React.Fragment key={index}>
+                          <hr />
+                          <span style={{ color: '#1eff00' }}>{line.replace('Correção: ', '')}</span>
+                        </React.Fragment>
+                      );
+                    }
+
+                    // Linha normal
+                    return (
+                      <React.Fragment key={index}>
+                        {line}
+                        {index < lines.length - 1 && <br />}
+                      </React.Fragment>
+                    );
+                  })}
                 </Message>
               ))}
             <div ref={messagesEndRef} />
