@@ -102,6 +102,20 @@ const Button = styled.button`
     }
 `;
 
+const Select = styled.select`
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 0.375rem;
+    background-color: rgb(55, 65, 81);
+    border: 1px solid rgb(75, 85, 99);
+    color: white;
+    box-sizing: border-box;
+`;
+
+const Option = styled.option`
+    color: white;
+`;
+
 const StyledLink = styled(Link)`
     display: block;
     margin-top: 10px;
@@ -124,7 +138,7 @@ function Register() {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
-    
+
     const goToIndex = () => {
         navigate('/');
     };
@@ -135,13 +149,22 @@ function Register() {
         setError('');
 
         try {
+
             const userData = {
-                name: event.target.name.value,
+                first_name: event.target.first_name.value,
                 email: event.target.email.value,
-                password: event.target.password.value
+                password: event.target.password.value,
+                language: event.target.language.value,
             };
 
+            if (userData.password !== event.target['confirm-password'].value) {
+                setError('As senhas não coincidem');
+                setIsLoading(false);
+                return;
+            }
+
             const response = await register(userData);
+
             if (response.message === 'User created successfully') {
                 navigate('/login');
             } else {
@@ -175,16 +198,31 @@ function Register() {
                     )}
 
                     <InputContainer>
-                        <InputLabel htmlFor="name">
+                        <InputLabel htmlFor="first_name">
                             Nome
                         </InputLabel>
                         <Input
-                            type="text"
-                            id="name"
-                            name="name"
+                            type="first_name"
+                            id="first_name"
+                            name="first_name"
                             placeholder="Digite seu nome"
                             required
                         />
+                    </InputContainer>
+
+                    <InputContainer>
+                        <InputLabel htmlFor="name">
+                            Idioma que deseja aprender
+                        </InputLabel>
+                        <Select
+                            id="language"
+                            name="language"
+                            required
+                        >
+                            <Option value="" disabled selected>Selecione</Option>
+                            <Option value="english">Inglês</Option>
+                        </Select>
+
                     </InputContainer>
 
                     <InputContainer>
@@ -209,6 +247,19 @@ function Register() {
                             id="password"
                             name="password"
                             placeholder="Digite sua senha"
+                            required
+                        />
+                    </InputContainer>
+
+                    <InputContainer>
+                        <InputLabel htmlFor="confirm-password">
+                            Confirmar Senha
+                        </InputLabel>
+                        <Input
+                            type="password"
+                            id="confirm-password"
+                            name="confirm-password"
+                            placeholder="Confirme sua senha"
                             required
                         />
                     </InputContainer>

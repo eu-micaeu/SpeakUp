@@ -15,18 +15,21 @@ import (
 type CustomClaims struct {
 	UserID string `json:"user_id"`
 	Email  string `json:"email"`
+	Language string `json:"language"`
 	jwt.StandardClaims
 }
 
 var jwtKey = []byte(os.Getenv("JWT_KEY"))
 
 // GenerateJWT generates a JWT token
-func GenerateJWT(id string, email string) (string, error) {
+func GenerateJWT(id string, email string, language string) (string, error) {
+
 	expirationTime := time.Now().Add(24 * time.Hour)
 	
 	claims := &CustomClaims{
 		UserID: id,
 		Email: email,
+		Language: language,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 		},
@@ -79,6 +82,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 
 		c.Set("user_id", claims.UserID)
+		c.Set("language", claims.Language)
 		
 		c.Next()
 	}
@@ -115,4 +119,14 @@ func GetUserIDFromContext(c *gin.Context) string {
 	}
 
 	return userID.(string)
+}
+
+// GetLanguageFromContext gets the language from the context
+func GetLanguageFromContext(c *gin.Context) string {
+	language, exists := c.Get("language")
+	if !exists {
+		return ""
+	}
+
+	return language.(string)
 }

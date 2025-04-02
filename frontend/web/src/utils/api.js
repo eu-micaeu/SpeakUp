@@ -129,3 +129,21 @@ export const generateAIResponseCorrection = async (message) => {
         console.log(error)
     }
 }
+
+// generate AI response translation
+export const generateAIResponseTranslation = async (message) => {
+    try {
+        const response = await axios.post(`http://localhost:8080/ai/generate-response-translation`, {
+            message
+        }, {
+            headers: {
+                Authorization: `Bearer ${Cookies.get('authToken')}`
+            }
+        });
+
+        return response.data;
+    }
+    catch (error) {
+        console.log(error)
+    }
+}
