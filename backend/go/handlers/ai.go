@@ -103,3 +103,26 @@ func GenerateResponseTranslate(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"response": translateResp})
 }
+
+// GenerateResponseTopic generates a response for the AI
+func GenerateResponseTopic(c *gin.Context) {
+	var request struct {
+		Message string `json:"message"`
+	}
+
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	connector := connectors.NewOpenAIConnector()
+
+	// Generate a response for the topic
+	topicResp, err := connector.GenerateResponse(context.Background(), "Please generate a topic for the following text, generate with 2 words only: " + request.Message)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"response": topicResp})
+}

@@ -113,7 +113,7 @@ func GetMessagesByChatId(c *gin.Context) {
 	chatId := c.Param("id")
 	db := config.GetMongoClient()
 	collection := db.Database("speakup").Collection("messages")
-	cursor, err := collection.Find(c, map[string]string{"chatid": chatId})
+	cursor, err := collection.Find(c, map[string]string{"chat_id": chatId})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get messages"})
 		return

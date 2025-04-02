@@ -112,7 +112,7 @@ func GetChatsByUserId(c *gin.Context) {
 	id := middlewares.GetUserIDFromContext(c)
 	db := config.GetMongoClient()
 	collection := db.Database("speakup").Collection("chats")
-	cursor, err := collection.Find(c, map[string]string{"userid": id})
+	cursor, err := collection.Find(c, map[string]string{"user_id": id})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get chats"})
 		return

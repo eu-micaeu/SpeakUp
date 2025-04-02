@@ -1,6 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { getChatsByUserId, createChat, deleteChat, getMessagesByChatId, addMessageToChat, generateAIResponseDialog, generateAIResponseCorrection, generateAIResponseTranslation } from '../../utils/api';
+import { 
+  getChatsByUserId, 
+  createChat, 
+  deleteChat, 
+  getMessagesByChatId, 
+  addMessageToChat, 
+  generateAIResponseDialog, 
+  generateAIResponseCorrection, 
+  generateAIResponseTranslation,
+  generateAIResponseTopic
+} from '../../utils/api';
 import { useNavigate } from 'react-router-dom';
 import SendIcon from '@mui/icons-material/Send';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -12,7 +22,7 @@ const PageHome = styled.div`
 `;
 
 const Sidebar = styled.aside`
-  width: ${props => props.$isVisible ? '300px' : '0'};
+  width: ${props => props.$isVisible ? '20%' : '0'};
   background-color: #000000;
   position: relative;
   color: #ffffff;
@@ -51,7 +61,7 @@ const Sidebar = styled.aside`
     justify-content: space-between;
     align-items: center;
     margin: 10px 0;
-    width: 180px;
+    width: 250px;
 
     &:hover {
       background-color: #424242;
@@ -216,7 +226,7 @@ const BtCreateChat = styled.button`
   cursor: pointer;
   font-weight: bold;
   margin: 20px 0;
-  width: 200px;
+  width: 270px;
   font-family: 'Karla', sans-serif;
   &:hover {
     background-color: #4CAF50;
@@ -290,9 +300,9 @@ function Home() {
       const formattedMessages = response.map(msg => ({
         id: msg.id,
         text: msg.content,
-        sender: msg.sender || 'user',
-        timestamp: msg.timestamp,
-        chatId: msg.chat_id,
+        sender: msg.sender,
+        created_id: msg.created_at,
+        chat_id: msg.chat_id,
         type: msg.type
       }));
       setMessages(formattedMessages);
@@ -315,10 +325,10 @@ function Home() {
       let chatId = currentChatId;
 
       if (!chatId) {
-        const firstWord = messageContent.split(' ')[0];
-        const topic = firstWord.length > 0 ? firstWord : "Novo Chat";
+        
+        const topicResponse = await generateAIResponseTopic(messageContent);
 
-        const newChat = await createChat(topic);
+        const newChat = await createChat(topicResponse.response);
         chatId = newChat.id;
         setCurrentChatId(chatId);
         setChats(prevChats => [...prevChats, newChat]);

@@ -55,8 +55,21 @@ const ErrorMessage = styled.div`
     margin-bottom: 1.5rem;
 `;
 
+const InputRow = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+`;
+
 const InputContainer = styled.div`
     margin-bottom: 1.5rem;
+    width: 48%;
+`;
+
+const InputContainerFull = styled.div`
+    margin-bottom: 1.5rem;
+    width: 100%;
 `;
 
 const InputLabel = styled.label`
@@ -138,9 +151,25 @@ function Register() {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
+    const [selectedLanguage, setSelectedLanguage] = useState('');
+    const [levels, setLevels] = useState([]);
 
     const goToIndex = () => {
         navigate('/');
+    };
+
+    const handleLanguageChange = (e) => {
+        const language = e.target.value;
+        setSelectedLanguage(language);
+        
+        // Define os níveis com base no idioma selecionado
+        if (language === 'english') {
+            setLevels(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']);
+        } else if (language === 'japanese') {
+            setLevels(['N5', 'N4', 'N3', 'N2', 'N1']);
+        } else {
+            setLevels([]);
+        }
     };
 
     const handleRegister = async (event) => {
@@ -149,13 +178,16 @@ function Register() {
         setError('');
 
         try {
-
             const userData = {
                 first_name: event.target.first_name.value,
+                last_name: event.target.last_name.value,
                 email: event.target.email.value,
                 password: event.target.password.value,
                 language: event.target.language.value,
+                level: event.target.level.value,
             };
+
+            console.log(userData);
 
             if (userData.password !== event.target['confirm-password'].value) {
                 setError('As senhas não coincidem');
@@ -197,35 +229,71 @@ function Register() {
                         </ErrorMessage>
                     )}
 
-                    <InputContainer>
-                        <InputLabel htmlFor="first_name">
-                            Nome
-                        </InputLabel>
-                        <Input
-                            type="first_name"
-                            id="first_name"
-                            name="first_name"
-                            placeholder="Digite seu nome"
-                            required
-                        />
-                    </InputContainer>
+                    <InputRow>
+                        <InputContainer>
+                            <InputLabel htmlFor="first_name">
+                                Primeiro nome
+                            </InputLabel>
+                            <Input
+                                type="first_name"
+                                id="first_name"
+                                name="first_name"
+                                placeholder="Digite seu nome"
+                                required
+                            />
+                        </InputContainer>
 
-                    <InputContainer>
-                        <InputLabel htmlFor="name">
-                            Idioma que deseja aprender
-                        </InputLabel>
-                        <Select
-                            id="language"
-                            name="language"
-                            required
-                        >
-                            <Option value="" disabled selected>Selecione</Option>
-                            <Option value="english">Inglês</Option>
-                        </Select>
+                        <InputContainer>
+                            <InputLabel htmlFor="last_name">
+                                Último nome
+                            </InputLabel>
+                            <Input
+                                type="last_name"
+                                id="last_name"
+                                name="last_name"
+                                placeholder="Digite seu último sobrenome"
+                                required
+                            />
+                        </InputContainer>
+                    </InputRow>
 
-                    </InputContainer>
+                    <InputRow>
+                        <InputContainer>
+                            <InputLabel htmlFor="language">
+                                Idioma que deseja aprender
+                            </InputLabel>
+                            <Select
+                                id="language"
+                                name="language"
+                                onChange={handleLanguageChange}
+                                required
+                            >
+                                <Option value="" disabled selected>Selecione</Option>
+                                <Option value="english">Inglês</Option>
+                                <Option value="japanese">Japonês</Option>
+                            </Select>
+                        </InputContainer>
 
-                    <InputContainer>
+                        <InputContainer>
+                            <InputLabel htmlFor="level">
+                                Nível atual no idioma
+                            </InputLabel>
+                            <Select
+                                id="level"
+                                name="level"
+                                required
+                                disabled={!selectedLanguage}
+                            >
+                                <Option value="" disabled selected>Selecione</Option>
+                                {levels.map((level) => (
+                                    <Option key={level} value={level}>{level}</Option>
+                                ))}
+                            </Select>
+                        </InputContainer>
+                    </InputRow>
+
+                    {/* Restante do seu formulário permanece o mesmo */}
+                    <InputContainerFull>
                         <InputLabel htmlFor="email">
                             Email
                         </InputLabel>
@@ -236,33 +304,35 @@ function Register() {
                             placeholder="Digite seu email"
                             required
                         />
-                    </InputContainer>
+                    </InputContainerFull>
 
-                    <InputContainer>
-                        <InputLabel htmlFor="password">
-                            Senha
-                        </InputLabel>
-                        <Input
-                            type="password"
-                            id="password"
-                            name="password"
-                            placeholder="Digite sua senha"
-                            required
-                        />
-                    </InputContainer>
+                    <InputRow>
+                        <InputContainer>
+                            <InputLabel htmlFor="password">
+                                Senha
+                            </InputLabel>
+                            <Input
+                                type="password"
+                                id="password"
+                                name="password"
+                                placeholder="Digite sua senha"
+                                required
+                            />
+                        </InputContainer>
 
-                    <InputContainer>
-                        <InputLabel htmlFor="confirm-password">
-                            Confirmar Senha
-                        </InputLabel>
-                        <Input
-                            type="password"
-                            id="confirm-password"
-                            name="confirm-password"
-                            placeholder="Confirme sua senha"
-                            required
-                        />
-                    </InputContainer>
+                        <InputContainer>
+                            <InputLabel htmlFor="confirm-password">
+                                Confirmar Senha
+                            </InputLabel>
+                            <Input
+                                type="password"
+                                id="confirm-password"
+                                name="confirm-password"
+                                placeholder="Confirme sua senha"
+                                required
+                            />
+                        </InputContainer>
+                    </InputRow>
 
                     <Button
                         type="submit"

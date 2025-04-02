@@ -20,6 +20,8 @@ export const register = async (userData) => {
      
     const response = await axios.post('http://localhost:8080/user/', userData);
 
+    console.log(response)
+
     return response.data;
 
 }
@@ -69,8 +71,6 @@ export const getMessagesByChatId = async (chatId) => {
             Authorization: `Bearer ${Cookies.get('authToken')}`
         }
     });
-
-    console.log(response.data)
 
     return response.data;
 
@@ -134,6 +134,24 @@ export const generateAIResponseCorrection = async (message) => {
 export const generateAIResponseTranslation = async (message) => {
     try {
         const response = await axios.post(`http://localhost:8080/ai/generate-response-translation`, {
+            message
+        }, {
+            headers: {
+                Authorization: `Bearer ${Cookies.get('authToken')}`
+            }
+        });
+
+        return response.data;
+    }
+    catch (error) {
+        console.log(error)
+    }
+}
+
+// generate AI response topic
+export const generateAIResponseTopic = async (message) => {
+    try {
+        const response = await axios.post(`http://localhost:8080/ai/generate-response-topic`, {
             message
         }, {
             headers: {
