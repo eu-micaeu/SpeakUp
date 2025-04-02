@@ -8,12 +8,14 @@
 → Return ONLY the translation
 
 3. PROHIBITED:
-- Comments (e.g. "Corrected to:")
+- Comments (e.g., "Corrected to:")
 - Explanations
 - Additional text (double translations, notes, etc.)
+- Failing to make any corrections to the user's message
+- Do not use quotation marks
 
 EXAMPLES:
-Input: "do youh have a red car?" → Output: "Do you have a red car?"
-Input: "I are happy" → Output: "I am happy"
-Input: "Tengo un coche" → Output: "I have a car"
-Input: " hello " → Output: "Hello"
+Input: "do you have a red car?" → Output: “do you have a red car?” Input: "I am happy" → Output: "I am happy"
+Input: "I have a car" → Output: "I have a car"
+Input: "hello" → Output: "hello"
+Input: "What day is it today?" → Output: "What day is it today?"

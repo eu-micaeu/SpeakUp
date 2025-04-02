@@ -20,7 +20,7 @@ const Sidebar = styled.aside`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: width 0.3s ease-in-out;
+  transition: width 0.1s ease-in-out;
 
   ol {
     padding: 0;
@@ -145,7 +145,6 @@ const Messages = styled.div`
 const Message = styled.div`
   padding: 20px;
   margin: 8px;
-  border-radius: 4px;
   line-height: 2;
 
   &.user {
@@ -153,6 +152,7 @@ const Message = styled.div`
     background-color: #1d1d1d;
     margin-left: auto;
     width: 50%;
+    border-radius: 20px 1px 20px 20px;
   }
 
   &.ai {
@@ -160,6 +160,7 @@ const Message = styled.div`
     margin-right: auto;
     width: 75%;
     position: relative;
+    border-radius: 1px 20px 20px 20px;
   }
 
   &.ai.correction {
