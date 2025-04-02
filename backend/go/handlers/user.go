@@ -2,10 +2,11 @@ package handlers
 
 import (
 	"net/http"
-	"speakup/models"
-	"github.com/gin-gonic/gin"
 	"speakup/config"
 	"speakup/middlewares"
+	"speakup/models"
+
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"golang.org/x/crypto/bcrypt"
@@ -40,35 +41,37 @@ func Login(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Login successful", "token": token})
 }
 
+// CRUD operations for user
+
 // CreateUser handles the creation of a new user
 func CreateUser(c *gin.Context) {
-	client := config.GetMongoClient()
-	var user models.User
-	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	collection := client.Database("speakup").Collection("users")
-	user.ID = uuid.New().String()
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
-		return
-	}
-	user.Password = string(hashedPassword)
-	_, err = collection.InsertOne(c, bson.M{
-		"id":         user.ID,
-		"first_name": user.FirstName,
-		"last_name":  user.LastName,
-		"email":      user.Email,
-		"password":   user.Password,
-		"language":   user.Language,
-	})
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"message": "User created successfully"})
+    client := config.GetMongoClient()
+    var user models.User
+    if err := c.ShouldBindJSON(&user); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    // Generate a unique ID for the user
+    user.ID = uuid.New().String()
+
+    // Hash the user's password
+    hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
+        return
+    }
+    user.Password = string(hashedPassword)
+
+    // Insert the user object directly into the database
+    collection := client.Database("speakup").Collection("users")
+    _, err = collection.InsertOne(c, user)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{"message": "User created successfully"})
 }
 
 // GetUsers handles the retrieval of a user
