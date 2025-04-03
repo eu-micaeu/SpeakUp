@@ -34,7 +34,7 @@ const Main = styled.main`
 const Title = styled.h1`
   text-align: center;
   font-size: 3em;
-  padding: 50px 0;
+  padding: 30px 0;
   margin: 0;
   color: #fff;
 `;
@@ -51,7 +51,7 @@ const CardsContainer = styled.div`
 `;
 
 const Card = styled.div`
-  width: 50%;
+  width: 300px;
   height: 60%;
   padding: 40px;
   background-color: #000;
@@ -77,9 +77,9 @@ const Card = styled.div`
 
 const CardContent = styled.p`
   font-size: 1em;
-  margin: 20px 10px;
+  margin: 20px;
   text-align: justify;
-  line-height: 1.6em;
+  line-height: 1.5em;
 `;
 
 const DotsContainer = styled.div`
