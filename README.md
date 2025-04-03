@@ -2,30 +2,18 @@
 
 # SpeakUp
 
-✨**Objetivo:** 
 <p style="text-align: justify;">
-O SpeakUp é uma plataforma inovadora que utiliza inteligência artificial para auxiliar no aprendizado de novos idiomas de maneira eficiente e personalizada. 
+Uma plataforma inovadora que utiliza inteligência artificial para auxiliar no aprendizado de novos idiomas de maneira eficiente e personalizada. 
 Com foco na melhoria contínua, a IA analisa seus textos em tempo real, identificando erros de digitação e gramaticais.
 A cada erro encontrado, a ferramenta destaca as correções necessárias, oferecendo explicações detalhadas sobre o que foi corrigido e o motivo.
 Dessa forma, você não apenas corrige suas falhas, mas também aprende com cada interação, desenvolvendo suas habilidades linguísticas de maneira prática e envolvente.
 </p>
 
-## Principais funcionalidades:
-
-1. **Correção em Tempo Real:** A IA analisa os textos à medida que você digita, identificando e corrigindo erros gramaticais, ortográficos e de digitação instantaneamente.
-2. **Explicações Detalhadas:** Cada correção vem acompanhada de uma explicação sobre o motivo do erro e a regra gramatical ou ortográfica aplicada, facilitando o aprendizado.
-3. **Feedback Personalizado:** A plataforma se adapta ao seu nível de proficiência e oferece feedback personalizado para melhorar suas habilidades linguísticas, focando nas áreas em que você apresenta mais dificuldades.
-4. **Histórico de Aprendizado:** Todas as correções feitas ao longo do tempo ficam armazenadas em um histórico pessoal, permitindo que você acompanhe seu progresso e revise suas melhorias.
-
-</p>
-
 ## Tecnologias utilizadas:
-
-### GoLang
 
 <br>
 
-<img src="https://go.dev/blog/go-brand/Go-Logo/PNG/Go-Logo_Blue.png" alt="GoLang" width="150">
+- GoLang
 
 <br>
 
@@ -33,11 +21,9 @@ Dessa forma, você não apenas corrige suas falhas, mas também aprende com cada
 GoLang, ou Go, é uma linguagem de programação desenvolvida pela Google, projetada para ser eficiente, com ótimo desempenho em ambientes de alta concorrência. Suas principais vantagens incluem sintaxe simples, gerenciamento de memória automático e alta velocidade de compilação, tornando-a ideal para a criação de sistemas distribuídos, servidores web e soluções de grande escala.
 </p>
 
-### ReactJS
-
 <br>
 
-<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/862px-React-icon.svg.png" alt="ReactJs" width="100">
+- ReactJS
 
 <br>
 
@@ -45,11 +31,9 @@ GoLang, ou Go, é uma linguagem de programação desenvolvida pela Google, proje
 ReactJS é uma biblioteca JavaScript desenvolvida pelo Facebook para a criação de interfaces de usuário dinâmicas e eficientes. Ela facilita o desenvolvimento de componentes reutilizáveis, permitindo a construção de aplicações modernas e rápidas. Além disso, sua estrutura baseada em componentes facilita a manutenção e a escalabilidade de grandes aplicações web.
 </p>
 
-### Docker
-
 <br>
 
-<img src="https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/97_Docker_logo_logos-512.png" alt="Docker" width="150">
+- Docker
 
 <br>
 
@@ -57,11 +41,9 @@ ReactJS é uma biblioteca JavaScript desenvolvida pelo Facebook para a criação
 Docker é uma plataforma que permite empacotar e isolar aplicações em contêineres. Isso garante que o software funcione de maneira consistente em diferentes ambientes, desde o desenvolvimento até a produção. Docker simplifica a gestão de dependências e facilita o deployment de aplicativos, otimizando a utilização de recursos e a portabilidade entre plataformas.
 </p>
 
-### MongoDB
-
 <br>
 
-<img src="https://images.icon-icons.com/2415/PNG/512/mongodb_original_wordmark_logo_icon_146425.png" alt="MongoDB" width="150">
+- MongoDB
 
 <br>
 
@@ -70,6 +52,18 @@ MongoDB é um banco de dados NoSQL orientado a documentos que armazena dados em 
 </p>
 
 <br>
+
+## Principais funcionalidades:
+
+- **Correção em Tempo Real:** A IA analisa os textos à medida que você digita, identificando e corrigindo erros gramaticais, ortográficos e de digitação instantaneamente.
+   
+- **Explicações Detalhadas:** Cada correção vem acompanhada de uma explicação sobre o motivo do erro e a regra gramatical ou ortográfica aplicada, facilitando o aprendizado.
+   
+- **Feedback Personalizado:** A plataforma se adapta ao seu nível de proficiência e oferece feedback personalizado para melhorar suas habilidades linguísticas, focando nas áreas em que você apresenta mais dificuldades.
+   
+- **Histórico de Aprendizado:** Todas as correções feitas ao longo do tempo ficam armazenadas em um histórico pessoal, permitindo que você acompanhe seu progresso e revise suas melhorias.
+
+</p>
 
 ## Como rodar?
 
