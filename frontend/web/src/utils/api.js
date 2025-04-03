@@ -1,10 +1,12 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
+const API_URL = process.env.REACT_APP_API_URL
+
 // Login
 export const login = async (email, password) => {
 
-    const response = await axios.post('http://localhost:8080/user/login', {
+    const response = await axios.post(API_URL + '/user/login', {
         email,
         password
     });
@@ -18,7 +20,7 @@ export const login = async (email, password) => {
 
 export const register = async (userData) => {
      
-    const response = await axios.post('http://localhost:8080/user/', userData);
+    const response = await axios.post(API_URL + '/user/', userData);
 
     console.log(response)
 
@@ -28,7 +30,7 @@ export const register = async (userData) => {
 // Create chat
 export const createChat = async (topic) => {
 
-    const response = await axios.post('http://localhost:8080/chat', {
+    const response = await axios.post(API_URL + '/chat', {
         topic
     }, {
         headers: {
@@ -42,7 +44,7 @@ export const createChat = async (topic) => {
 // Delete chat
 export const deleteChat = async (chatId) => {
 
-    const response = await axios.delete(`http://localhost:8080/chat/${chatId}`, {
+    const response = await axios.delete(API_URL + `/chat/${chatId}`, {
         headers: {
             Authorization: `Bearer ${Cookies.get('authToken')}`
         }
@@ -53,7 +55,7 @@ export const deleteChat = async (chatId) => {
 // Get chats by user id
 export const getChatsByUserId = async () => {
 
-    const response = await axios.get(`http://localhost:8080/chat/user`, {
+    const response = await axios.get(API_URL + `/chat/user`, {
         headers: {
             Authorization: `Bearer ${Cookies.get('authToken')}`
         }
@@ -66,7 +68,7 @@ export const getChatsByUserId = async () => {
 // Get messages by chat id
 export const getMessagesByChatId = async (chatId) => {
 
-    const response = await axios.get(`http://localhost:8080/message/chat/${chatId}`, {
+    const response = await axios.get(API_URL + `/message/chat/${chatId}`, {
         headers: {
             Authorization: `Bearer ${Cookies.get('authToken')}`
         }
@@ -79,7 +81,7 @@ export const getMessagesByChatId = async (chatId) => {
 // Add message to chat
 export const addMessageToChat = async (chat_id, content, sender, type) => {
 
-    const response = await axios.post(`http://localhost:8080/message`, {
+    const response = await axios.post(API_URL + `/message`, {
         chat_id,
         content,
         sender, 
@@ -97,7 +99,7 @@ export const addMessageToChat = async (chat_id, content, sender, type) => {
 // generate AI response dialog
 export const generateAIResponseDialog = async (message) => {
     try {
-        const response = await axios.post(`http://localhost:8080/ai/generate-response-dialog`, {
+        const response = await axios.post(API_URL + `/ai/generate-response-dialog`, {
             message
         }, {
             headers: {
@@ -115,7 +117,7 @@ export const generateAIResponseDialog = async (message) => {
 // generate AI response correction
 export const generateAIResponseCorrection = async (message) => {
     try {
-        const response = await axios.post(`http://localhost:8080/ai/generate-response-correction`, {
+        const response = await axios.post(API_URL + `/ai/generate-response-correction`, {
             message
         }, {
             headers: {
@@ -133,7 +135,7 @@ export const generateAIResponseCorrection = async (message) => {
 // generate AI response translation
 export const generateAIResponseTranslation = async (message) => {
     try {
-        const response = await axios.post(`http://localhost:8080/ai/generate-response-translation`, {
+        const response = await axios.post(API_URL + `/ai/generate-response-translation`, {
             message
         }, {
             headers: {
@@ -151,7 +153,7 @@ export const generateAIResponseTranslation = async (message) => {
 // generate AI response topic
 export const generateAIResponseTopic = async (message) => {
     try {
-        const response = await axios.post(`http://localhost:8080/ai/generate-response-topic`, {
+        const response = await axios.post(API_URL + `/ai/generate-response-topic`, {
             message
         }, {
             headers: {

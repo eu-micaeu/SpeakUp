@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import {
   getChatsByUserId,
   createChat,
@@ -244,6 +244,110 @@ const DivSpeakUp = styled.div`
   margin-bottom: 25px;
 `;
 
+// Animação de rotação (mantida)
+const rotate = keyframes`
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+`;
+
+// Novo estilo para o modal central
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: ${props => props.$visible ? 'flex' : 'none'};
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+const ModalContent = styled.div`
+  background-color: #1d1d1d;
+  border-radius: 10px;
+  padding: 25px;
+  width: 300px;
+  max-width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  animation: ${props => props.$visible ? 'fadeIn 0.3s ease-out' : 'none'};
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
+
+const ModalTitle = styled.h3`
+  margin-top: 0;
+  color: #fff;
+  text-align: center;
+  border-bottom: 1px solid #444;
+  padding-bottom: 10px;
+`;
+
+const OptionButton = styled.button`
+  display: block;
+  width: 100%;
+  padding: 12px 15px;
+  margin: 10px 0;
+  background-color: #313131;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+  font-size: 16px;
+
+  &:hover {
+    background-color: #4CAF50;
+    transform: scale(1.02);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+`;
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #777;
+  font-size: 20px;
+  cursor: pointer;
+
+  &:hover {
+    color: #fff;
+  }
+`;
+
+// Estilo do ícone de settings (modificado para usar a animação)
+const StyledSettingsIcon = styled(SettingsIcon)`
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    animation: ${rotate} 0.5s linear;
+    color: rgb(187, 187, 187);
+  }
+`;
+
 function Home() {
 
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
@@ -251,8 +355,22 @@ function Home() {
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [currentChatId, setCurrentChatId] = useState(null);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
   const messagesEndRef = useRef(null);
   const navigate = useNavigate();
+  const popupRef = useRef(null);
+
+  const handleSettingsClick = () => {
+    setShowSettingsModal(true);
+  };
+
+  const handleOptionSelect = (option) => {
+    setShowSettingsModal(false);
+  };
+
+  const closeModal = () => {
+    setShowSettingsModal(false);
+  };
 
   const goToIndex = () => {
     navigate('/');
@@ -479,6 +597,21 @@ function Home() {
       </Sidebar>
 
       <MainContent $sidebarVisible={isSidebarVisible}>
+
+        {/* Modal de Settings */}
+        <ModalOverlay $visible={showSettingsModal} onClick={closeModal}>
+          <ModalContent $visible={showSettingsModal} onClick={(e) => e.stopPropagation()}>
+            <CloseButton onClick={closeModal}>&times;</CloseButton>
+            <ModalTitle>Escolha o Modelo</ModalTitle>
+            <OptionButton onClick={() => handleOptionSelect('OpenAI')}>
+              OpenAI
+            </OptionButton>
+            <OptionButton onClick={() => handleOptionSelect('Gemini')}>
+              Gemini
+            </OptionButton>
+          </ModalContent>
+        </ModalOverlay>
+
         {!isSidebarVisible && (
           <ToggleButton onClick={toggleSidebar} $sidebarVisible={isSidebarVisible}>
             &#9776;
@@ -529,13 +662,10 @@ function Home() {
           </Messages>
 
           <ChatInput>
-            <SettingsIcon
-              onKeyDown={handleKeyPress}
-              onClick={handleSendMessage}
-              style={{ color: "#fff", cursor: "pointer" }}
-              onMouseEnter={(e) => e.target.style.color = "rgb(187, 187, 187)"}
-              onMouseLeave={(e) => e.target.style.color = "#fff"}
+            <StyledSettingsIcon
+              onClick={handleSettingsClick}
             />
+
             <input
               type="text"
               placeholder="Digite sua mensagem..."
@@ -543,6 +673,7 @@ function Home() {
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={handleKeyPress}
             />
+
             <SendIcon
               onKeyDown={handleKeyPress}
               onClick={handleSendMessage}
