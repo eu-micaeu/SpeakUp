@@ -32,7 +32,7 @@ func GenerateResponseDialog(c *gin.Context) {
 		return
 	}
 
-	connector := connectors.NewOpenAIConnector()
+	connector := connectors.NewGeminiConnector()
 
 	// Generate a response for the dialogue
 	dialogueResp, err := connector.GenerateResponse(context.Background(), prompt + request.Message + "Answer me in this language: " + middlewares.GetLanguageFromContext(c))
@@ -64,7 +64,7 @@ func GenerateResponseCorrection(c *gin.Context) {
 		return
 	}
 
-	connector := connectors.NewOpenAIConnector()
+	connector := connectors.NewGeminiConnector()
 
 	// Generate a correction for the dialogue
 	correctionResp, err := connector.GenerateResponse(context.Background(), prompt + request.Message)
@@ -78,6 +78,15 @@ func GenerateResponseCorrection(c *gin.Context) {
 
 // GenerateResponseTranslate generates a translation for the AI
 func GenerateResponseTranslate(c *gin.Context) {
+
+	promptPath := filepath.Join("prompts", "promptTranslate.txt")
+	promptBytes, err := os.ReadFile(promptPath)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load prompt: " + err.Error()})
+		return
+	}
+	prompt := string(promptBytes)
+
 	var request struct {
 		Message string `json:"message"`
 	}
@@ -87,10 +96,10 @@ func GenerateResponseTranslate(c *gin.Context) {
 		return
 	}
 
-	connector := connectors.NewOpenAIConnector()
+	connector := connectors.NewGeminiConnector()
 
 	// Generate a translation for the dialogue
-	translateResp, err := connector.GenerateResponse(context.Background(), "Please translate the following text to Portuguese: "+request.Message)
+	translateResp, err := connector.GenerateResponse(context.Background(), prompt + request.Message)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -110,10 +119,10 @@ func GenerateResponseTopic(c *gin.Context) {
 		return
 	}
 
-	connector := connectors.NewOpenAIConnector()
+	connector := connectors.NewGeminiConnector()
 
 	// Generate a response for the topic
-	topicResp, err := connector.GenerateResponse(context.Background(), "Please generate a topic for the following text, generate with 2 words only: " + request.Message)
+	topicResp, err := connector.GenerateResponse(context.Background(), "Please generate a topic for the following text, return only words ,generate with 2 words only: " + request.Message)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
