@@ -2,6 +2,10 @@
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 
+// Icons
+import CreateIcon from '@mui/icons-material/Create';
+import BookIcon from '@mui/icons-material/Book';
+
 import {useNavigate} from 'react-router-dom';
 
 import styled from 'styled-components';
@@ -70,19 +74,33 @@ function Home() {
 
                     <Card onClick={() => goToChat()}>
 
-                        <h3>IA</h3>
+                        <CreateIcon 
+                        
+                            sx={{
+
+                                fontSize: "5rem",
+
+                            }}
+                        
+                        ></CreateIcon>
+
+                        <h2>Praticar.</h2>
 
                     </Card>
 
                     <Card>
 
-                        <h3>Plano de ensino</h3>
+                        <BookIcon
 
-                    </Card>
+                            sx={{
 
-                    <Card>
+                                fontSize: "5rem",
 
-                        <h3>Card 3</h3>
+                            }}
+
+                        ></BookIcon>
+
+                        <h2>Plano de Ensino.</h2>
 
                     </Card>
 
