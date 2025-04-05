@@ -33,9 +33,8 @@ const Main = styled.main`
 
 const Title = styled.h1`
   text-align: center;
-  font-size: 3em;
-  padding: 30px 0;
-  margin: 0;
+  font-size: 2em;
+  margin: 30px 0 0 0;
   color: #fff;
 `;
 
@@ -44,19 +43,17 @@ const CardsContainer = styled.div`
   justify-content: center;
   align-items: center;
   gap: 20px;
-  padding: 0 20px;
-  width: 80%;
   position: relative;
   height: 400px;
 `;
 
 const Card = styled.div`
-  width: 300px;
+  width: 500px;
   height: 60%;
-  padding: 40px;
+  padding: 50px 25px;
   background-color: #000;
   color: #fff;
-  border-radius: 10px;
+  border-radius: 5px;
   transition: all 0.5s ease;
   display: flex;
   flex-direction: column;
@@ -77,7 +74,6 @@ const Card = styled.div`
 
 const CardContent = styled.p`
   font-size: 1em;
-  margin: 20px;
   text-align: justify;
   line-height: 1.5em;
 `;
@@ -90,8 +86,8 @@ const DotsContainer = styled.div`
 `;
 
 const Dot = styled.div`
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background-color: ${props => props.active ? '#fff' : '#666'};
   cursor: pointer;
@@ -114,6 +110,7 @@ function Index() {
       <Header />
       
       <Main>
+
         <Title>SpeakUp</Title>
         
         <CardsContainer>
