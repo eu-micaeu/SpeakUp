@@ -28,7 +28,7 @@ const PageHome = styled.div`
 `;
 
 const Sidebar = styled.aside`
-  width: ${props => props.$isVisible ? '20%' : '0'};
+  width: ${props => props.$isVisible ? '400px' : '0'};
   background-color: #000000;
   position: relative;
   color: #ffffff;
@@ -67,7 +67,7 @@ const Sidebar = styled.aside`
     justify-content: space-between;
     align-items: center;
     margin: 10px 0;
-    width: 250px;
+    width: 220px;
 
     &:hover {
       background-color: #424242;
@@ -187,14 +187,6 @@ const Message = styled.div`
     padding: 10px;
     margin: 10px 0;
   }
-
-  .translation {
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid #555;
-    font-style: italic;
-    color: #aaa;
-  }
 `;
 
 const ChatInput = styled.div`
@@ -232,7 +224,7 @@ const BtCreateChat = styled.button`
   cursor: pointer;
   font-weight: bold;
   margin: 20px 0;
-  width: 270px;
+  width: 240px;
   font-family: 'Karla', sans-serif;
   &:hover {
     background-color: #4CAF50;
@@ -357,6 +349,47 @@ const ActionsDiv = styled.div`
   flex-direction: row;
 `
 
+const SkeletonMessage = styled.div`
+  padding: 20px;
+  margin: 8px;
+  border-radius: 20px;
+  background-color: #2a2a2a;
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+    animation: loading 1.5s infinite;
+  }
+
+  @keyframes loading {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+`;
+
+const SkeletonLine = styled.div`
+  height: 16px;
+  background-color: #3a3a3a;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  
+  &:last-child {
+    margin-bottom: 0;
+    width: 80%;
+  }
+`;
+
 function Chat() {
 
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
@@ -365,6 +398,8 @@ function Chat() {
   const [inputMessage, setInputMessage] = useState('');
   const [currentChatId, setCurrentChatId] = useState(null);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [isSendingMessage, setIsSendingMessage] = useState(false);
   const { logout } = useAuth();
   const messagesEndRef = useRef(null);
   const navigate = useNavigate();
@@ -429,6 +464,7 @@ function Chat() {
 
   const loadChatMessages = async (chatId) => {
     try {
+      setIsLoadingMessages(true);
       const response = await getMessagesByChatId(chatId);
       const formattedMessages = response.map(msg => ({
         id: msg.id,
@@ -442,11 +478,15 @@ function Chat() {
     } catch (error) {
       console.error("Erro ao carregar mensagens:", error);
       setMessages([]);
+    } finally {
+      setIsLoadingMessages(false);
     }
   };
 
   const handleSendMessage = async () => {
-    if (inputMessage.trim() === '') return;
+    if (inputMessage.trim() === '' || isSendingMessage) return;
+
+    setIsSendingMessage(true);
 
     const messageContent = inputMessage.trim();
     setInputMessage('');
@@ -532,6 +572,8 @@ function Chat() {
       if (tempMessage) setMessages(prev => prev.filter(m => m.id !== tempMessage.id));
       if (tempAIMessage) setMessages(prev => prev.filter(m => m.id !== tempAIMessage.id));
       setInputMessage(messageContent);
+    } finally {
+      setIsSendingMessage(false);
     }
   };
 
@@ -644,40 +686,71 @@ function Chat() {
         </DivSpeakUp>
         <ChatContainer>
           <Messages>
-            {messages
-              .filter(msg => msg.chatId === currentChatId || msg.chat_id === currentChatId)
-              .map((message) => (
-                <Message key={message.id} className={`${message.sender} ${message.type}`}>
-                  {(message.text || message.content).split('\n\n').map((line, index, lines) => {
-                    // Verifica se é a linha de tradução
-                    if (line.startsWith('[TRANSLATION]: ')) {
-                      return (
-                        <div key={index} className="translation">
-                          <strong>Tradução:</strong> {line.replace('[TRANSLATION]: ', '')}
-                        </div>
-                      );
-                    }
+            {isLoadingMessages ? (
+              <>
+                <SkeletonMessage className="ai">
+                  <SkeletonLine />
+                  <SkeletonLine />
+                  <SkeletonLine />
+                </SkeletonMessage>
+                <SkeletonMessage className="user">
+                  <SkeletonLine />
+                  <SkeletonLine />
+                </SkeletonMessage>
+                <SkeletonMessage className="ai">
+                  <SkeletonLine />
+                  <SkeletonLine />
+                  <SkeletonLine />
+                  <SkeletonLine />
+                </SkeletonMessage>
+              </>
+            ) : (
+              messages
+                .filter(msg => msg.chatId === currentChatId || msg.chat_id === currentChatId)
+                .map((message) => (
+                  <Message key={message.id} className={`${message.sender} ${message.type}`}>
+                    {(message.text || message.content).split(/\n{1,}/).map((line, index, lines) => {
+                      // Verifica se é a linha de tradução
+                      if (line.startsWith('[TRANSLATION]: ')) {
+                        return (
+                          <div key={index} style={{
+                            marginTop: "10px",
+                            paddingTop: "10px",
+                            borderTop: "1px solid #555",
+                            color: "#aaa",
+                          }}>
+                            <strong>Tradução:</strong> {line.replace('[TRANSLATION]: ', '')}
+                          </div>
+                        );
+                      }
 
-                    // Verifica se é a linha de correção
-                    if (index === 1 && line.startsWith('Correção: ')) {
+                      // Verifica se é a linha de correção
+                      if (index === 1 && line.startsWith('Correção: ')) {
+                        return (
+                          <React.Fragment key={index}>
+                            <hr />
+                            <span style={{ color: '#1eff00' }}>{line.replace('Correção: ', '')}</span>
+                          </React.Fragment>
+                        );
+                      }
+
+                      // Linha normal
                       return (
                         <React.Fragment key={index}>
-                          <hr />
-                          <span style={{ color: '#1eff00' }}>{line.replace('Correção: ', '')}</span>
+                          {line}
+                          {index < lines.length - 1 && <br />}
                         </React.Fragment>
                       );
-                    }
-
-                    // Linha normal
-                    return (
-                      <React.Fragment key={index}>
-                        {line}
-                        {index < lines.length - 1 && <br />}
-                      </React.Fragment>
-                    );
-                  })}
-                </Message>
-              ))}
+                    })}
+                  </Message>
+                ))
+            )}
+            {isSendingMessage && (
+              <SkeletonMessage className="ai">
+                <SkeletonLine />
+                <SkeletonLine />
+              </SkeletonMessage>
+            )}
             <div ref={messagesEndRef} />
           </Messages>
 

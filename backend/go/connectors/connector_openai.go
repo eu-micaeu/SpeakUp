@@ -17,7 +17,7 @@ func NewOpenAIConnector() *OpenAIConnector {
 	client := openai.NewClient(apiKey)
 	return &OpenAIConnector{
 		client: client,
-		model:  "gpt-3.5-turbo",
+		model:  "gpt-4o",
 	}
 }
 
