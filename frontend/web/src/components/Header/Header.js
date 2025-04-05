@@ -32,7 +32,6 @@ function Header() {
       <Logo 
         src="logo.png" 
         alt="Logo" 
-        onClick={() => handleNavigation('/')} 
       />
 
       {user ? (

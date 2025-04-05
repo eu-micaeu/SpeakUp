@@ -17,6 +17,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import LogoutIcon from '@mui/icons-material/Logout';
 import PersonIcon from '@mui/icons-material/Person';
 import SettingsIcon from '@mui/icons-material/Settings';
+import AppsIcon from '@mui/icons-material/Apps';
 
 // Context
 import { useAuth } from '../../contexts/Auth';
@@ -349,6 +350,13 @@ const StyledSettingsIcon = styled(SettingsIcon)`
   }
 `;
 
+const ActionsDiv = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row;
+`
+
 function Chat() {
 
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
@@ -376,6 +384,10 @@ function Chat() {
   const goToIndex = () => {
     logout();
     navigate('/');
+  };
+
+  const goToHome = () => {
+    navigate('/home');
   };
 
   const clearCookies = () => {
@@ -584,14 +596,23 @@ function Chat() {
           <BtCreateChat onClick={() => { setCurrentChatId(null); setMessages([]); setIsSidebarVisible(false) }}>+</BtCreateChat>
         </ul>
 
-        <LogoutIcon
-          onClick={() => { goToIndex(); clearCookies(); }}
-          style={{ color: "#ff0000", cursor: "pointer", margin: "20px" }}
-          onMouseEnter={(e) => e.target.style.color = "#ffffff"}
-          onMouseLeave={(e) => e.target.style.color = "#ff0000"}
-        >
-          Sair
-        </LogoutIcon>
+        <ActionsDiv>
+
+          <LogoutIcon
+            onClick={() => { goToIndex(); clearCookies(); }}
+            style={{ color: "#ff0000", cursor: "pointer", margin: "20px" }}
+            onMouseEnter={(e) => e.target.style.color = "#ffffff"}
+            onMouseLeave={(e) => e.target.style.color = "#ff0000"}
+          ></LogoutIcon>
+
+          <AppsIcon
+            onClick={goToHome}
+            style={{ color: "#fff", cursor: "pointer", margin: "20px" }}
+            onMouseEnter={(e) => e.target.style.color = "rgb(194, 194, 194)"}
+            onMouseLeave={(e) => e.target.style.color = "#fff"}
+          ></AppsIcon>
+
+        </ActionsDiv>
 
       </Sidebar>
 
@@ -683,7 +704,7 @@ function Chat() {
           </ChatInput>
 
         </ChatContainer>
-        
+
         <p>O SpeakUp ainda está em Beta, poderá ter erros nas respostas e/ou correções.</p>
       </MainContent>
     </PageHome>
