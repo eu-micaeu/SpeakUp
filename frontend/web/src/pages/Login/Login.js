@@ -4,8 +4,10 @@ import { toast, ToastContainer } from 'react-toastify';
 import styled from 'styled-components';
 import 'react-toastify/dist/ReactToastify.css';
 
+import { useAuth } from '../../contexts/Auth';
+
 // Routes
-import { login } from '../../utils/api';
+import { login as loginApi } from '../../utils/api';
 
 const PageLogin = styled.div`
     
@@ -129,6 +131,7 @@ function Login() {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
+    const { login } = useAuth();
 
     const goToIndex = () => {
         navigate('/');
@@ -145,23 +148,27 @@ function Login() {
         const email = event.target.email.value;
         const password = event.target.password.value;
         try {
-            const response = await login(email, password);
+
+            const response = await loginApi(email, password);
 
             if (response.message === 'Login successful') {
-                toast.success('Login successful!');
-                setTimeout(() => {
-                    goToHome();
-                }, 3000);
-            } else {
-                setError('Login failed. Please check your credentials.');
-                toast.error('Login failed. Please check your credentials.');
+
+                console.log('Login successful');
+
+                login();
+
+                toast.success('Login realizado com sucesso!');
+
+                goToHome();
+                
             }
+
         } catch (err) {
             setError('An error occurred. Please try again.');
-            toast.error('An error occurred. Please try again.');
         } finally {
             setIsLoading(false);
         }
+
     }
 
     return (
@@ -231,5 +238,3 @@ function Login() {
 }
 
 export default Login;
-
-
