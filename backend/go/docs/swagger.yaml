@@ -1,5 +1,16 @@
 basePath: /
 definitions:
+  models.Chat:
+    properties:
+      id:
+        type: string
+      start_time:
+        type: string
+      topic:
+        type: string
+      user_id:
+        type: string
+    type: object
   models.Message:
     properties:
       chat_id:
@@ -39,6 +50,195 @@ info:
   title: SpeakUp API
   version: "1.0"
 paths:
+  /chat:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all chats
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of chats
+          schema:
+            items:
+              $ref: '#/definitions/models.Chat'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            type: object
+      summary: Get all chats
+      tags:
+      - Chat
+    post:
+      consumes:
+      - application/json
+      description: Creates a new chat for a user
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Chat object
+        in: body
+        name: chat
+        required: true
+        schema:
+          $ref: '#/definitions/models.Chat'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created chat
+          schema:
+            $ref: '#/definitions/models.Chat'
+        "400":
+          description: Bad request
+          schema:
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            type: object
+      summary: Create a new chat
+      tags:
+      - Chat
+  /chat/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a chat by ID
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Chat ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Chat deleted successfully
+          schema:
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            type: object
+      summary: Delete a chat
+      tags:
+      - Chat
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a chat by its ID
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Chat ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Chat found
+          schema:
+            $ref: '#/definitions/models.Chat'
+        "404":
+          description: Chat not found
+          schema:
+            type: object
+      summary: Get a chat by ID
+      tags:
+      - Chat
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing chat by ID
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Chat ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated chat object
+        in: body
+        name: chat
+        required: true
+        schema:
+          $ref: '#/definitions/models.Chat'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated chat
+          schema:
+            $ref: '#/definitions/models.Chat'
+        "400":
+          description: Bad request
+          schema:
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            type: object
+      summary: Update a chat
+      tags:
+      - Chat
+  /chat/user:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all chats for the authenticated user
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of user's chats
+          schema:
+            properties:
+              chats:
+                items:
+                  $ref: '#/definitions/models.Chat'
+                type: array
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            type: object
+      summary: Get user's chats
+      tags:
+      - Chat
   /message:
     get:
       consumes:
