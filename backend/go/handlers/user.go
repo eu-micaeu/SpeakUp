@@ -54,6 +54,17 @@ func Login(c *gin.Context) {
 // CRUD operations for user
 
 // CreateUser handles the creation of a new user
+// CreateUser godoc
+// @Summary      Create a new user
+// @Description  Create a new user with the provided details
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        user body models.User true "User details"
+// @Success      200  {object}  object{message=string}
+// @Failure      400  {object}  object{error=string}
+// @Failure      500  {object}  object{error=string}
+// @Router       /user [post]
 func CreateUser(c *gin.Context) {
 	client := config.GetMongoClient()
 	var user models.User
@@ -85,6 +96,15 @@ func CreateUser(c *gin.Context) {
 }
 
 // GetUsers handles the retrieval of a user
+// GetUsers godoc
+// @Summary      Get a user by ID
+// @Description  Retrieve a user's details by their ID
+// @Tags         users
+// @Produce      json
+// @Param        id path string true "User ID"
+// @Success      200  {object}  models.User
+// @Failure      500  {object}  object{error=string}
+// @Router       /user/{id} [get]
 func GetUsers(c *gin.Context) {
 	client := config.GetMongoClient()
 	id := c.Param("id")
@@ -99,6 +119,18 @@ func GetUsers(c *gin.Context) {
 }
 
 // UpdateUser handles the update of a user
+// UpdateUser godoc
+// @Summary      Update a user
+// @Description  Update a user's details by their ID
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        id path string true "User ID"
+// @Param        user body models.User true "User details"
+// @Success      200  {object}  object{message=string}
+// @Failure      400  {object}  object{error=string}
+// @Failure      500  {object}  object{error=string}
+// @Router       /user/{id} [put]
 func UpdateUser(c *gin.Context) {
 	client := config.GetMongoClient()
 	id := c.Param("id")
@@ -122,6 +154,15 @@ func UpdateUser(c *gin.Context) {
 }
 
 // DeleteUser handles the deletion of a user
+// DeleteUser godoc
+// @Summary      Delete a user
+// @Description  Delete a user by their ID
+// @Tags         users
+// @Produce      json
+// @Param        id path string true "User ID"
+// @Success      200  {object}  object{message=string}
+// @Failure      500  {object}  object{error=string}
+// @Router       /user/{id} [delete]
 func DeleteUser(c *gin.Context) {
 	client := config.GetMongoClient()
 	id := c.Param("id")
