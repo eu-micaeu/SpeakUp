@@ -1,7 +1,7 @@
-import styled from 'styled-components';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 import { useState, useEffect } from 'react';
+import styles from './Index.module.css';
 
 const cardData = [
   {
@@ -21,86 +21,13 @@ const cardData = [
   }
 ];
 
-// Styled components
-const Main = styled.main`
-  background-color: #313131;
-  padding: 0;
-  height: 90vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const Title = styled.h1`
-  text-align: center;
-  font-size: 2em;
-  margin: 30px 0 0 0;
-  color: #fff;
-`;
-
-const CardsContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
-  position: relative;
-  height: 400px;
-`;
-
-const Card = styled.div`
-  width: 500px;
-  height: 60%;
-  padding: 50px 25px;
-  background-color: #000;
-  color: #fff;
-  border-radius: 5px;
-  transition: all 0.5s ease;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: absolute;
-  opacity: 0;
-  transform: scale(0.9);
-  
-  &.active {
-    opacity: 1;
-    transform: scale(1);
-  }
-  
-  &:hover {
-    transform: scale(1.05);
-  }
-`;
-
-const CardContent = styled.p`
-  font-size: 1em;
-  text-align: justify;
-  line-height: 1.5em;
-`;
-
-const DotsContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin: 10px 0;
-`;
-
-const Dot = styled.div`
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background-color: ${props => props.active ? '#fff' : '#666'};
-  cursor: pointer;
-  transition: background-color 0.3s;
-`;
-
 function Index() {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % cardData.length);
-    }, 5000);
+    }, 2500);
     
     return () => clearInterval(interval);
   }, []);
@@ -109,32 +36,32 @@ function Index() {
     <>
       <Header />
       
-      <Main>
+      <main className={styles.main}>
 
-        <Title>SpeakUp</Title>
+        <h1 className={styles.title}>SpeakUp</h1>
         
-        <CardsContainer>
+        <div className={styles.cardsContainer}>
           {cardData.map((card, index) => (
-            <Card 
+            <div 
               key={index}
-              className={index === currentIndex ? 'active' : ''}
+              className={`${styles.card} ${index === currentIndex ? styles.active : ''}`}
             >
               <img src={card.imgSrc} alt={card.alt} width={75} height={75} />
-              <CardContent>{card.content}</CardContent>
-            </Card>
+              <p className={styles.cardContent}>{card.content}</p>
+            </div>
           ))}
-        </CardsContainer>
+        </div>
 
-        <DotsContainer>
+        <div className={styles.dotsContainer}>
           {cardData.map((_, index) => (
-            <Dot 
+            <div 
               key={index} 
-              active={index === currentIndex}
+              className={`${styles.dot} ${index === currentIndex ? styles.active : ''}`}
               onClick={() => setCurrentIndex(index)}
             />
           ))}
-        </DotsContainer>
-      </Main>
+        </div>
+      </main>
       
       <Footer />
     </>

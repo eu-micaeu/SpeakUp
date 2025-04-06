@@ -1,0 +1,75 @@
+.main {
+    background-color: #313131;
+    padding: 0;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.title {
+    text-align: center;
+    font-size: 2em;
+    margin: 50px 0 30px 0;
+    color: #fff;
+}
+
+.cardsContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    position: relative;
+    height: 400px;
+}
+
+.card {
+    width: 250px;
+    height: 250px;
+    padding: 50px;
+    background-color: #000;
+    color: #fff;
+    border-radius: 30px;
+    transition: all 0.5s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    opacity: 0;
+    transform: scale(0.9);
+}
+
+.card.active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.card:hover {
+    transform: scale(1.05);
+}
+
+.cardContent {
+    font-size: 1em;
+    text-align: center;
+    line-height: 1.5em;
+}
+
+.dotsContainer {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #666;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.dot.active {
+    background-color: #fff;
+}

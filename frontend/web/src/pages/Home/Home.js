@@ -6,49 +6,10 @@ import Footer from '../../components/Footer/Footer';
 import CreateIcon from '@mui/icons-material/Create';
 import BookIcon from '@mui/icons-material/Book';
 
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-import styled from 'styled-components';
-
-const PageHome = styled.div`
-    display: flex;
-    background-color: rgb(0, 0, 0);
-    color: white;
-    height: 100vh;
-    text-align: center;
-    margin: 10px 0;
-    padding: 40px 0;
-    flex-direction: column;
-`;
-
-const CardsContainer = styled.div`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 20px;
-    margin: 20px;
-    padding: 20px;
-    background-color: #000;
-    border-radius: 10px;
-`;
-
-const Card = styled.div`
-    background-color: #1a1a1a;
-    border-radius: 10px;
-    width: 250px;
-    height: 200px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    transition: ease 0.3s all;
-
-    &:hover {
-        cursor: pointer;
-        transform: scale(1.05);
-    }
-`;
+// CSS Module
+import styles from './Home.module.css';
 
 function Home() {
 
@@ -66,13 +27,13 @@ function Home() {
 
             <Header />
 
-            <PageHome>
+            <div className={styles.pageHome}>
 
                 <h1>Menu</h1>
 
-                <CardsContainer>
+                <div className={styles.cardsContainer}>
 
-                    <Card onClick={() => goToChat()}>
+                    <div className={styles.card} onClick={() => goToChat()}>
 
                         <CreateIcon 
                         
@@ -84,11 +45,11 @@ function Home() {
                         
                         ></CreateIcon>
 
-                        <h2>Praticar.</h2>
+                        <h2>Praticar</h2>
 
-                    </Card>
+                    </div>
 
-                    <Card>
+                    <div className={styles.card}>
 
                         <BookIcon
 
@@ -100,13 +61,13 @@ function Home() {
 
                         ></BookIcon>
 
-                        <h2>Plano de Ensino.</h2>
+                        <h2>Plano de Ensino</h2>
 
-                    </Card>
+                    </div>
 
-                </CardsContainer>
+                </div>
 
-            </PageHome>
+            </div>
 
             <Footer />
 
