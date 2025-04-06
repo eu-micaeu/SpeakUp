@@ -4,17 +4,26 @@ import (
 	"net/http"
 	"time"
 
-	"speakup/models"
 	"speakup/config"
+	"speakup/models"
 
 	"go.mongodb.org/mongo-driver/bson"
-	
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
 // CRUD operations for messages
+// @Summary Create a new message
+// @Description Create a new message with the input payload
+// @Tags messages
+// @Accept  json
+// @Produce  json
+// @Param message body models.Message true "Message object"
+// @Success 201 {object} models.Message
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /messages [post]
 
 // CreateMessage is a handler function that creates a new message
 func CreateMessage(c *gin.Context) {
@@ -40,6 +49,15 @@ func CreateMessage(c *gin.Context) {
 }
 
 // GetMessageById is a handler function that gets a message by ID
+// @Summary Get a message by ID
+// @Description Get a message by its ID
+// @Tags messages
+// @Accept  json
+// @Produce  json
+// @Param id path string true "Message ID"
+// @Success 200 {object} models.Message
+// @Failure 404 {object} map[string]string
+// @Router /messages/{id} [get]
 func GetMessageById(c *gin.Context) {
 	id := c.Param("id")
 	db := config.GetMongoClient()
@@ -55,6 +73,14 @@ func GetMessageById(c *gin.Context) {
 }
 
 // GetMessages is a handler function that gets all messages
+// @Summary Get all messages
+// @Description Get a list of all messages
+// @Tags messages
+// @Accept  json
+// @Produce  json
+// @Success 200 {array} models.Message
+// @Failure 500 {object} map[string]string
+// @Router /messages [get]
 func GetMessages(c *gin.Context) {
 	db := config.GetMongoClient()
 	collection := db.Database("speakup").Collection("messages")
@@ -74,6 +100,17 @@ func GetMessages(c *gin.Context) {
 }
 
 // UpdateMessage is a handler function that updates a message
+// @Summary Update a message
+// @Description Update a message with the input payload
+// @Tags messages
+// @Accept  json
+// @Produce  json
+// @Param id path string true "Message ID"
+// @Param message body models.Message true "Message object"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /messages/{id} [put]
 func UpdateMessage(c *gin.Context) {
 	id := c.Param("id")
 	var message models.Message
@@ -93,6 +130,15 @@ func UpdateMessage(c *gin.Context) {
 }
 
 // DeleteMessage is a handler function that deletes a message
+// @Summary Delete a message
+// @Description Delete a message by its ID
+// @Tags messages
+// @Accept  json
+// @Produce  json
+// @Param id path string true "Message ID"
+// @Success 200 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /messages/{id} [delete]
 func DeleteMessage(c *gin.Context) {
 	id := c.Param("id")
 	db := config.GetMongoClient()
@@ -109,6 +155,15 @@ func DeleteMessage(c *gin.Context) {
 // Special handler functions
 
 // GetMessagesByChatId is a handler function that gets all messages by chat ID
+// @Summary Get messages by chat ID
+// @Description Get a list of messages by chat ID
+// @Tags messages
+// @Accept  json
+// @Produce  json
+// @Param id path string true "Chat ID"
+// @Success 200 {array} models.Message
+// @Failure 500 {object} map[string]string
+// @Router /messages/chat/{id} [get]
 func GetMessagesByChatId(c *gin.Context) {
 	chatId := c.Param("id")
 	db := config.GetMongoClient()

@@ -1,5 +1,20 @@
 basePath: /
 definitions:
+  models.Message:
+    properties:
+      chat_id:
+        type: string
+      content:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      sender:
+        type: string
+      type:
+        type: string
+    type: object
   models.User:
     properties:
       email:
@@ -24,6 +39,153 @@ info:
   title: SpeakUp API
   version: "1.0"
 paths:
+  /messages:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all messages
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Message'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all messages
+      tags:
+      - messages
+  /messages/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a message by its ID
+      parameters:
+      - description: Message ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a message
+      tags:
+      - messages
+    get:
+      consumes:
+      - application/json
+      description: Get a message by its ID
+      parameters:
+      - description: Message ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Message'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a message by ID
+      tags:
+      - messages
+    put:
+      consumes:
+      - application/json
+      description: Update a message with the input payload
+      parameters:
+      - description: Message ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Message object
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/models.Message'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a message
+      tags:
+      - messages
+  /messages/chat/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of messages by chat ID
+      parameters:
+      - description: Chat ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Message'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get messages by chat ID
+      tags:
+      - messages
   /user:
     post:
       consumes:
@@ -189,5 +351,5 @@ paths:
             type: object
       summary: Login de usuário
       tags:
-      - users
+      - Autenticação
 swagger: "2.0"

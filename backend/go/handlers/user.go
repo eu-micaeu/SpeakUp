@@ -16,7 +16,7 @@ import (
 // Login godoc
 // @Summary      Login de usuário
 // @Description  Autentica um usuário e retorna um token JWT
-// @Tags         users
+// @Tags         Autenticação
 // @Accept       json
 // @Produce      json
 // @Param         credentials body object{email=string,password=string} true "Credenciais de login"
