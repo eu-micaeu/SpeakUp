@@ -5,5 +5,30 @@ info:
   description: API para o projeto SpeakUp
   title: SpeakUp API
   version: "1.0"
-paths: {}
+paths:
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: Autentica um usuário e retorna um token JWT
+      parameters:
+      - description: Credenciais
+        in: body
+        name: credentials
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              token:
+                type: string
+            type: object
+      summary: Login de usuário
+      tags:
+      - users
 swagger: "2.0"

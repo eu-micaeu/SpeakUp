@@ -9,6 +9,7 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"speakup/config"
+	_ "speakup/docs"
 	"speakup/middlewares"
 	"speakup/routes"
 )
