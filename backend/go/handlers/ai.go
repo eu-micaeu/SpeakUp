@@ -69,7 +69,7 @@ func GenerateResponseDialog(c *gin.Context) {
 // @Router /ai/generate-response-correction [post]
 func GenerateResponseCorrection(c *gin.Context) {
 
-	promptPath := filepath.Join("prompts", "promptCorrectionEN.txt")
+	promptPath := filepath.Join("prompts", "promptCorrection.txt")
 	promptBytes, err := os.ReadFile(promptPath)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load prompt: " + err.Error()})
@@ -89,7 +89,7 @@ func GenerateResponseCorrection(c *gin.Context) {
 	connector := connectors.NewGeminiConnector()
 
 	// Generate a correction for the dialogue
-	correctionResp, err := connector.GenerateResponse(context.Background(), prompt+request.Message)
+	correctionResp, err := connector.GenerateResponse(context.Background(), prompt+request.Message+"Answer me in this language: "+middlewares.GetLanguageFromContext(c))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
