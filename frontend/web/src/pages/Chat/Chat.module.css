@@ -73,6 +73,7 @@
     justify-content: space-around;
     align-items: center;
     color: #fff;
+    width: 100%;
 }
 
 .mainContent h1 {

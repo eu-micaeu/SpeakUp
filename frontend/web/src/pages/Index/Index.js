@@ -2,6 +2,7 @@ import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 import { useState, useEffect } from 'react';
 import styles from './Index.module.css';
+import { useAuth } from '../../contexts/Auth';
 
 const cardData = [
   {
@@ -23,6 +24,7 @@ const cardData = [
 
 function Index() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const { user } = useAuth();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -31,6 +33,12 @@ function Index() {
     
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      window.location.href = '/home';
+    }
+  }, [user]);
 
   return (
     <>
