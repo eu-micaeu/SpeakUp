@@ -39,11 +39,17 @@ info:
   title: SpeakUp API
   version: "1.0"
 paths:
-  /messages:
+  /message:
     get:
       consumes:
       - application/json
-      description: Get a list of all messages
+      description: Retrieve a list of all messages
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -53,21 +59,26 @@ paths:
             items:
               $ref: '#/definitions/models.Message'
             type: array
+        "401":
+          description: Não autorizado
         "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
+          description: Erro ao buscar mensagens
+      security:
+      - BearerAuth: []
       summary: Get all messages
       tags:
-      - messages
-  /messages/{id}:
+      - message
+  /message/{id}:
     delete:
       consumes:
       - application/json
-      description: Delete a message by its ID
+      description: Remove an existing message from the system
       parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Message ID
         in: path
         name: id
@@ -77,25 +88,26 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: string
-            type: object
+          description: Mensagem deletada com sucesso
+        "401":
+          description: Não autorizado
         "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
+          description: Erro ao deletar mensagem
+      security:
+      - BearerAuth: []
       summary: Delete a message
       tags:
-      - messages
+      - message
     get:
       consumes:
       - application/json
-      description: Get a message by its ID
+      description: Retrieve a message using its ID
       parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Message ID
         in: path
         name: id
@@ -108,26 +120,31 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.Message'
+        "401":
+          description: Não autorizado
         "404":
-          description: Not Found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
+          description: Mensagem não encontrada
+      security:
+      - BearerAuth: []
       summary: Get a message by ID
       tags:
-      - messages
+      - message
     put:
       consumes:
       - application/json
-      description: Update a message with the input payload
+      description: Update an existing message with new information
       parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Message ID
         in: path
         name: id
         required: true
         type: string
-      - description: Message object
+      - description: Message object containing content and type
         in: body
         name: message
         required: true
@@ -137,32 +154,29 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: string
-            type: object
+          description: Mensagem atualizada com sucesso
         "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
+          description: Campo obrigatório faltando
+        "401":
+          description: Não autorizado
         "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
+          description: Erro ao atualizar mensagem
+      security:
+      - BearerAuth: []
       summary: Update a message
       tags:
-      - messages
-  /messages/chat/{id}:
+      - message
+  /message/chat/{id}:
     get:
       consumes:
       - application/json
-      description: Get a list of messages by chat ID
+      description: Retrieve all messages belonging to a specific chat
       parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Chat ID
         in: path
         name: id
@@ -177,15 +191,15 @@ paths:
             items:
               $ref: '#/definitions/models.Message'
             type: array
+        "401":
+          description: Não autorizado
         "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
+          description: Erro ao buscar mensagens
+      security:
+      - BearerAuth: []
       summary: Get messages by chat ID
       tags:
-      - messages
+      - message
   /user:
     post:
       consumes:

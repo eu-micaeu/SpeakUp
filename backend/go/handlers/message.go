@@ -13,17 +13,20 @@ import (
 	"github.com/google/uuid"
 )
 
-// CRUD operations for messages
+// CreateMessage creates a new message
 // @Summary Create a new message
-// @Description Create a new message with the input payload
-// @Tags messages
-// @Accept  json
-// @Produce  json
-// @Param message body models.Message true "Message object"
+// @Description Create a new message with the provided information
+// @Tags message
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param Authorization header string true "Bearer token"
+// @Param message body models.Message true "Message object containing chat_id, content, sender, and type"
 // @Success 201 {object} models.Message
-// @Failure 400 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Router /messages [post]
+// @Failure 400 "Campo obrigatório faltando"
+// @Failure 401 "Não autorizado"
+// @Failure 500 "Erro ao criar mensagem"
+// @Router /message [post]
 
 // CreateMessage is a handler function that creates a new message
 func CreateMessage(c *gin.Context) {
@@ -48,16 +51,19 @@ func CreateMessage(c *gin.Context) {
 
 }
 
-// GetMessageById is a handler function that gets a message by ID
+// GetMessageById gets a message by ID
 // @Summary Get a message by ID
-// @Description Get a message by its ID
-// @Tags messages
-// @Accept  json
-// @Produce  json
+// @Description Retrieve a message using its ID
+// @Tags message
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param Authorization header string true "Bearer token"
 // @Param id path string true "Message ID"
 // @Success 200 {object} models.Message
-// @Failure 404 {object} map[string]string
-// @Router /messages/{id} [get]
+// @Failure 401 "Não autorizado"
+// @Failure 404 "Mensagem não encontrada"
+// @Router /message/{id} [get]
 func GetMessageById(c *gin.Context) {
 	id := c.Param("id")
 	db := config.GetMongoClient()
@@ -72,15 +78,18 @@ func GetMessageById(c *gin.Context) {
 	c.JSON(http.StatusOK, message)
 }
 
-// GetMessages is a handler function that gets all messages
+// GetMessages gets all messages
 // @Summary Get all messages
-// @Description Get a list of all messages
-// @Tags messages
-// @Accept  json
-// @Produce  json
+// @Description Retrieve a list of all messages
+// @Tags message
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param Authorization header string true "Bearer token"
 // @Success 200 {array} models.Message
-// @Failure 500 {object} map[string]string
-// @Router /messages [get]
+// @Failure 401 "Não autorizado"
+// @Failure 500 "Erro ao buscar mensagens"
+// @Router /message [get]
 func GetMessages(c *gin.Context) {
 	db := config.GetMongoClient()
 	collection := db.Database("speakup").Collection("messages")
@@ -99,18 +108,21 @@ func GetMessages(c *gin.Context) {
 	c.JSON(http.StatusOK, messages)
 }
 
-// UpdateMessage is a handler function that updates a message
+// UpdateMessage updates a message by ID
 // @Summary Update a message
-// @Description Update a message with the input payload
-// @Tags messages
-// @Accept  json
-// @Produce  json
+// @Description Update an existing message with new information
+// @Tags message
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param Authorization header string true "Bearer token"
 // @Param id path string true "Message ID"
-// @Param message body models.Message true "Message object"
-// @Success 200 {object} map[string]string
-// @Failure 400 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Router /messages/{id} [put]
+// @Param message body models.Message true "Message object containing content and type"
+// @Success 200 "Mensagem atualizada com sucesso"
+// @Failure 400 "Campo obrigatório faltando"
+// @Failure 401 "Não autorizado"
+// @Failure 500 "Erro ao atualizar mensagem"
+// @Router /message/{id} [put]
 func UpdateMessage(c *gin.Context) {
 	id := c.Param("id")
 	var message models.Message
@@ -129,16 +141,19 @@ func UpdateMessage(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Message updated successfully"})
 }
 
-// DeleteMessage is a handler function that deletes a message
+// DeleteMessage deletes a message by ID
 // @Summary Delete a message
-// @Description Delete a message by its ID
-// @Tags messages
-// @Accept  json
-// @Produce  json
+// @Description Remove an existing message from the system
+// @Tags message
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param Authorization header string true "Bearer token"
 // @Param id path string true "Message ID"
-// @Success 200 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Router /messages/{id} [delete]
+// @Success 200 "Mensagem deletada com sucesso"
+// @Failure 401 "Não autorizado"
+// @Failure 500 "Erro ao deletar mensagem"
+// @Router /message/{id} [delete]
 func DeleteMessage(c *gin.Context) {
 	id := c.Param("id")
 	db := config.GetMongoClient()
@@ -154,16 +169,19 @@ func DeleteMessage(c *gin.Context) {
 
 // Special handler functions
 
-// GetMessagesByChatId is a handler function that gets all messages by chat ID
+// GetMessagesByChatId gets all messages from a specific chat
 // @Summary Get messages by chat ID
-// @Description Get a list of messages by chat ID
-// @Tags messages
-// @Accept  json
-// @Produce  json
+// @Description Retrieve all messages belonging to a specific chat
+// @Tags message
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param Authorization header string true "Bearer token"
 // @Param id path string true "Chat ID"
 // @Success 200 {array} models.Message
-// @Failure 500 {object} map[string]string
-// @Router /messages/chat/{id} [get]
+// @Failure 401 "Não autorizado"
+// @Failure 500 "Erro ao buscar mensagens"
+// @Router /message/chat/{id} [get]
 func GetMessagesByChatId(c *gin.Context) {
 	chatId := c.Param("id")
 	db := config.GetMongoClient()

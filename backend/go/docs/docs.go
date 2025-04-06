@@ -15,9 +15,14 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/messages": {
+        "/message": {
             "get": {
-                "description": "Get a list of all messages",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieve a list of all messages",
                 "consumes": [
                     "application/json"
                 ],
@@ -25,9 +30,18 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "messages"
+                    "message"
                 ],
                 "summary": "Get all messages",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -38,21 +52,23 @@ const docTemplate = `{
                             }
                         }
                     },
+                    "401": {
+                        "description": "Não autorizado"
+                    },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
+                        "description": "Erro ao buscar mensagens"
                     }
                 }
             }
         },
-        "/messages/chat/{id}": {
+        "/message/chat/{id}": {
             "get": {
-                "description": "Get a list of messages by chat ID",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieve all messages belonging to a specific chat",
                 "consumes": [
                     "application/json"
                 ],
@@ -60,10 +76,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "messages"
+                    "message"
                 ],
                 "summary": "Get messages by chat ID",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "Chat ID",
@@ -82,21 +105,23 @@ const docTemplate = `{
                             }
                         }
                     },
+                    "401": {
+                        "description": "Não autorizado"
+                    },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
+                        "description": "Erro ao buscar mensagens"
                     }
                 }
             }
         },
-        "/messages/{id}": {
+        "/message/{id}": {
             "get": {
-                "description": "Get a message by its ID",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieve a message using its ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -104,10 +129,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "messages"
+                    "message"
                 ],
                 "summary": "Get a message by ID",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "Message ID",
@@ -123,19 +155,21 @@ const docTemplate = `{
                             "$ref": "#/definitions/models.Message"
                         }
                     },
+                    "401": {
+                        "description": "Não autorizado"
+                    },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
+                        "description": "Mensagem não encontrada"
                     }
                 }
             },
             "put": {
-                "description": "Update a message with the input payload",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update an existing message with new information",
                 "consumes": [
                     "application/json"
                 ],
@@ -143,10 +177,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "messages"
+                    "message"
                 ],
                 "summary": "Update a message",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "Message ID",
@@ -155,7 +196,7 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "Message object",
+                        "description": "Message object containing content and type",
                         "name": "message",
                         "in": "body",
                         "required": true,
@@ -166,36 +207,26 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
+                        "description": "Mensagem atualizada com sucesso"
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
+                        "description": "Campo obrigatório faltando"
+                    },
+                    "401": {
+                        "description": "Não autorizado"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
+                        "description": "Erro ao atualizar mensagem"
                     }
                 }
             },
             "delete": {
-                "description": "Delete a message by its ID",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Remove an existing message from the system",
                 "consumes": [
                     "application/json"
                 ],
@@ -203,10 +234,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "messages"
+                    "message"
                 ],
                 "summary": "Delete a message",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "Message ID",
@@ -217,22 +255,13 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
+                        "description": "Mensagem deletada com sucesso"
+                    },
+                    "401": {
+                        "description": "Não autorizado"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
+                        "description": "Erro ao deletar mensagem"
                     }
                 }
             }
