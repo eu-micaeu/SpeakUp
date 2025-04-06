@@ -12,11 +12,16 @@ paths:
       - application/json
       description: Autentica um usuário e retorna um token JWT
       parameters:
-      - description: Credenciais
+      - description: Credenciais de login
         in: body
         name: credentials
         required: true
         schema:
+          properties:
+            email:
+              type: string
+            password:
+              type: string
           type: object
       produces:
       - application/json

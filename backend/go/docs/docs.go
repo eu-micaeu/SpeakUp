@@ -30,12 +30,20 @@ const docTemplate = `{
                 "summary": "Login de usuário",
                 "parameters": [
                     {
-                        "description": "Credenciais",
+                        "description": "Credenciais de login",
                         "name": "credentials",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object"
+                            "type": "object",
+                            "properties": {
+                                "email": {
+                                    "type": "string"
+                                },
+                                "password": {
+                                    "type": "string"
+                                }
+                            }
                         }
                     }
                 ],

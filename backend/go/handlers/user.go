@@ -19,7 +19,8 @@ import (
 // @Tags         users
 // @Accept       json
 // @Produce      json
-// @Param        credentials  body      object  true  "Credenciais"
+// @Param         credentials body object{email=string,password=string} true "Credenciais de login"
+// @Example      {object} credentials {"email":"user@example.com","password":"123456"}
 // @Success      200         {object}  object{token=string}
 // @Router       /user/login [post]
 func Login(c *gin.Context) {
