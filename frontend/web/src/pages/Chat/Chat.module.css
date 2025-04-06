@@ -1,0 +1,370 @@
+.pageHome {
+    display: flex;
+    height: 100vh;
+}
+
+.sidebar {
+    width: 400px;
+    background-color: #000000;
+    position: relative;
+    color: #ffffff;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: width 0.1s ease-in-out;
+}
+
+.sidebar ol {
+    padding: 0;
+    text-align: center;
+}
+
+.sidebar ul {
+    margin: 50px 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    list-style: none;
+}
+
+.sidebar ul li {
+    list-style: none;
+    text-align: center;
+    padding: 10px;
+    background-color: #313131;
+    border-radius: 10px;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0 0 0;
+    width: 80%;
+}
+
+.sidebar ul li:hover {
+    background-color: #424242;
+}
+
+.sidebar ul li.activeChat {
+    background-color: #4CAF50;
+}
+
+.sidebar ul li svg {
+    margin-left: 10px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.sidebar ul li svg:hover {
+    color: rgb(255, 0, 0);
+}
+
+.mainContent {
+    padding: 20px;
+    background-color: #313131;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    color: #fff;
+    width: 100%;
+}
+
+.mainContent h1 {
+    margin: 25px;
+}
+
+.toggleButton {
+    background-color: transparent;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #fff;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+}
+
+.chatContainer {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 50%;
+}
+
+.messages {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 70vh;
+}
+
+.messages::-webkit-scrollbar {
+    width: 8px;
+}
+
+.messages::-webkit-scrollbar-track {
+    border-radius: 4px;
+}
+
+.messages::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 4px;
+}
+
+.messages::-webkit-scrollbar-thumb:hover {
+    background: #777;
+}
+
+.message {
+    padding: 20px;
+    margin: 8px;
+    line-height: 2;
+    width: 75%;
+}
+
+.message.user {
+    color: #e3f2fd;
+    background-color: #1d1d1d;
+    margin-left: auto;
+    border-radius: 20px 1px 20px 20px;
+}
+
+.message.ai {
+    background-color: #242424;
+    margin-right: auto;
+    position: relative;
+    border-radius: 1px 20px 20px 20px;
+}
+
+.message.ai.correction {
+    background-color: #1eff00;
+    color: #000000;
+    text-align: center;
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+.chatInput {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chatInput input {
+    flex: 1;
+    padding: 20px;
+    width: 100%;
+    border: none;
+    font-size: 1rem;
+    border-radius: 4px;
+    background-color: #3d3d3d;
+    color: #fff;
+    margin: 10px 0;
+}
+
+.chatInput input:focus {
+    outline: none;
+}
+
+.btCreateChat {
+    border: none;
+    border-radius: 10px;
+    color: #4CAF50;
+    background-color: transparent;
+    padding: 10px;
+    font-size: 1.2em;
+    cursor: pointer;
+    font-weight: bold;
+    margin: 20px 0;
+    width: 50%;
+    font-family: 'Karla', sans-serif;
+}
+
+.btCreateChat:hover {
+    background-color: #4CAF50;
+    color: #000000;
+}
+
+.divSpeakUp {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+    margin-bottom: 25px;
+    gap: 20px;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modalContent {
+    background-color: #1d1d1d;
+    border-radius: 10px;
+    padding: 25px;
+    width: 300px;
+    max-width: 90%;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modalTitle {
+    margin-top: 0;
+    color: #fff;
+    text-align: center;
+    border-bottom: 1px solid #444;
+    padding-bottom: 10px;
+}
+
+.optionButton {
+    display: block;
+    width: 100%;
+    padding: 12px 15px;
+    margin: 10px 0;
+    background-color: #313131;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    font-size: 16px;
+}
+
+.optionButton:hover {
+    background-color: #4CAF50;
+    transform: scale(1.02);
+}
+
+.optionButton:active {
+    transform: scale(0.98);
+}
+
+.closeButton {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: #777;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.closeButton:hover {
+    color: #fff;
+}
+
+.styledSettingsIcon {
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.styledSettingsIcon:hover {
+    animation: rotate 0.5s linear;
+    color: rgb(187, 187, 187);
+}
+
+.actionsDiv {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+}
+
+@keyframes loading {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.sidebarHidden {
+    width: 0;
+}
+
+.toggleButtonHidden {
+    display: none;
+}
+
+.toggleButtonMainContent {
+    color: #fff;
+    position: fixed;
+    display: block;
+    left: 20px;
+}
+
+.toggleButtonMainContentSidebarVisible {
+    left: 320px;
+}
+
+.modalOverlayHidden {
+    display: none;
+}
+
+.loadingSpinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, .3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.spinnerContainer {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}

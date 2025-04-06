@@ -1,0 +1,37 @@
+.pageHome {
+    display: flex;
+    background-color: #313131;
+    color: white;
+    height: 100vh;
+    text-align: center;
+    padding: 40px 0;
+    flex-direction: column;
+}
+
+.cardsContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin: 20px;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.card {
+    background-color: #000000;
+    border-radius: 10px;
+    width: 250px;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: ease 0.3s all;
+}
+
+.card:hover {
+    cursor: pointer;
+    transform: scale(1.05);
+}

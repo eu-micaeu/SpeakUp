@@ -1,0 +1,113 @@
+.pageLogin {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(0, 0, 0);
+    color: white;
+    height: 100vh;
+}
+
+.card {
+    width: 100%;
+    max-width: 28rem;
+    padding: 2rem;
+    background-color: rgb(31, 31, 31);
+    border-radius: 0px 20px 20px 20px;
+}
+
+.textCenter {
+    text-align: center;
+}
+
+.logo {
+    height: 3rem;
+    margin: 0 auto 1rem;
+    cursor: pointer;
+    transition: 1s ease all;
+}
+
+.logo:hover {
+    transform: scale(1.1);
+    cursor: pointer;
+}
+
+.h2 {
+    font-size: 1.875rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.p {
+    color: rgb(156, 163, 175);
+    margin-bottom: 2rem;
+}
+
+.inputContainer {
+    margin-bottom: 1.5rem;
+}
+
+.inputLabel {
+    display: block;
+    font-size: 0.875rem;
+    color: rgb(209, 213, 219);
+    margin-bottom: 0.25rem;
+}
+
+.input {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 0.375rem;
+    background-color: rgb(55, 65, 81);
+    border: 1px solid rgb(75, 85, 99);
+    color: white;
+    box-sizing: border-box;
+}
+
+.input::placeholder {
+    color: rgb(156, 163, 175);
+}
+
+.button {
+    width: 100%;
+    padding: 0.75rem;
+    margin: 0 0 1.5rem 0;
+    border-radius: 0.375rem;
+    border: none;
+    background-color: rgb(53, 53, 53);
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    box-sizing: border-box;
+}
+
+.button:hover:not(:disabled) {
+    background-color: rgb(37, 99, 235);
+}
+
+.button:disabled {
+    opacity: 0.75;
+    cursor: not-allowed;
+}
+
+.errorMessage {
+    background-color: rgb(239, 68, 68);
+    color: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.styledLink {
+    color: rgb(156, 163, 175);
+    text-decoration: none;
+    font-size: 0.875rem;
+}
+
+.styledLink span {
+    color: rgb(59, 130, 246);
+    font-weight: 500;
+}
+
+.styledLink span:hover {
+    color: rgb(37, 99, 235);
+}
