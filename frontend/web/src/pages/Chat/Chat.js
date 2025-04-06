@@ -119,8 +119,6 @@ function Chat() {
 
     const messageContent = inputMessage.trim();
     setInputMessage('');
-    let tempMessage;
-    let tempAIMessage;
 
     try {
       let chatId = currentChatId;
@@ -136,21 +134,10 @@ function Chat() {
       const aiCorrectionResponse = await generateAIResponseCorrection(messageContent);
       const combinedMessageContent = `${messageContent}\n\nCorreção: ${aiCorrectionResponse.response}`;
 
-      tempMessage = {
-        id: Date.now(),
-        text: combinedMessageContent,
-        sender: 'user',
-        timestamp: new Date().toISOString(),
-        chatId: chatId,
-        type: 'request'
-      };
-
-      setMessages(prevMessages => [...prevMessages, tempMessage]);
-
       const savedMessage = await addMessageToChat(chatId, combinedMessageContent, 'user', 'request');
 
       setMessages(prevMessages => [
-        ...prevMessages.filter(m => m.id !== tempMessage.id),
+        ...prevMessages,
         {
           id: savedMessage.id,
           text: savedMessage.content,
@@ -166,21 +153,10 @@ function Chat() {
 
       const aiResponseWithTranslation = `${aiResponseDialog.response}\n\n[TRANSLATION]: ${aiTranslation.response}`;
 
-      tempAIMessage = {
-        id: Date.now() + 1,
-        text: aiResponseWithTranslation,
-        sender: 'ai',
-        timestamp: new Date().toISOString(),
-        chatId: chatId,
-        type: 'response'
-      };
-
-      setMessages(prevMessages => [...prevMessages, tempAIMessage]);
-
       const savedAIMessage = await addMessageToChat(chatId, aiResponseWithTranslation, 'ai', 'response');
 
       setMessages(prevMessages => [
-        ...prevMessages.filter(m => m.id !== tempAIMessage.id),
+        ...prevMessages,
         {
           id: savedAIMessage.id,
           text: savedAIMessage.content,
@@ -193,8 +169,6 @@ function Chat() {
 
     } catch (error) {
       console.error("Erro ao processar mensagem:", error);
-      if (tempMessage) setMessages(prev => prev.filter(m => m.id !== tempMessage.id));
-      if (tempAIMessage) setMessages(prev => prev.filter(m => m.id !== tempAIMessage.id));
       setInputMessage(messageContent);
     } finally {
       setIsSendingMessage(false);
@@ -230,7 +204,7 @@ function Chat() {
       />
 
       <aside className={`${styles.sidebar} ${!isSidebarVisible ? styles.sidebarHidden : ''}`}>
-        <button 
+        <button
           className={`${styles.toggleButton} ${isSidebarVisible ? '' : styles.toggleButtonHidden}`}
           onClick={toggleSidebar}
         >
@@ -259,8 +233,8 @@ function Chat() {
           ) : (
             <ol>Crie um chat!</ol>
           )}
-          <button 
-            className={styles.btCreateChat} 
+          <button
+            className={styles.btCreateChat}
             onClick={() => { setCurrentChatId(null); setMessages([]); setIsSidebarVisible(false) }}
           >
             +
@@ -284,8 +258,8 @@ function Chat() {
       </aside>
 
       <main className={styles.mainContent}>
-        <div 
-          className={`${styles.modalOverlay} ${showSettingsModal ? '' : styles.modalOverlayHidden}`} 
+        <div
+          className={`${styles.modalOverlay} ${showSettingsModal ? '' : styles.modalOverlayHidden}`}
           onClick={closeModal}
         >
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
@@ -301,7 +275,7 @@ function Chat() {
         </div>
 
         {!isSidebarVisible && (
-          <button 
+          <button
             className={`${styles.toggleButton} ${styles.toggleButtonMainContent} ${isSidebarVisible ? styles.toggleButtonMainContentSidebarVisible : ''}`}
             onClick={toggleSidebar}
           >
@@ -315,76 +289,50 @@ function Chat() {
         </div>
         <div className={styles.chatContainer}>
           <div className={styles.messages}>
-            {isLoadingMessages ? (
-              <>
-                <div className={`${styles.message} ${styles.ai} ${styles.skeletonMessage}`}>
-                  <div className={styles.skeletonLine} />
-                  <div className={styles.skeletonLine} />
-                  <div className={styles.skeletonLine} />
-                </div>
-                <div className={`${styles.message} ${styles.user} ${styles.skeletonMessage}`}>
-                  <div className={styles.skeletonLine} />
-                  <div className={styles.skeletonLine} />
-                </div>
-                <div className={`${styles.message} ${styles.ai} ${styles.skeletonMessage}`}>
-                  <div className={styles.skeletonLine} />
-                  <div className={styles.skeletonLine} />
-                  <div className={styles.skeletonLine} />
-                  <div className={styles.skeletonLine} />
-                </div>
-              </>
-            ) : (
-              messages
-                .filter(msg => msg.chatId === currentChatId || msg.chat_id === currentChatId)
-                .map((message) => (
-                  <div 
-                    key={message.id} 
-                    className={`${styles.message} ${message.sender === 'user' ? styles.user : styles.ai} ${message.type === 'correction' ? styles.correction : ''}`}
-                  >
-                    {(message.text || message.content).split(/\n{1,}/).map((line, index, lines) => {
-                      if (line.startsWith('[TRANSLATION]: ')) {
-                        return (
-                          <div key={index} style={{
-                            marginTop: "10px",
-                            paddingTop: "10px",
-                            borderTop: "1px solid #555",
-                            color: "#aaa",
-                          }}>
-                            <strong>Tradução:</strong> {line.replace('[TRANSLATION]: ', '')}
-                          </div>
-                        );
-                      }
+            {messages
+              .filter(msg => msg.chatId === currentChatId || msg.chat_id === currentChatId)
+              .map((message) => (
+                <div
+                  key={message.id}
+                  className={`${styles.message} ${message.sender === 'user' ? styles.user : styles.ai} ${message.type === 'correction' ? styles.correction : ''}`}
+                >
+                  {(message.text || message.content).split(/\n{1,}/).map((line, index, lines) => {
+                    if (line.startsWith('[TRANSLATION]: ')) {
+                      return (
+                        <div key={index} style={{
+                          marginTop: "10px",
+                          paddingTop: "10px",
+                          borderTop: "1px solid #555",
+                          color: "#aaa",
+                        }}>
+                          <strong>Tradução:</strong> {line.replace('[TRANSLATION]: ', '')}
+                        </div>
+                      );
+                    }
 
-                      if (index === 1 && line.startsWith('Correção: ')) {
-                        return (
-                          <React.Fragment key={index}>
-                            <hr />
-                            <span style={{ color: '#1eff00' }}>{line.replace('Correção: ', '')}</span>
-                          </React.Fragment>
-                        );
-                      }
-
+                    if (index === 1 && line.startsWith('Correção: ')) {
                       return (
                         <React.Fragment key={index}>
-                          {line}
-                          {index < lines.length - 1 && <br />}
+                          <hr />
+                          <span style={{ color: '#1eff00' }}>{line.replace('Correção: ', '')}</span>
                         </React.Fragment>
                       );
-                    })}
-                  </div>
-                ))
-            )}
-            {isSendingMessage && (
-              <div className={`${styles.message} ${styles.ai} ${styles.skeletonMessage}`}>
-                <div className={styles.skeletonLine} />
-                <div className={styles.skeletonLine} />
-              </div>
-            )}
+                    }
+
+                    return (
+                      <React.Fragment key={index}>
+                        {line}
+                        {index < lines.length - 1 && <br />}
+                      </React.Fragment>
+                    );
+                  })}
+                </div>
+              ))}
             <div ref={messagesEndRef} />
           </div>
 
           <div className={styles.chatInput}>
-            <SettingsIcon 
+            <SettingsIcon
               className={styles.styledSettingsIcon}
               onClick={handleSettingsClick}
             />
@@ -395,15 +343,20 @@ function Chat() {
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={handleKeyPress}
+              disabled={isSendingMessage}
             />
 
-            <SendIcon
-              onKeyDown={handleKeyPress}
-              onClick={handleSendMessage}
-              style={{ color: "#fff", cursor: "pointer" }}
-              onMouseEnter={(e) => e.target.style.color = "rgb(187, 187, 187)"}
-              onMouseLeave={(e) => e.target.style.color = "#fff"}
-            />
+            {isSendingMessage ? (
+              <div className={styles.loadingSpinner} style={{ margin: '0 10px' }} />
+            ) : (
+              <SendIcon
+                onKeyDown={handleKeyPress}
+                onClick={handleSendMessage}
+                style={{ color: "#fff", cursor: "pointer" }}
+                onMouseEnter={(e) => e.target.style.color = "rgb(187, 187, 187)"}
+                onMouseLeave={(e) => e.target.style.color = "#fff"}
+              />
+            )}
           </div>
         </div>
 

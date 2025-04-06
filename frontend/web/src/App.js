@@ -6,6 +6,7 @@ import Login from './pages/Login/Login';
 import Register from './pages/Register/Register';
 import Chat from './pages/Chat/Chat';
 import Home from './pages/Home/Home';
+import TeachingPlan from './pages/TeachingPlan/TeachingPlan';
 
 // Components
 import { AuthProvider } from './contexts/Auth';
@@ -24,6 +25,14 @@ function App() {
             element={
               <PrivateRoute>
                 <Chat />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/teaching-plan"
+            element={
+              <PrivateRoute>
+                <TeachingPlan />
               </PrivateRoute>
             }
           />
