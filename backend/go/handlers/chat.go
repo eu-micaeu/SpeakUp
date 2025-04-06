@@ -4,17 +4,28 @@ import (
 	"net/http"
 	"time"
 
-	"speakup/models"
-	"speakup/middlewares"
 	"speakup/config"
+	"speakup/middlewares"
+	"speakup/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
-// CRUD operations for chat
+// @Summary CRUD operations for chat
 
-// CreateChat creates a new chat
+// CreateChat godoc
+// @Summary Create a new chat
+// @Description Creates a new chat for a user
+// @Tags Chat
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer token"
+// @Param chat body object{user_id=string,topic=string} true "Chat object"
+// @Success 201 {object} models.Chat "Created chat"
+// @Failure 400 {object} object "Bad request"
+// @Failure 500 {object} object "Internal server error"
+// @Router /chat [post]
 func CreateChat(c *gin.Context) {
 	var chat models.Chat
 	if err := c.ShouldBindJSON(&chat); err != nil {
@@ -37,7 +48,17 @@ func CreateChat(c *gin.Context) {
 	c.JSON(http.StatusCreated, chat)
 }
 
-// GetChat gets a chat by ID
+// GetChatById godoc
+// @Summary Get a chat by ID
+// @Description Retrieves a chat by its ID
+// @Tags Chat
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer token"
+// @Param id path string true "Chat ID"
+// @Success 200 {object} models.Chat "Chat found"
+// @Failure 404 {object} object "Chat not found"
+// @Router /chat/{id} [get]
 func GetChatById(c *gin.Context) {
 	id := c.Param("id")
 	db := config.GetMongoClient()
@@ -52,7 +73,16 @@ func GetChatById(c *gin.Context) {
 	c.JSON(http.StatusOK, chat)
 }
 
-// GetChats gets all chats
+// GetChats godoc
+// @Summary Get all chats
+// @Description Retrieves all chats
+// @Tags Chat
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer token"
+// @Success 200 {array} models.Chat "List of chats"
+// @Failure 500 {object} object "Internal server error"
+// @Router /chat [get]
 func GetChats(c *gin.Context) {
 	db := config.GetMongoClient()
 	collection := db.Database("speakup").Collection("chats")
@@ -71,7 +101,19 @@ func GetChats(c *gin.Context) {
 	c.JSON(http.StatusOK, chats)
 }
 
-// UpdateChat updates a chat by ID
+// UpdateChat godoc
+// @Summary Update a chat
+// @Description Updates an existing chat by ID
+// @Tags Chat
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer token"
+// @Param id path string true "Chat ID"
+// @Param chat body models.Chat true "Updated chat object"
+// @Success 200 {object} models.Chat "Updated chat"
+// @Failure 400 {object} object "Bad request"
+// @Failure 500 {object} object "Internal server error"
+// @Router /chat/{id} [put]
 func UpdateChat(c *gin.Context) {
 	id := c.Param("id")
 	var chat models.Chat
@@ -91,7 +133,17 @@ func UpdateChat(c *gin.Context) {
 	c.JSON(http.StatusOK, chat)
 }
 
-// DeleteChat deletes a chat by ID
+// DeleteChat godoc
+// @Summary Delete a chat
+// @Description Deletes a chat by ID
+// @Tags Chat
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer token"
+// @Param id path string true "Chat ID"
+// @Success 200 {object} object "Chat deleted successfully"
+// @Failure 500 {object} object "Internal server error"
+// @Router /chat/{id} [delete]
 func DeleteChat(c *gin.Context) {
 	id := c.Param("id")
 	db := config.GetMongoClient()
@@ -107,7 +159,16 @@ func DeleteChat(c *gin.Context) {
 
 // Special operations for chat
 
-// GetChatsByUserId gets all chats by user ID
+// GetChatsByUserId godoc
+// @Summary Get user's chats
+// @Description Retrieves all chats for the authenticated user
+// @Tags Chat
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer token"
+// @Success 200 {object} object{chats=[]models.Chat} "List of user's chats"
+// @Failure 500 {object} object "Internal server error"
+// @Router /chat/user [get]
 func GetChatsByUserId(c *gin.Context) {
 	id := middlewares.GetUserIDFromContext(c)
 	db := config.GetMongoClient()

@@ -1,0 +1,767 @@
+basePath: /
+definitions:
+  models.Chat:
+    properties:
+      id:
+        type: string
+      start_time:
+        type: string
+      topic:
+        type: string
+      user_id:
+        type: string
+    type: object
+  models.Message:
+    properties:
+      chat_id:
+        type: string
+      content:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      sender:
+        type: string
+      type:
+        type: string
+    type: object
+  models.User:
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: string
+      language:
+        type: string
+      last_name:
+        type: string
+      level:
+        type: string
+      password:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API para o projeto SpeakUp
+  title: SpeakUp API
+  version: "1.0"
+paths:
+  /ai/generate-response-correction:
+    post:
+      consumes:
+      - application/json
+      description: Analisa e corrige erros gramaticais no texto fornecido
+      parameters:
+      - description: Token de autenticação
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Chat object
+        in: body
+        name: message
+        required: true
+        schema:
+          properties:
+            message:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Correção gerada com sucesso" example({"response":"I went to
+            school yesterday"})
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Erro na requisição" example({"error":"Invalid request"})
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Erro interno do servidor" example({"error":"Internal server
+            error"})
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Gera uma correção de texto usando IA
+      tags:
+      - AI
+  /ai/generate-response-dialog:
+    post:
+      consumes:
+      - application/json
+      description: Gera uma resposta de diálogo contextual baseada na mensagem fornecida
+      parameters:
+      - description: Token de autenticação
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Chat object
+        in: body
+        name: message
+        required: true
+        schema:
+          properties:
+            message:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Resposta gerada com sucesso" example({"response":"Hi! I'm doing
+            great, thank you for asking. How are you?"})
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Erro na requisição" example({"error":"Invalid request"})
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Erro interno do servidor" example({"error":"Internal server
+            error"})
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Gera uma resposta de diálogo usando IA
+      tags:
+      - AI
+  /ai/generate-response-topic:
+    post:
+      consumes:
+      - application/json
+      description: Analisa o texto fornecido e gera um tópico relevante de duas palavras
+      parameters:
+      - description: Token de autenticação
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Chat object
+        in: body
+        name: message
+        required: true
+        schema:
+          properties:
+            topic:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Tópico gerado com sucesso" example({"response":"World Travel"})
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Erro na requisição" example({"error":"Invalid request"})
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Erro interno do servidor" example({"error":"Internal server
+            error"})
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Gera um tópico para uma conversa usando IA
+      tags:
+      - AI
+  /ai/generate-response-translation:
+    post:
+      consumes:
+      - application/json
+      description: Traduz o texto fornecido para o idioma especificado
+      parameters:
+      - description: Token de autenticação
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Chat object
+        in: body
+        name: message
+        required: true
+        schema:
+          properties:
+            message:
+              type: string
+            target_language:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Tradução gerada com sucesso" example({"response":"Olá, como
+            vai você?"})
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Erro na requisição" example({"error":"Invalid request"})
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Erro interno do servidor" example({"error":"Internal server
+            error"})
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Gera uma tradução de texto usando IA
+      tags:
+      - AI
+  /chat:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all chats
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of chats
+          schema:
+            items:
+              $ref: '#/definitions/models.Chat'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            type: object
+      summary: Get all chats
+      tags:
+      - Chat
+    post:
+      consumes:
+      - application/json
+      description: Creates a new chat for a user
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Chat object
+        in: body
+        name: chat
+        required: true
+        schema:
+          properties:
+            topic:
+              type: string
+            user_id:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created chat
+          schema:
+            $ref: '#/definitions/models.Chat'
+        "400":
+          description: Bad request
+          schema:
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            type: object
+      summary: Create a new chat
+      tags:
+      - Chat
+  /chat/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a chat by ID
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Chat ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Chat deleted successfully
+          schema:
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            type: object
+      summary: Delete a chat
+      tags:
+      - Chat
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a chat by its ID
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Chat ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Chat found
+          schema:
+            $ref: '#/definitions/models.Chat'
+        "404":
+          description: Chat not found
+          schema:
+            type: object
+      summary: Get a chat by ID
+      tags:
+      - Chat
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing chat by ID
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Chat ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated chat object
+        in: body
+        name: chat
+        required: true
+        schema:
+          $ref: '#/definitions/models.Chat'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated chat
+          schema:
+            $ref: '#/definitions/models.Chat'
+        "400":
+          description: Bad request
+          schema:
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            type: object
+      summary: Update a chat
+      tags:
+      - Chat
+  /chat/user:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all chats for the authenticated user
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of user's chats
+          schema:
+            properties:
+              chats:
+                items:
+                  $ref: '#/definitions/models.Chat'
+                type: array
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            type: object
+      summary: Get user's chats
+      tags:
+      - Chat
+  /message:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all messages
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Message'
+            type: array
+        "401":
+          description: Não autorizado
+        "500":
+          description: Erro ao buscar mensagens
+      security:
+      - BearerAuth: []
+      summary: Get all messages
+      tags:
+      - message
+  /message/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove an existing message from the system
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Message ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Mensagem deletada com sucesso
+        "401":
+          description: Não autorizado
+        "500":
+          description: Erro ao deletar mensagem
+      security:
+      - BearerAuth: []
+      summary: Delete a message
+      tags:
+      - message
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a message using its ID
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Message ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Message'
+        "401":
+          description: Não autorizado
+        "404":
+          description: Mensagem não encontrada
+      security:
+      - BearerAuth: []
+      summary: Get a message by ID
+      tags:
+      - message
+    put:
+      consumes:
+      - application/json
+      description: Update an existing message with new information
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Message ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Message object containing content and type
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/models.Message'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Mensagem atualizada com sucesso
+        "400":
+          description: Campo obrigatório faltando
+        "401":
+          description: Não autorizado
+        "500":
+          description: Erro ao atualizar mensagem
+      security:
+      - BearerAuth: []
+      summary: Update a message
+      tags:
+      - message
+  /message/chat/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all messages belonging to a specific chat
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Chat ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Message'
+            type: array
+        "401":
+          description: Não autorizado
+        "500":
+          description: Erro ao buscar mensagens
+      security:
+      - BearerAuth: []
+      summary: Get messages by chat ID
+      tags:
+      - message
+  /user:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user with the provided details
+      parameters:
+      - description: User details
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              message:
+                type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Create a new user
+      tags:
+      - users
+  /user/{id}:
+    delete:
+      description: Delete a user by their ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              message:
+                type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Delete a user
+      tags:
+      - users
+    get:
+      description: Retrieve a user's details by their ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "500":
+          description: Internal Server Error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Get a user by ID
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: Update a user's details by their ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User details
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              message:
+                type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Update a user
+      tags:
+      - users
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: Autentica um usuário e retorna um token JWT
+      parameters:
+      - description: Credenciais de login
+        in: body
+        name: credentials
+        required: true
+        schema:
+          properties:
+            email:
+              type: string
+            password:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              token:
+                type: string
+            type: object
+      summary: Login de usuário
+      tags:
+      - Autenticação
+swagger: "2.0"
