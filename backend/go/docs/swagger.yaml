@@ -50,6 +50,199 @@ info:
   title: SpeakUp API
   version: "1.0"
 paths:
+  /ai/generate-response-correction:
+    post:
+      consumes:
+      - application/json
+      description: Analisa e corrige erros gramaticais no texto fornecido
+      parameters:
+      - description: Token de autenticação
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Chat object
+        in: body
+        name: message
+        required: true
+        schema:
+          properties:
+            message:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Correção gerada com sucesso" example({"response":"I went to
+            school yesterday"})
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Erro na requisição" example({"error":"Invalid request"})
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Erro interno do servidor" example({"error":"Internal server
+            error"})
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Gera uma correção de texto usando IA
+      tags:
+      - AI
+  /ai/generate-response-dialog:
+    post:
+      consumes:
+      - application/json
+      description: Gera uma resposta de diálogo contextual baseada na mensagem fornecida
+      parameters:
+      - description: Token de autenticação
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Chat object
+        in: body
+        name: message
+        required: true
+        schema:
+          properties:
+            message:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Resposta gerada com sucesso" example({"response":"Hi! I'm doing
+            great, thank you for asking. How are you?"})
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Erro na requisição" example({"error":"Invalid request"})
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Erro interno do servidor" example({"error":"Internal server
+            error"})
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Gera uma resposta de diálogo usando IA
+      tags:
+      - AI
+  /ai/generate-response-topic:
+    post:
+      consumes:
+      - application/json
+      description: Analisa o texto fornecido e gera um tópico relevante de duas palavras
+      parameters:
+      - description: Token de autenticação
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Chat object
+        in: body
+        name: message
+        required: true
+        schema:
+          properties:
+            topic:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Tópico gerado com sucesso" example({"response":"World Travel"})
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Erro na requisição" example({"error":"Invalid request"})
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Erro interno do servidor" example({"error":"Internal server
+            error"})
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Gera um tópico para uma conversa usando IA
+      tags:
+      - AI
+  /ai/generate-response-translation:
+    post:
+      consumes:
+      - application/json
+      description: Traduz o texto fornecido para o idioma especificado
+      parameters:
+      - description: Token de autenticação
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Chat object
+        in: body
+        name: message
+        required: true
+        schema:
+          properties:
+            message:
+              type: string
+            target_language:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Tradução gerada com sucesso" example({"response":"Olá, como
+            vai você?"})
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Erro na requisição" example({"error":"Invalid request"})
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Erro interno do servidor" example({"error":"Internal server
+            error"})
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Gera uma tradução de texto usando IA
+      tags:
+      - AI
   /chat:
     get:
       consumes:
@@ -92,7 +285,12 @@ paths:
         name: chat
         required: true
         schema:
-          $ref: '#/definitions/models.Chat'
+          properties:
+            topic:
+              type: string
+            user_id:
+              type: string
+          type: object
       produces:
       - application/json
       responses:

@@ -21,7 +21,7 @@ import (
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "Bearer token"
-// @Param chat body models.Chat true "Chat object"
+// @Param chat body object{user_id=string,topic=string} true "Chat object"
 // @Success 201 {object} models.Chat "Created chat"
 // @Failure 400 {object} object "Bad request"
 // @Failure 500 {object} object "Internal server error"

@@ -12,7 +12,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// GenerateResponse generates a response for the AI
+// @Summary Gera uma resposta de diálogo usando IA
+// @Description Gera uma resposta de diálogo contextual baseada na mensagem fornecida
+// @Tags AI
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Token de autenticação"
+// @Param message body object{message=string} true "Chat object"
+// @Success 200 {object} map[string]string "Resposta gerada com sucesso" example({"response":"Hi! I'm doing great, thank you for asking. How are you?"})
+// @Failure 400 {object} map[string]string "Erro na requisição" example({"error":"Invalid request"})
+// @Failure 500 {object} map[string]string "Erro interno do servidor" example({"error":"Internal server error"})
+// @Router /ai/generate-response-dialog [post]
 func GenerateResponseDialog(c *gin.Context) {
 
 	promptPath := filepath.Join("prompts", "promptDialog.txt")
@@ -35,7 +46,7 @@ func GenerateResponseDialog(c *gin.Context) {
 	connector := connectors.NewGeminiConnector()
 
 	// Generate a response for the dialogue
-	dialogueResp, err := connector.GenerateResponse(context.Background(), prompt + request.Message + "Answer me in this language: " + middlewares.GetLanguageFromContext(c))
+	dialogueResp, err := connector.GenerateResponse(context.Background(), prompt+request.Message+"Answer me in this language: "+middlewares.GetLanguageFromContext(c))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -44,7 +55,18 @@ func GenerateResponseDialog(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"response": dialogueResp})
 }
 
-// GenerateResponseCorrection generates a correction for the AI
+// @Summary Gera uma correção de texto usando IA
+// @Description Analisa e corrige erros gramaticais no texto fornecido
+// @Tags AI
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Token de autenticação"
+// @Param message body object{message=string} true "Chat object"
+// @Success 200 {object} map[string]string "Correção gerada com sucesso" example({"response":"I went to school yesterday"})
+// @Failure 400 {object} map[string]string "Erro na requisição" example({"error":"Invalid request"})
+// @Failure 500 {object} map[string]string "Erro interno do servidor" example({"error":"Internal server error"})
+// @Router /ai/generate-response-correction [post]
 func GenerateResponseCorrection(c *gin.Context) {
 
 	promptPath := filepath.Join("prompts", "promptCorrectionEN.txt")
@@ -67,7 +89,7 @@ func GenerateResponseCorrection(c *gin.Context) {
 	connector := connectors.NewGeminiConnector()
 
 	// Generate a correction for the dialogue
-	correctionResp, err := connector.GenerateResponse(context.Background(), prompt + request.Message)
+	correctionResp, err := connector.GenerateResponse(context.Background(), prompt+request.Message)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -76,7 +98,18 @@ func GenerateResponseCorrection(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"response": correctionResp})
 }
 
-// GenerateResponseTranslate generates a translation for the AI
+// @Summary Gera uma tradução de texto usando IA
+// @Description Traduz o texto fornecido para o idioma especificado
+// @Tags AI
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Token de autenticação"
+// @Param message body object{message=string,target_language=string} true "Chat object"
+// @Success 200 {object} map[string]string "Tradução gerada com sucesso" example({"response":"Olá, como vai você?"})
+// @Failure 400 {object} map[string]string "Erro na requisição" example({"error":"Invalid request"})
+// @Failure 500 {object} map[string]string "Erro interno do servidor" example({"error":"Internal server error"})
+// @Router /ai/generate-response-translation [post]
 func GenerateResponseTranslate(c *gin.Context) {
 
 	promptPath := filepath.Join("prompts", "promptTranslate.txt")
@@ -99,7 +132,7 @@ func GenerateResponseTranslate(c *gin.Context) {
 	connector := connectors.NewGeminiConnector()
 
 	// Generate a translation for the dialogue
-	translateResp, err := connector.GenerateResponse(context.Background(), prompt + request.Message)
+	translateResp, err := connector.GenerateResponse(context.Background(), prompt+request.Message)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -108,7 +141,18 @@ func GenerateResponseTranslate(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"response": translateResp})
 }
 
-// GenerateResponseTopic generates a response for the AI
+// @Summary Gera um tópico para uma conversa usando IA
+// @Description Analisa o texto fornecido e gera um tópico relevante de duas palavras
+// @Tags AI
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Token de autenticação"
+// @Param message body object{topic=string} true "Chat object"
+// @Success 200 {object} map[string]string "Tópico gerado com sucesso" example({"response":"World Travel"})
+// @Failure 400 {object} map[string]string "Erro na requisição" example({"error":"Invalid request"})
+// @Failure 500 {object} map[string]string "Erro interno do servidor" example({"error":"Internal server error"})
+// @Router /ai/generate-response-topic [post]
 func GenerateResponseTopic(c *gin.Context) {
 	var request struct {
 		Message string `json:"message"`
@@ -122,7 +166,7 @@ func GenerateResponseTopic(c *gin.Context) {
 	connector := connectors.NewGeminiConnector()
 
 	// Generate a response for the topic
-	topicResp, err := connector.GenerateResponse(context.Background(), "Please generate a topic for the following text, return only words ,generate with 2 words only: " + request.Message)
+	topicResp, err := connector.GenerateResponse(context.Background(), "Please generate a topic for the following text, return only words ,generate with 2 words only: "+request.Message)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
