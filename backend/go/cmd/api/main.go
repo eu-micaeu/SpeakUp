@@ -5,11 +5,19 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"speakup/config"
-	"speakup/routes"
 	"speakup/middlewares"
+	"speakup/routes"
 )
+
+// @title           SpeakUp API
+// @version         1.0
+// @description     API para o projeto SpeakUp
+// @host            localhost:8080
+// @BasePath        /
 
 func main() {
 
@@ -32,6 +40,9 @@ func main() {
 	routes.ChatRoutes(r)
 	routes.MessageRoutes(r)
 	routes.AIRoutes(r)
+
+	// Load Swagger
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	r.Run()
 
