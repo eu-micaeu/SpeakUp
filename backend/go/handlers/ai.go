@@ -89,7 +89,7 @@ func GenerateResponseCorrection(c *gin.Context) {
 	connector := connectors.NewGeminiConnector()
 
 	// Generate a correction for the dialogue
-	correctionResp, err := connector.GenerateResponse(context.Background(), prompt+request.Message+"Answer me in this language: "+middlewares.GetLanguageFromContext(c))
+	correctionResp, err := connector.GenerateResponse(context.Background(), "Answer me in this language: " + middlewares.GetLanguageFromContext(c) + prompt + request.Message)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
