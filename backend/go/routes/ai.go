@@ -8,7 +8,7 @@ import (
 
 func AIRoutes(router *gin.Engine) {
 
-    aiRoutes := router.Group("/ai")
+    aiRoutes := router.Group("api/ai")
 
     {
 
