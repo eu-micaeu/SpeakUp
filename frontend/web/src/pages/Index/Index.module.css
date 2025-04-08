@@ -1,17 +1,39 @@
 .main {
-    background-color: #313131;
+    background: linear-gradient(135deg, #313131 0%, #1a1a1a 100%);
     padding: 0;
-    height: 90vh;
+    min-height: 90vh;
     display: flex;
     flex-direction: column;
     align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    pointer-events: none;
+}
+
+.particle {
+    position: absolute;
+    background: rgba(255, 255, 255, 1);
+    border-radius: 50%;
+    animation: floatParticle infinite ease-in-out;
+    opacity: 0;
 }
 
 .title {
     text-align: center;
-    font-size: 2em;
-    margin: 50px 0 30px 0;
+    font-size: 2.5em;
+    margin: 60px 0 40px;
     color: #fff;
+    letter-spacing: 2px;
+    animation: fadeInDown 1s ease-out;
 }
 
 .cardsContainer {
@@ -20,56 +42,105 @@
     align-items: center;
     gap: 20px;
     position: relative;
-    height: 400px;
+    height: 450px;
+    width: 100%;
+    max-width: 1200px;
 }
 
 .card {
-    width: 250px;
-    height: 250px;
-    padding: 50px;
-    background-color: #000;
+    width: 300px;
+    height: 280px;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.9);
     color: #fff;
-    border-radius: 30px;
-    transition: all 0.5s ease;
+    border-radius: 5px;
+    transition: all 0.5s ease-in-out;
     display: flex;
     flex-direction: column;
     align-items: center;
-    position: absolute;
-    opacity: 0;
-    transform: scale(0.9);
+    opacity: 0.7;
+    transform: scale(0.9) translateZ(0);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(5px);
+    cursor: pointer;
+    position: relative;
 }
 
 .card.active {
     opacity: 1;
-    transform: scale(1);
+    transform: scale(1.1) translateZ(20px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+    z-index: 10;
 }
 
-.card:hover {
-    transform: scale(1.05);
+.cardImage {
+    transition: transform 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.card:hover .cardImage {
+    transform: scale(1.1) rotate(5deg);
 }
 
 .cardContent {
-    font-size: 1em;
-    text-align: center;
-    line-height: 1.5em;
+    font-size: 0.95em;
+    text-align: justify;
+    line-height: 1.6em;
+    opacity: 0.9;
+    transition: opacity 0.3s ease;
+}
+
+.card:hover .cardContent {
+    opacity: 1;
 }
 
 .dotsContainer {
     display: flex;
     justify-content: center;
-    gap: 10px;
-    margin: 10px 0;
+    gap: 12px;
+    margin: 20px 0;
 }
 
 .dot {
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    background-color: #666;
+    background-color: rgba(255, 255, 255, 0.3);
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
 }
 
 .dot.active {
     background-color: #fff;
+    transform: scale(1.2);
+}
+
+.dot:hover {
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+/* Animações */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes floatParticle {
+    0% {
+        opacity: 0;
+        transform: translateY(0) translateX(0);
+    }
+    20% {
+        opacity: 0.7;
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(100vh) translateX(calc(50%));
+    }
 }

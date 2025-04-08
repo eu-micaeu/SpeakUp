@@ -16,7 +16,6 @@ const HeaderContainer = styled.header`
 const Logo = styled.img`
   width: 40px;
   margin: 20px;
-  cursor: pointer;
 `;
 
 function Header() {
