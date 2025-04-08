@@ -9,7 +9,7 @@ import (
 
 // UserRoutes sets up the routes for the user
 func UserRoutes(router *gin.Engine) {
-	userRoutes := router.Group("/user")
+	userRoutes := router.Group("api/user")
 	{
 		// RESTful routes
 		userRoutes.POST("/", handlers.CreateUser)
