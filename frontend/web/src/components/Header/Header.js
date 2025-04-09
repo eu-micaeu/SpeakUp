@@ -14,8 +14,8 @@ const HeaderContainer = styled.header`
 `;
 
 const Logo = styled.img`
-  width: 40px;
-  margin: 20px;
+  width: 60px;
+  margin: 25px 50px;
 `;
 
 function Header() {
@@ -37,8 +37,8 @@ function Header() {
         <LogoutIcon
           sx={{
             color: "rgb(255, 0, 0)",
-            margin: "20px",
-            fontSize: "2rem",
+            margin: "25px 50px",
+            fontSize: "3rem",
             cursor: "pointer",
             '&:hover': {
               color: "#fff"
@@ -50,14 +50,15 @@ function Header() {
           }}
         />
       ) : (
+
         <LoginIcon
           sx={{
-            color: "rgb(0, 255, 0)",
-            margin: "20px",
-            fontSize: "2rem",
+            color: "rgb(255, 255, 255)",
+            margin: "25px 50px",
+            fontSize: "3rem",
             cursor: "pointer",
             '&:hover': {
-              color: "#fff"
+              color: "rgb(182, 182, 182)"
             }
           }}
           onClick={() => handleNavigation('/login')}
