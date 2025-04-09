@@ -8,7 +8,7 @@ import (
 )
 
 func ChatRoutes(router *gin.Engine) {
-    chatRoutes := router.Group("/chat")
+    chatRoutes := router.Group("api/chat")
     {
         // CRUD operations for chat
         chatRoutes.POST("", middlewares.AuthMiddleware(), handlers.CreateChat)

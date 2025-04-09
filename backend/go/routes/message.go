@@ -11,7 +11,7 @@ import (
 
 func MessageRoutes(router *gin.Engine) {
 
-	messageRoutes := router.Group("/message")
+	messageRoutes := router.Group("api/message")
 
 	{
 		// CRUD operations for messages

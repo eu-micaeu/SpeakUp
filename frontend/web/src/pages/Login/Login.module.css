@@ -7,9 +7,15 @@
     height: 100vh;
 }
 
+form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
 .card {
     width: 100%;
-    max-width: 28rem;
     padding: 2rem;
     background-color: rgb(31, 31, 31);
     border-radius: 0px 20px 20px 20px;
