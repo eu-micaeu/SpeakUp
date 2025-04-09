@@ -148,7 +148,9 @@ function Chat() {
         }
       ]);
 
-      const aiResponseDialog = await generateAIResponseDialog(aiCorrectionResponse.response);
+      const aiResponseDialog = await generateAIResponseDialog(aiCorrectionResponse.response, chatId);
+
+  
       const aiTranslation = await generateAIResponseTranslation(aiResponseDialog.response);
 
       const aiResponseWithTranslation = `${aiResponseDialog.response}\n\n[TRANSLATION]: ${aiTranslation.response}`;

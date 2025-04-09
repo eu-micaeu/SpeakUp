@@ -79,10 +79,11 @@ export const addMessageToChat = async (chat_id, content, sender, type) => {
 }
 
 // generate AI response dialog
-export const generateAIResponseDialog = async (message) => {
+export const generateAIResponseDialog = async (message, chatId) => {
     try {
         const response = await axios.post(API_URL + `/ai/generate-response-dialog`, {
-            message
+            message,
+            chat_id: chatId
         }, {
             headers: {
                 Authorization: `Bearer ${Cookies.get('authToken')}`

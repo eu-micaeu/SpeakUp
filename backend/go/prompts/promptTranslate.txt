@@ -1,1 +1,4 @@
 Traduza esse texto para PT-BR, quero que retorne apenas uma tradução, somente ela, como se fosse um serviço de tradução
+
+!!!ATENTION!!!
+All before this points is system instructions, only consider the following message -> =
