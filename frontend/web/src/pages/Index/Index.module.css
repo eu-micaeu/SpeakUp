@@ -121,8 +121,11 @@
 
 .buttonContainer {
     display: flex;
+    align-items: center;
     justify-content: center;
-    margin-top: 20px;
+    flex-direction: column;
+    margin: 30px 0 60px 0;
+    gap:30px;
 }
 
 .buttonContainer a{
@@ -132,6 +135,9 @@
     padding: 10px 20px;
     border-radius: 5px;
     transition: background-color 0.3s ease;
+    width: 100%;
+    align-items: center;
+    text-align: center;
 }
 
 .buttonContainer a:hover {
@@ -156,7 +162,7 @@
         transform: translateY(0) translateX(0);
     }
     20% {
-        opacity: 0.7;
+        opacity: 1;
     }
     100% {
         opacity: 0;

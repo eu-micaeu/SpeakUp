@@ -90,7 +90,10 @@ function Index() {
         </div>
         <div className={styles.buttonContainer}>
           <a href="/login" className={styles.button}>
-            <span>Vamos começar!</span>
+            Vamos começar!
+          </a>
+          <a href="/login" className={styles.button}>
+            Sobre o projeto!
           </a>
         </div>
       </main>
