@@ -23,16 +23,8 @@ const cardData = [
 ];
 
 function Index() {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(1); // Carta do meio como padrão
   const { user } = useAuth();
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % cardData.length);
-    }, 2500);
-    
-    return () => clearInterval(interval);
-  }, []);
 
   useEffect(() => {
     if (user) {
@@ -40,37 +32,71 @@ function Index() {
     }
   }, [user]);
 
+  useEffect(() => {
+    const particlesContainer = document.querySelector(`.${styles.particles}`);
+    const numberOfParticles = 50;
+
+    for (let i = 0; i < numberOfParticles; i++) {
+      const particle = document.createElement('div');
+      particle.className = styles.particle;
+
+      const size = Math.random() * 5 + 1;
+      const left = Math.random() * 100;
+      const animationDuration = Math.random() * 5 + 3;
+      const delay = Math.random() * 5;
+
+      particle.style.width = `${size}px`;
+      particle.style.height = `${size}px`;
+      particle.style.left = `${left}%`;
+      particle.style.animationDuration = `${animationDuration}s`;
+      particle.style.animationDelay = `${delay}s`;
+
+      particlesContainer.appendChild(particle);
+    }
+  }, []);
+
   return (
     <>
       <Header />
-      
       <main className={styles.main}>
-
+        <div className={styles.particles}></div>
         <h1 className={styles.title}>SpeakUp</h1>
-        
         <div className={styles.cardsContainer}>
           {cardData.map((card, index) => (
-            <div 
+            <div
               key={index}
-              className={`${styles.card} ${index === currentIndex ? styles.active : ''}`}
+              className={`${styles.card} ${index === activeIndex ? styles.active : ''}`}
+              onClick={() => setActiveIndex(index)}
             >
-              <img src={card.imgSrc} alt={card.alt} width={75} height={75} />
+              <img
+                src={card.imgSrc}
+                alt={card.alt}
+                width={75}
+                height={75}
+                className={styles.cardImage}
+              />
               <p className={styles.cardContent}>{card.content}</p>
             </div>
           ))}
         </div>
-
         <div className={styles.dotsContainer}>
           {cardData.map((_, index) => (
-            <div 
-              key={index} 
-              className={`${styles.dot} ${index === currentIndex ? styles.active : ''}`}
-              onClick={() => setCurrentIndex(index)}
+            <div
+              key={index}
+              className={`${styles.dot} ${index === activeIndex ? styles.active : ''}`}
+              onClick={() => setActiveIndex(index)}
             />
           ))}
         </div>
+        <div className={styles.buttonContainer}>
+          <a href="/login" className={styles.button}>
+            Vamos começar!
+          </a>
+          <a href="/login" className={styles.button}>
+            Sobre o projeto!
+          </a>
+        </div>
       </main>
-      
       <Footer />
     </>
   );
