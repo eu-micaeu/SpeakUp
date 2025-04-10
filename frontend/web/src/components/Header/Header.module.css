@@ -1,0 +1,59 @@
+.headerContainer {
+    background-color: #000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    height: 10%;
+}
+
+.logo {
+    width: 60px;
+    margin: 25px 50px;
+}
+
+.icon {
+    margin: 25px 50px;
+    font-size: 3rem !important;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.logoutIcon {
+    color: rgb(255, 0, 0);
+}
+
+.logoutIcon:hover {
+    color: #fff;
+}
+
+.loginIcon {
+    color: rgb(255, 255, 255);
+}
+
+.loginIcon:hover {
+    color: rgb(182, 182, 182);
+}
+
+
+@media screen and (max-width: 768px) {
+    .headerContainer {
+        align-items: center;
+        padding: 10px 0;
+    }
+
+    .logo {
+        width: 30px;
+    }
+
+    .headerContainer svg {
+        width: 50px;
+        margin: 10px 30px;
+    }
+
+    .icon {
+        font-size: 2rem !important;
+        margin: 10px 0;
+    }
+
+}

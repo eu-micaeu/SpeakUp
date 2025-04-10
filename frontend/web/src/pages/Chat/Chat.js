@@ -14,7 +14,6 @@ import { useNavigate } from 'react-router-dom';
 import SendIcon from '@mui/icons-material/Send';
 import DeleteIcon from '@mui/icons-material/Delete';
 import LogoutIcon from '@mui/icons-material/Logout';
-import PersonIcon from '@mui/icons-material/Person';
 import SettingsIcon from '@mui/icons-material/Settings';
 import AppsIcon from '@mui/icons-material/Apps';
 import { useAuth } from '../../contexts/Auth';
@@ -199,11 +198,6 @@ function Chat() {
 
   return (
     <div className={styles.pageHome}>
-      <PersonIcon
-        style={{ color: "#fff", cursor: "pointer", position: "absolute", top: "20px", right: "20px", fontSize: "30px" }}
-        onMouseEnter={(e) => e.target.style.color = "rgb(187, 187, 187)"}
-        onMouseLeave={(e) => e.target.style.color = "#fff"}
-      />
 
       <aside className={`${styles.sidebar} ${!isSidebarVisible ? styles.sidebarHidden : ''}`}>
         <button

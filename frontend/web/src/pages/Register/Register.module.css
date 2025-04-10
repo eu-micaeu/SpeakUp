@@ -142,3 +142,52 @@ form {
 .styledLink span:hover {
     color: rgb(37, 99, 235);
 }
+
+@media screen and (max-width: 768px) {
+    .card {
+        padding: 1.5rem;
+    }
+
+    .logo {
+        height: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .title {
+        font-size: 1.5rem;
+        text-align: center;
+    }
+
+    .subtitle {
+        font-size: 0.95rem;
+        text-align: center;
+    }
+
+    .inputRow {
+        flex-direction: column;
+    }
+
+    .inputContainer {
+        width: 100%;
+    }
+
+    .inputContainerFull {
+        width: 100%;
+    }
+
+    .input,
+    .select,
+    .button {
+        padding: 0.65rem;
+        font-size: 0.95rem;
+    }
+
+    .errorMessage {
+        font-size: 0.875rem;
+        padding: 0.75rem;
+    }
+
+    .styledLink {
+        font-size: 0.8rem;
+    }
+}

@@ -1,22 +1,8 @@
-import styled from 'styled-components';
+import styles from './Header.module.css';
 import { useNavigate } from 'react-router-dom';
 import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useAuth } from '../../contexts/Auth';
-
-const HeaderContainer = styled.header`
-  background-color: #000;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 0;
-  height: 10%;
-`;
-
-const Logo = styled.img`
-  width: 60px;
-  margin: 25px 50px;
-`;
 
 function Header() {
   const { user, logout } = useAuth();
@@ -27,44 +13,28 @@ function Header() {
   };
 
   return (
-    <HeaderContainer>
-      <Logo 
+    <header className={styles.headerContainer}>
+      <img 
         src="logo.png" 
-        alt="Logo" 
+        alt="Logo"
+        className={styles.logo}
       />
 
       {user ? (
         <LogoutIcon
-          sx={{
-            color: "rgb(255, 0, 0)",
-            margin: "25px 50px",
-            fontSize: "3rem",
-            cursor: "pointer",
-            '&:hover': {
-              color: "#fff"
-            }
-          }}
+          className={`${styles.icon} ${styles.logoutIcon}`}
           onClick={() => {
             logout();
             handleNavigation('/');
           }}
         />
       ) : (
-
         <LoginIcon
-          sx={{
-            color: "rgb(255, 255, 255)",
-            margin: "25px 50px",
-            fontSize: "3rem",
-            cursor: "pointer",
-            '&:hover': {
-              color: "rgb(182, 182, 182)"
-            }
-          }}
+          className={`${styles.icon} ${styles.loginIcon}`}
           onClick={() => handleNavigation('/login')}
         />
       )}
-    </HeaderContainer>
+    </header>
   );
 }
 

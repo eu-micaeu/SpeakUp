@@ -368,3 +368,97 @@
     justify-content: center;
     padding: 20px;
 }
+
+@media screen and (max-width: 768px) {
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+
+    .sidebar ul {
+        flex-wrap: nowrap;
+        margin: 50px 0;
+    }
+
+    .sidebar ul li {
+        margin: 0 10px;
+        width: auto;
+        padding: 10px 15px;
+        font-size: 0.8rem;
+    }
+
+    .sidebarHidden {
+        display: none;
+    }
+
+    .mainContent {
+        padding: 10px;
+        width: 100%;
+    }
+
+
+    .chatContainer {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .message {
+        width: 80%;
+        padding: 15px;
+        font-size: 0.8rem ;
+    }
+
+    .btCreateChat {
+        width: 100%;
+    }
+
+    .toggleButton {
+        top: 10px;
+        left: 10px;
+        font-size: 20px;
+    }
+
+    .divSpeakUp {
+        gap: 10px;
+    }
+
+    .divSpeakUp h2{
+        display: none;
+    }
+
+    .divSpeakUp img{
+        width: 30px;
+        height: 30px;
+    }
+
+    .chatInput {
+        gap: 10px;
+    }
+
+    .chatInput input {
+        width: 100%;
+        margin: 0;
+    }
+
+    .toggleButtonMainContentSidebarVisible {
+        left: 20px;
+    }
+
+    .modalContent {
+        width: 90%;
+        padding: 20px;
+    }
+
+    .optionButton {
+        font-size: 14px;
+    }
+
+    p{
+        font-size: 10px;
+        line-height: 1.5;
+    }
+}

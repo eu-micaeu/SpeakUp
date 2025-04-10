@@ -35,7 +35,6 @@ function Login() {
             const response = await loginApi(email, password);
 
             if (response.message === 'Login successful') {
-                console.log('Login successful');
                 login();
                 toast.success('Login realizado com sucesso!');
                 goToHome();
