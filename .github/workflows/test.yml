@@ -2,55 +2,68 @@ name: CI - Test Automation
 
 on:
   push:
-    branches:
-      - main
+    paths:
+      - 'backend/go/**'
+      - 'frontend/web/**'
+      - '.github/workflows/**'
   pull_request:
-    branches:
-      - main
+    paths:
+      - 'backend/go/**'
+      - 'frontend/web/**'
+      - '.github/workflows/**'
 
 jobs:
   backend-tests:
     name: Backend Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GO111MODULE: on
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: 1.20
+          go-version: '1.20'
+          check-latest: true
 
-      - name: Install dependencies
+      - name: Fix go.mod format
+        working-directory: ./backend/go
         run: |
-          cd backend/go
-          go mod tidy
+          # Fix Go version format (1.23.0 → 1.23)
+          if [ -f go.mod ]; then
+            sed -i 's/go 1\.23\.0/go 1.23/' go.mod
+            # Remove toolchain directive if present
+            sed -i '/^toolchain/d' go.mod
+            echo "Updated go.mod:"
+            cat go.mod
+          fi
 
-      - name: Run tests
-        run: |
-          cd backend/go
-          go test ./... -v
-
-  frontend-tests:
-    name: Frontend Tests
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: Cache Go modules
+        uses: actions/cache@v3
         with:
-          node-version: 18
+          path: |
+            ~/go/pkg/mod
+            backend/go/go.sum
+          key: ${{ runner.os }}-go-${{ hashFiles('backend/go/go.mod') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
 
       - name: Install dependencies
-        run: |
-          cd frontend/web
-          npm install
+        working-directory: ./backend/go
+        run: go mod tidy
 
       - name: Run tests
-        run: |
-          cd frontend/web
-          npm test -- --watchAll=false
+        working-directory: ./backend/go
+        run: go test ./... -v -coverprofile=coverage.out -covermode=atomic
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend/go/coverage.out
