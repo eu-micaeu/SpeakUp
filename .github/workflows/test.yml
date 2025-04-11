@@ -26,20 +26,19 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Go
+      - name: Set up Go 1.23.0
         uses: actions/setup-go@v4
         with:
-          go-version: '1.20'
+          go-version: '1.23.0'
           check-latest: true
 
-      - name: Fix go.mod format
+      - name: Update go.mod format
         working-directory: ./backend/go
         run: |
-          # Fix Go version format (1.23.0 → 1.23)
+          # Ensure go.mod uses correct format (1.23 without patch version)
           if [ -f go.mod ]; then
+            # Update to standard format (1.23) while keeping toolchain if needed
             sed -i 's/go 1\.23\.0/go 1.23/' go.mod
-            # Remove toolchain directive if present
-            sed -i '/^toolchain/d' go.mod
             echo "Updated go.mod:"
             cat go.mod
           fi
@@ -56,7 +55,10 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./backend/go
-        run: go mod tidy
+        run: |
+          # Explicitly set toolchain if needed (uncomment if required)
+          # go env -w GOTOOLCHAIN=local
+          go mod tidy
 
       - name: Run tests
         working-directory: ./backend/go
