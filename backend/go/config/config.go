@@ -40,3 +40,7 @@ func ConnectMongoDB() {
 func GetMongoClient() *mongo.Client {
 	return client
 }
+
+func SetMongoClient(c *mongo.Client) {
+	client = c
+}
