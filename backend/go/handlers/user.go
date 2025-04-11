@@ -150,6 +150,9 @@ func UpdateUser(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
 		return
+	} else {
+		c.JSON(http.StatusOK, gin.H{"message": "User updated successfully"})
+		return
 	}
 }
 
