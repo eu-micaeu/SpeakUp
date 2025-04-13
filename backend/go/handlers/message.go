@@ -16,7 +16,7 @@ import (
 // CreateMessage creates a new message
 // @Summary Create a new message
 // @Description Create a new message with the provided information
-// @Tags message
+// @Tags Message
 // @Accept json
 // @Produce json
 // @Security BearerAuth
