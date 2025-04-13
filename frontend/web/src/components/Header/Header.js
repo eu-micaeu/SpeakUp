@@ -25,7 +25,7 @@ function Header() {
           className={`${styles.icon} ${styles.logoutIcon}`}
           onClick={() => {
             logout();
-            handleNavigation('/');
+            handleNavigation('/login');
           }}
         />
       ) : (

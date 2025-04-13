@@ -14,7 +14,6 @@ import styles from './Login.module.css';
 function Login() {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState('');
     const { login } = useAuth();
 
     const goToIndex = () => {
@@ -27,7 +26,6 @@ function Login() {
 
     const handleLogin = async (event) => {
         event.preventDefault();
-        setError('');
         setIsLoading(true);
         const email = event.target.email.value;
         const password = event.target.password.value;
@@ -37,10 +35,15 @@ function Login() {
             if (response.message === 'Login successful') {
                 login();
                 toast.success('Login realizado com sucesso!');
-                goToHome();
+                setTimeout(() => {
+                    goToHome();
+                }, 2000);
+            } else {
+                toast.error('Email ou senha inválidos');
             }
         } catch (err) {
-            setError('An error occurred. Please try again.');
+            console.error(err);
+            toast.error('Email ou senha inválidos'); // Adicione esta linha
         } finally {
             setIsLoading(false);
         }
@@ -61,12 +64,6 @@ function Login() {
                         <h2 className={styles.h2}>Bem-vindo de volta!</h2>
                         <p className={styles.p}>Entre para continuar a conversa</p>
                     </div>
-
-                    {error && (
-                        <div className={styles.errorMessage}>
-                            {error}
-                        </div>
-                    )}
 
                     <div className={styles.inputContainer}>
                         <label htmlFor="email" className={styles.inputLabel}>
