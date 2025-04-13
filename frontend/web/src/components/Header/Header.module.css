@@ -3,18 +3,17 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 0;
-    height: 10%;
+    height: 15vh;
 }
 
 .logo {
-    width: 60px;
+    width: 2.5rem;
     margin: 25px 50px;
 }
 
 .icon {
     margin: 25px 50px;
-    font-size: 3rem !important;
+    font-size: 2.5rem !important;
     cursor: pointer;
     transition: color 0.3s ease;
 }

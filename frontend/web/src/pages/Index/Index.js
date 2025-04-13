@@ -1,4 +1,3 @@
-import Footer from '../../components/Footer/Footer';
 import { useState, useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import styles from './Index.module.css';
@@ -189,7 +188,6 @@ function Index() {
           </a>
         </div>
       </main>
-      <Footer />
     </>
   );
 }

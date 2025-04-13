@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import styles from './Register.module.css';
+import { toast, ToastContainer } from 'react-toastify';
 
 // Routes
 import { register } from '../../utils/api';
+
+// CSS Module
+import styles from './Register.module.css';
 
 function Register() {
     const navigate = useNavigate();
@@ -19,7 +22,7 @@ function Register() {
     const handleLanguageChange = (e) => {
         const language = e.target.value;
         setSelectedLanguage(language);
-        
+
         if (language === 'english') {
             setLevels(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']);
         } else if (language === 'japanese') {
@@ -53,7 +56,12 @@ function Register() {
             const response = await register(userData);
 
             if (response.message === 'User created successfully') {
-                navigate('/login');
+
+                toast.success('Usuário criado com sucesso!');
+                setTimeout(() => {
+                    navigate('/login');
+                }, 2000);
+
             } else {
                 setError('Erro ao criar usuário');
             }
@@ -66,6 +74,7 @@ function Register() {
 
     return (
         <div className={styles.pageRegister}>
+            <ToastContainer />
             <form className={styles.form} onSubmit={handleRegister}>
                 <div className={styles.card}>
                     <div className={styles.textCenter}>

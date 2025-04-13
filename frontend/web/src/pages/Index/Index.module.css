@@ -1,7 +1,7 @@
 .main {
     background: linear-gradient(135deg, #313131 0%, #1a1a1a 100%);
     padding: 0;
-    height: 120vh;
+    height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
