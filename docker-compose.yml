@@ -1,19 +1,6 @@
 version: '3.8'
 
 services:
-  mongodb:
-    container_name: speakup-mongodb
-    image: mongo:6.0
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: mongoadmin
-      MONGO_INITDB_ROOT_PASSWORD: mongopassword
-      MONGODB_AUTH_MECHANISM: SCRAM-SHA-1
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
-    command: mongod --auth --bind_ip_all
 
   backend:
     build:
@@ -25,7 +12,6 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - MONGO_CONNECTION_STRING=mongodb://mongoadmin:mongopassword@mongodb:27017/?authSource=admin
       - JWT_KEY=secret
     command: ["/go/bin/air"]
 
