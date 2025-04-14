@@ -36,9 +36,10 @@
 
 
 @media screen and (max-width: 768px) {
+
     .headerContainer {
         align-items: center;
-        padding: 10px 0;
+        height: 10vh;
     }
 
     .logo {
