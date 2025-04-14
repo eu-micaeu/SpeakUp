@@ -1,12 +1,102 @@
 .main {
-    background: linear-gradient(135deg, #313131 0%, #1a1a1a 100%);
-    padding: 0;
+    position: relative;
+    overflow-x: hidden;
+    background-color: #0a0a0a;
+    color: white;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+}
+
+.hero {
     height: 100vh;
     display: flex;
     flex-direction: column;
+    justify-content: center;
     align-items: center;
+    text-align: center;
+    z-index: 1;
     position: relative;
-    overflow: hidden;
+    padding: 2rem;
+}
+
+.heroTitle {
+    font-size: 4rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    background: linear-gradient(270deg,
+            #e0e0e0, #bfbfbf, #a0a0a0, #8a8a8a, #bfbfbf, #e0e0e0);
+    background-size: 200% auto;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    animation: chromeShine 6s ease-in-out infinite;
+}
+
+@keyframes chromeShine {
+    0% {
+        background-position: 0% center;
+    }
+
+    100% {
+        background-position: -200% center;
+    }
+}
+
+.heroSubtitle {
+    font-size: 1rem;
+    max-width: 600px;
+    margin-bottom: 2rem;
+    opacity: 0.8;
+}
+
+.cta {
+    background: #ffffff;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    text-decoration: none;
+    color: rgb(0, 0, 0);
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.cta:hover {
+    background: #f0f0f0;
+    transform: translateY(-2px);
+}
+
+.featureSection {
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
+    width: 100%;
+    margin: 50px 0;
+}
+
+.feature {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    width: 800px;
+    margin: 0 auto;
+    justify-content: space-between;
+}
+
+.feature img {
+    width: 100px;
+    height: auto;
+}
+
+.feature h2 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.feature div {
+    font-size: 1.2rem;
+    width: 600px;
+    opacity: 0.8;
 }
 
 .particles {
@@ -17,134 +107,6 @@
     height: 100%;
     z-index: 0;
     pointer-events: none;
-}
-
-.divSpeakUpTitle{
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: row;
-    animation: fadeInDown 1s ease-out;
-    margin: 50px 0 0 0;
-    gap: 25px;
-    user-select: none;
-
-}
-
-.divSpeakUpTitle h1{
-    margin: 0;
-    font-size: 2em;
-    color: #fff;
-}
-
-.cardsContainer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    position: relative;
-    height: 450px;
-    width: 100%;
-    max-width: 1200px;
-}
-
-.card {
-    width: 300px;
-    height: 280px;
-    padding: 20px;
-    background: rgba(0, 0, 0, 0.9);
-    color: #fff;
-    border-radius: 5px;
-    transition: all 0.5s ease-in-out;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    opacity: 0.7;
-    transform: scale(0.9) translateZ(0);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(5px);
-    cursor: pointer;
-    position: relative;
-}
-
-.card.active {
-    opacity: 1;
-    transform: scale(1.1) translateZ(20px);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
-    z-index: 10;
-}
-
-.cardImage {
-    transition: transform 0.3s ease;
-    margin-bottom: 20px;
-}
-
-.card:hover .cardImage {
-    transform: scale(1.1) rotate(5deg);
-}
-
-.cardContent {
-    font-size: 0.95em;
-    text-align: justify;
-    line-height: 1.6em;
-    opacity: 0.9;
-    transition: opacity 0.3s ease;
-}
-
-.card:hover .cardContent {
-    opacity: 1;
-}
-
-.dotsContainer {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    margin: 20px 0;
-}
-
-.dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.3);
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.dot.active {
-    background-color: #fff;
-    transform: scale(1.2);
-}
-
-.dot:hover {
-    background-color: rgba(255, 255, 255, 0.7);
-}
-
-.buttonContainer {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    margin: 30px 0 60px 0;
-    gap: 30px;
-    z-index: 1;
-}
-
-.buttonContainer a {
-    text-decoration: none;
-    color: #fff;
-    background-color: #000000;
-    padding: 10px 20px;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-    width: 100%;
-    align-items: center;
-    text-align: center;
-}
-
-.buttonContainer a:hover {
-    background-color: #333333;
 }
 
 @keyframes fadeInDown {
@@ -180,48 +142,51 @@
 }
 
 @media screen and (max-width: 768px) {
-
-    .main {
-        height: auto;
-        padding: 0 20px;
+    .hero {
+      height: auto;
+      padding: 4rem 2rem;
     }
-
-    .divSpeakUpTitle{
-        gap: 10px;
-        margin: 30px 0;
+  
+    .heroTitle {
+      font-size: 2rem;
+      text-align: center;
     }
-
-    .cardsContainer {
-        flex-direction: column;
-        height: auto;
-        gap: 30px;
-        padding: 0 20px;
+  
+    .heroSubtitle {
+      font-size: 1rem;
+      max-width: 90%;
+      margin-bottom: 2rem;
     }
-
-    .card {
-        width: 80%;
-        height: auto;
-        transform: none;
+  
+    .cta {
+      font-size: 1rem;
+      padding: 0.8rem 1.5rem;
     }
-
-    .card.active {
-        transform: none;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  
+    .featureSection {
+      gap: 2rem;
+      padding: 0;
+      margin: 30px 0;
     }
-
-    .buttonContainer {
-        width: 80%;
-        padding: 0 20px;
+  
+    .feature {
+      flex-direction: column;
+      width: 100%;
+      text-align: center;
+      gap: 1.5rem;
     }
-
-    .buttonContainer a {
-        width: 100%;
-        font-size: 1em;
-        padding: 12px;
+  
+    .feature img {
+      width: 80px;
     }
-
-    .dotsContainer {
-        display: none;
+  
+    .feature h2 {
+      font-size: 1.5rem;
     }
-    
-}
+  
+    .feature div {
+      font-size: 1rem;
+      width: 100%;
+    }
+  }
+  

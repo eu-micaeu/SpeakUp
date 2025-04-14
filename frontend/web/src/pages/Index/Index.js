@@ -139,55 +139,44 @@ function Index() {
   return (
     <>
       <main className={styles.main}>
+        <div ref={mountRef} className={styles.particles} />
 
-        <div ref={mountRef} className={styles.particles}></div>
+        <section className={styles.hero}>
+          <img src="logo.png" alt="Logo" className={styles.logo} />
+          <h1 className={styles.heroTitle}>Domine idiomas com a IA.</h1>
+          <p className={styles.heroSubtitle}>
+            Aprendizado personalizado com correções, explicações e evolução contínua.
+          </p>
+          <a href="/login" className={styles.cta}>Vamos começar!</a>
+        </section>
 
-        <div className={styles.divSpeakUpTitle}>
-
-          <img
-            src="logo.png"
-            alt="Logo"
-            className={styles.logo}
-          />
-          <h1 className={styles.title}>SpeakUp</h1>
-
-        </div>
-
-        <div className={styles.cardsContainer}>
-          {cardData.map((card, index) => (
-            <div
-              key={index}
-              className={`${styles.card} ${index === activeIndex ? styles.active : ''}`}
-              onClick={() => setActiveIndex(index)}
-            >
-              <img
-                src={card.imgSrc}
-                alt={card.alt}
-                width={75}
-                height={75}
-                className={styles.cardImage}
-              />
-              <p className={styles.cardContent}>{card.content}</p>
+        <section className={styles.featureSection}>
+          <div className={styles.feature}>
+            <img src="./chat.png" alt="Chat" />
+            <div>
+              <h2>Correções inteligentes em tempo real</h2>
+              <p>A plataforma analisa seus textos e corrige com explicações didáticas.</p>
             </div>
-          ))}
-        </div>
+          </div>
 
-        <div className={styles.dotsContainer}>
-          {cardData.map((_, index) => (
-            <div
-              key={index}
-              className={`${styles.dot} ${index === activeIndex ? styles.active : ''}`}
-              onClick={() => setActiveIndex(index)}
-            />
-          ))}
-        </div>
+          <div className={styles.feature}>
+            <img src="./ia.png" alt="IA" />
+            <div>
+              <h2>Experiência personalizada</h2>
+              <p>Entende seus erros mais comuns e ajuda você a dominá-los com contexto.</p>
+            </div>
+          </div>
 
-        <div className={styles.buttonContainer}>
-          <a href="/login" className={styles.button}>
-            Vamos começar!
-          </a>
-        </div>
+          <div className={styles.feature}>
+            <img src="./mic.png" alt="Voz" />
+            <div>
+              <h2>Reconhecimento de fala</h2>
+              <p>Em breve: pratique a pronúncia com feedback em tempo real.</p>
+            </div>
+          </div>
+        </section>
       </main>
+
     </>
   );
 }
