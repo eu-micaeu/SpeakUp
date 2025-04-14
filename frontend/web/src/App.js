@@ -7,6 +7,7 @@ import Register from './pages/Register/Register';
 import Chat from './pages/Chat/Chat';
 import Home from './pages/Home/Home';
 import TeachingPlan from './pages/TeachingPlan/TeachingPlan';
+import Perfil from './pages/Perfil/Perfil';
 
 // Components
 import { AuthProvider } from './contexts/Auth';
@@ -41,6 +42,14 @@ function App() {
             element={
               <PrivateRoute>
                 <Home />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/perfil"
+            element={
+              <PrivateRoute>
+                <Perfil />
               </PrivateRoute>
             }
           />
