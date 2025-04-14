@@ -57,7 +57,7 @@ func Login(c *gin.Context) {
 // CreateUser godoc
 // @Summary      Create a new user
 // @Description  Create a new user with the provided details
-// @Tags         users
+// @Tags         User
 // @Accept       json
 // @Produce      json
 // @Param        user body models.User true "User details"
@@ -99,7 +99,7 @@ func CreateUser(c *gin.Context) {
 // GetUsers godoc
 // @Summary      Get a user by ID
 // @Description  Retrieve a user's details by their ID
-// @Tags         users
+// @Tags         User
 // @Produce      json
 // @Param        id path string true "User ID"
 // @Success      200  {object}  models.User
@@ -122,7 +122,7 @@ func GetUsers(c *gin.Context) {
 // UpdateUser godoc
 // @Summary      Update a user
 // @Description  Update a user's details by their ID
-// @Tags         users
+// @Tags         User
 // @Accept       json
 // @Produce      json
 // @Param        id path string true "User ID"
@@ -160,7 +160,7 @@ func UpdateUser(c *gin.Context) {
 // DeleteUser godoc
 // @Summary      Delete a user
 // @Description  Delete a user by their ID
-// @Tags         users
+// @Tags         User
 // @Produce      json
 // @Param        id path string true "User ID"
 // @Success      200  {object}  object{message=string}

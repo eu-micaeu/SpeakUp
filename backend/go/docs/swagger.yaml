@@ -111,10 +111,12 @@ paths:
         type: string
       - description: Chat object
         in: body
-        name: message
+        name: request
         required: true
         schema:
           properties:
+            chat_id:
+              type: string
             message:
               type: string
           type: object
@@ -465,7 +467,7 @@ paths:
       - BearerAuth: []
       summary: Get all messages
       tags:
-      - message
+      - Message
   /message/{id}:
     delete:
       consumes:
@@ -495,7 +497,7 @@ paths:
       - BearerAuth: []
       summary: Delete a message
       tags:
-      - message
+      - Message
     get:
       consumes:
       - application/json
@@ -526,7 +528,7 @@ paths:
       - BearerAuth: []
       summary: Get a message by ID
       tags:
-      - message
+      - Message
     put:
       consumes:
       - application/json
@@ -563,7 +565,7 @@ paths:
       - BearerAuth: []
       summary: Update a message
       tags:
-      - message
+      - Message
   /message/chat/{id}:
     get:
       consumes:
@@ -597,7 +599,7 @@ paths:
       - BearerAuth: []
       summary: Get messages by chat ID
       tags:
-      - message
+      - Message
   /user:
     post:
       consumes:
@@ -636,7 +638,7 @@ paths:
             type: object
       summary: Create a new user
       tags:
-      - users
+      - User
   /user/{id}:
     delete:
       description: Delete a user by their ID
@@ -665,7 +667,7 @@ paths:
             type: object
       summary: Delete a user
       tags:
-      - users
+      - User
     get:
       description: Retrieve a user's details by their ID
       parameters:
@@ -690,7 +692,7 @@ paths:
             type: object
       summary: Get a user by ID
       tags:
-      - users
+      - User
     put:
       consumes:
       - application/json
@@ -733,7 +735,7 @@ paths:
             type: object
       summary: Update a user
       tags:
-      - users
+      - User
   /user/login:
     post:
       consumes:

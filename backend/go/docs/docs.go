@@ -115,12 +115,15 @@ const docTemplate = `{
                     },
                     {
                         "description": "Chat object",
-                        "name": "message",
+                        "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
                             "type": "object",
                             "properties": {
+                                "chat_id": {
+                                    "type": "string"
+                                },
                                 "message": {
                                     "type": "string"
                                 }
@@ -613,7 +616,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "message"
+                    "Message"
                 ],
                 "summary": "Get all messages",
                 "parameters": [
@@ -659,7 +662,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "message"
+                    "Message"
                 ],
                 "summary": "Get messages by chat ID",
                 "parameters": [
@@ -712,7 +715,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "message"
+                    "Message"
                 ],
                 "summary": "Get a message by ID",
                 "parameters": [
@@ -760,7 +763,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "message"
+                    "Message"
                 ],
                 "summary": "Update a message",
                 "parameters": [
@@ -817,7 +820,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "message"
+                    "Message"
                 ],
                 "summary": "Delete a message",
                 "parameters": [
@@ -859,7 +862,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "users"
+                    "User"
                 ],
                 "summary": "Create a new user",
                 "parameters": [
@@ -964,7 +967,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "users"
+                    "User"
                 ],
                 "summary": "Get a user by ID",
                 "parameters": [
@@ -1005,7 +1008,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "users"
+                    "User"
                 ],
                 "summary": "Update a user",
                 "parameters": [
@@ -1068,7 +1071,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "users"
+                    "User"
                 ],
                 "summary": "Delete a user",
                 "parameters": [

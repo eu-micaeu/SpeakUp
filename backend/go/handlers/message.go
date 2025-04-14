@@ -54,7 +54,7 @@ func CreateMessage(c *gin.Context) {
 // GetMessageById gets a message by ID
 // @Summary Get a message by ID
 // @Description Retrieve a message using its ID
-// @Tags message
+// @Tags Message
 // @Accept json
 // @Produce json
 // @Security BearerAuth
@@ -81,7 +81,7 @@ func GetMessageById(c *gin.Context) {
 // GetMessages gets all messages
 // @Summary Get all messages
 // @Description Retrieve a list of all messages
-// @Tags message
+// @Tags Message
 // @Accept json
 // @Produce json
 // @Security BearerAuth
@@ -111,7 +111,7 @@ func GetMessages(c *gin.Context) {
 // UpdateMessage updates a message by ID
 // @Summary Update a message
 // @Description Update an existing message with new information
-// @Tags message
+// @Tags Message
 // @Accept json
 // @Produce json
 // @Security BearerAuth
@@ -144,7 +144,7 @@ func UpdateMessage(c *gin.Context) {
 // DeleteMessage deletes a message by ID
 // @Summary Delete a message
 // @Description Remove an existing message from the system
-// @Tags message
+// @Tags Message
 // @Accept json
 // @Produce json
 // @Security BearerAuth
@@ -172,7 +172,7 @@ func DeleteMessage(c *gin.Context) {
 // GetMessagesByChatId gets all messages from a specific chat
 // @Summary Get messages by chat ID
 // @Description Retrieve all messages belonging to a specific chat
-// @Tags message
+// @Tags Message
 // @Accept json
 // @Produce json
 // @Security BearerAuth
