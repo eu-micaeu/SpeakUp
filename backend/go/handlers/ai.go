@@ -131,7 +131,7 @@ func GenerateResponseCorrection(c *gin.Context) {
 	connector := connectors.NewGeminiConnector()
 
 	// Generate a correction for the dialogue
-	correctionResp, err := connector.GenerateResponse(context.Background(), "Answer me in this language: "+middlewares.GetLanguageFromContext(c)+prompt+request.Message)
+	correctionResp, err := connector.GenerateResponse(context.Background(), "Answer me in this language: " + middlewares.GetLanguageFromContext(c) + prompt + request.Message)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -140,47 +140,46 @@ func GenerateResponseCorrection(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"response": correctionResp})
 }
 
-// @Summary Gera uma tradução de texto usando IA
-// @Description Traduz o texto fornecido para o idioma especificado
+// @Summary Traduz um texto usando IA
+// @Description Recebe um texto e retorna sua tradução para o idioma especificado
 // @Tags AI
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
 // @Param Authorization header string true "Token de autenticação"
-// @Param message body object{message=string,target_language=string} true "Chat object"
+// @Param message body object{message=string,target_language=string} true "Texto e idioma de destino"
 // @Success 200 {object} map[string]string "Tradução gerada com sucesso" example({"response":"Olá, como vai você?"})
-// @Failure 400 {object} map[string]string "Erro na requisição" example({"error":"Invalid request"})
-// @Failure 500 {object} map[string]string "Erro interno do servidor" example({"error":"Internal server error"})
+// @Failure 400 {object} map[string]string "Requisição inválida" example({"error":"Invalid request"})
+// @Failure 500 {object} map[string]string "Erro interno" example({"error":"Internal server error"})
 // @Router /ai/generate-response-translation [post]
 func GenerateResponseTranslate(c *gin.Context) {
-
 	promptPath := filepath.Join("prompts", "promptTranslate.txt")
+
 	promptBytes, err := os.ReadFile(promptPath)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load prompt: " + err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao carregar o prompt: " + err.Error()})
 		return
 	}
 	prompt := string(promptBytes)
 
-	var request struct {
-		Message string `json:"message"`
+	var req struct {
+		Message string `json:"message" binding:"required"`
 	}
 
-	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Dados inválidos: " + err.Error()})
 		return
 	}
 
 	connector := connectors.NewGeminiConnector()
 
-	// Generate a translation for the dialogue
-	translateResp, err := connector.GenerateResponse(context.Background(), prompt+request.Message)
+	response, err := connector.GenerateResponse(context.Background(), prompt+req.Message)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao gerar tradução: " + err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"response": translateResp})
+	c.JSON(http.StatusOK, gin.H{"response": response})
 }
 
 // @Summary Gera um tópico para uma conversa usando IA
