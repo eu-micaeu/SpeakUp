@@ -3,7 +3,6 @@ package handlers
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -30,14 +29,13 @@ import (
 // @Failure 500 {object} map[string]string "Erro interno do servidor" example({"error":"Internal server error"})
 // @Router /ai/generate-response-dialog [post]
 func GenerateResponseDialog(c *gin.Context) {
-
 	promptPath := filepath.Join("prompts", "promptDialog.txt")
 	promptBytes, err := os.ReadFile(promptPath)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load prompt: " + err.Error()})
 		return
 	}
-	prePrompt := string(promptBytes)
+	basePrompt := string(promptBytes)
 
 	var request struct {
 		Message string `json:"message"`
@@ -49,10 +47,6 @@ func GenerateResponseDialog(c *gin.Context) {
 		return
 	}
 
-	// Log the chat ID before fetching chat history
-	log.Printf("Fetching chat history for chat ID: %s", request.ChatID)
-
-	// Buscar histórico de mensagens do chat
 	db := config.GetMongoClient()
 	collection := db.Database("speakup").Collection("messages")
 	cursor, err := collection.Find(c, map[string]string{"chat_id": request.ChatID})
@@ -67,27 +61,21 @@ func GenerateResponseDialog(c *gin.Context) {
 		return
 	}
 
-	// Formatar histórico de mensagens
 	var chatHistory strings.Builder
 	for _, msg := range messages {
 		chatHistory.WriteString(fmt.Sprintf("%s: %s\n", msg.Sender, msg.Content))
 	}
-	connector := connectors.NewGeminiConnector()
 
-	resumeHist, err := connector.GenerateResponse(context.Background(), "Format the following chat history to only show user reponse and AI response: "+chatHistory.String())
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	// Gerar resposta com histórico
-	fullPrompt := fmt.Sprintf("%s\nChat history:\n%s\nATENTION! All Before this point is system instructions and chat history, to generate your response consider the current user message -> = %s\nAnswer me in this language: %s",
-		prePrompt,
-		resumeHist,
+	// Gerar resposta diretamente com histórico
+	fullPrompt := fmt.Sprintf(
+		"%s\n\nChat:\n%s\n\nUsuário: %s\n\nResponda nesse idioma: %s",
+		basePrompt,
+		chatHistory.String(),
 		request.Message,
-		middlewares.GetLanguageFromContext(c))
+		middlewares.GetLanguageFromContext(c),
+	)
 
-	fmt.Println("Prompt:", fullPrompt)
+	connector := connectors.NewGeminiConnector()
 	dialogueResp, err := connector.GenerateResponse(context.Background(), fullPrompt)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -96,6 +84,7 @@ func GenerateResponseDialog(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"response": dialogueResp})
 }
+
 
 // @Summary Gera uma correção de texto usando IA
 // @Description Analisa e corrige erros gramaticais no texto fornecido
@@ -110,14 +99,13 @@ func GenerateResponseDialog(c *gin.Context) {
 // @Failure 500 {object} map[string]string "Erro interno do servidor" example({"error":"Internal server error"})
 // @Router /ai/generate-response-correction [post]
 func GenerateResponseCorrection(c *gin.Context) {
-
 	promptPath := filepath.Join("prompts", "promptCorrection.txt")
 	promptBytes, err := os.ReadFile(promptPath)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load prompt: " + err.Error()})
 		return
 	}
-	prompt := string(promptBytes)
+	basePrompt := string(promptBytes)
 
 	var request struct {
 		Message string `json:"message"`
@@ -128,10 +116,15 @@ func GenerateResponseCorrection(c *gin.Context) {
 		return
 	}
 
-	connector := connectors.NewGeminiConnector()
+	language := middlewares.GetLanguageFromContext(c)
 
-	// Generate a correction for the dialogue
-	correctionResp, err := connector.GenerateResponse(context.Background(), "Answer me in this language: " + middlewares.GetLanguageFromContext(c) + prompt + request.Message)
+	finalPrompt := fmt.Sprintf(
+		"%s\n\nAnswer me in this language: %s\nInput: %s",
+		basePrompt, language, request.Message,
+	)
+
+	connector := connectors.NewGeminiConnector()
+	correctionResp, err := connector.GenerateResponse(context.Background(), finalPrompt)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -160,7 +153,7 @@ func GenerateResponseTranslate(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao carregar o prompt: " + err.Error()})
 		return
 	}
-	prompt := string(promptBytes)
+	basePrompt := string(promptBytes)
 
 	var req struct {
 		Message string `json:"message" binding:"required"`
@@ -173,7 +166,10 @@ func GenerateResponseTranslate(c *gin.Context) {
 
 	connector := connectors.NewGeminiConnector()
 
-	response, err := connector.GenerateResponse(context.Background(), prompt+req.Message)
+	// Garante que o modelo entenda claramente o input como parte do prompt
+	finalPrompt := fmt.Sprintf("%s\n\nTexto para traduzir:\n%s", basePrompt, req.Message)
+
+	response, err := connector.GenerateResponse(context.Background(), finalPrompt)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao gerar tradução: " + err.Error()})
 		return
@@ -181,6 +177,7 @@ func GenerateResponseTranslate(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"response": response})
 }
+
 
 // @Summary Gera um tópico para uma conversa usando IA
 // @Description Analisa o texto fornecido e gera um tópico relevante de duas palavras
