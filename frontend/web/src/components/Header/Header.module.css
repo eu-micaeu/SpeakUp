@@ -1,5 +1,5 @@
 .headerContainer {
-    background-color: #000;
+    background-color: #000000;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -13,7 +13,7 @@
 
 .icon {
     margin: 25px 50px;
-    font-size: 2.5rem !important;
+    font-size: 1.5rem !important;
     cursor: pointer;
     transition: color 0.3s ease;
 }

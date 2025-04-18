@@ -1,6 +1,6 @@
 .pageHome {
     display: flex;
-    background-color: #313131;
+    background: linear-gradient(135deg, #313131 0%, #1a1a1a 100%);
     color: white;
     height: 85vh;
     text-align: center;

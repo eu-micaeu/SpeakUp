@@ -1,0 +1,91 @@
+.pageTeachingPlan {
+    display: flex;
+    background: linear-gradient(135deg, #313131 0%, #1a1a1a 100%);
+    color: white;
+    min-height: 100vh;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.title {
+    color: #00bcd4;
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    animation: fadeIn 1.2s ease-in-out;
+}
+
+.sectionTitle {
+    color: #4dd0e1;
+    font-size: 1.8rem;
+    margin: 2rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    animation: fadeIn 1.4s ease-in-out;
+}
+
+.intro {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+    animation: fadeIn 1.6s ease-in-out;
+}
+
+.planList, .resourceList {
+    text-align: left;
+    padding-left: 1.5rem;
+    animation: fadeIn 1.2s ease-in-out;
+}
+
+.planList li, .resourceList li {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.planList li.animateIn, .resourceList li.animateIn {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.backArrow {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    color: #fff;
+    font-size: 2rem;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.backArrow:hover {
+    cursor: pointer;
+    color: #ccc;
+    transform: scale(1.2);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@media (max-width: 600px) {
+    .teachingPlan {
+        padding: 1.5rem;
+    }
+
+    .title {
+        font-size: 2rem;
+    }
+
+    .sectionTitle {
+        font-size: 1.5rem;
+    }
+
+    .backArrow {
+        font-size: 1.5rem;
+        left: 15px;
+        top: 15px;
+    }
+}

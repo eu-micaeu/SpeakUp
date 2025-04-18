@@ -93,8 +93,13 @@
     margin-bottom: 0.5rem;
 }
 
-.feature div {
+.feature p {
     font-size: 1.2rem;
+    max-width: 600px;
+    margin-bottom: 0.5rem;
+}
+
+.feature div {
     width: 600px;
     opacity: 0.8;
 }

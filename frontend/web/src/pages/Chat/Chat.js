@@ -28,9 +28,14 @@ function Chat() {
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [isSendingMessage, setIsSendingMessage] = useState(false);
+  const [showWelcomePopup, setShowWelcomePopup] = useState(true);
   const { logout } = useAuth();
   const messagesEndRef = useRef(null);
   const navigate = useNavigate();
+
+  const closeWelcomePopup = () => {
+    setShowWelcomePopup(false);
+  };
 
   const handleSettingsClick = () => {
     setShowSettingsModal(true);
@@ -115,7 +120,6 @@ function Chat() {
     if (inputMessage.trim() === '' || isSendingMessage) return;
 
     setIsSendingMessage(true);
-
     const messageContent = inputMessage.trim();
     setInputMessage('');
 
@@ -148,10 +152,7 @@ function Chat() {
       ]);
 
       const aiResponseDialog = await generateAIResponseDialog(aiCorrectionResponse.response, chatId);
-
-  
       const aiTranslation = await generateAIResponseTranslation(aiResponseDialog.response);
-
       const aiResponseWithTranslation = `${aiResponseDialog.response}\n\n[TRANSLATION]: ${aiTranslation.response}`;
 
       const savedAIMessage = await addMessageToChat(chatId, aiResponseWithTranslation, 'ai', 'response');
@@ -198,6 +199,34 @@ function Chat() {
 
   return (
     <div className={styles.pageHome}>
+      {showWelcomePopup && (
+        <div className={styles.modalOverlay} onClick={closeWelcomePopup}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <h3 className={styles.modalTitle}>Bem-vindo ao Chat de Prática!</h3>
+            <h3>
+              Aqui você pode praticar o idioma conversando com nossa IA. <br />
+              Digite uma frase e receba correções, traduções e sugestões de como melhorar.
+            </h3>
+            <p>
+              ✅ Correção gramatical<br />
+              ✅ Tradução para o português<br />
+              ✅ Diálogos simulados para praticar<br />
+            </p>
+            <p>
+              Exemplos de uso:<br /><br />
+              Entrada: "I ned a car"<br />
+              Saída: "I need a car"<br />
+            </p>
+            <button
+              className={styles.optionButton}
+              onClick={closeWelcomePopup}
+              style={{ marginTop: '15px' }}
+            >
+              Entendi!
+            </button>
+          </div>
+        </div>
+      )}
 
       <aside className={`${styles.sidebar} ${!isSidebarVisible ? styles.sidebarHidden : ''}`}>
         <button
@@ -356,7 +385,7 @@ function Chat() {
           </div>
         </div>
 
-        <p>O SpeakUp ainda está em Beta, poderá ter erros nas respostas e/ou correções.</p>
+        <p>Converse com nosso assistente de IA para praticar esse idioma em tempo real, recebendo feedback instantâneo.</p>
       </main>
     </div>
   );
