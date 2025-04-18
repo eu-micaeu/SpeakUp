@@ -3,7 +3,6 @@ package handlers
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -49,9 +48,6 @@ func GenerateResponseDialog(c *gin.Context) {
 		return
 	}
 
-	// Log the chat ID before fetching chat history
-	log.Printf("Fetching chat history for chat ID: %s", request.ChatID)
-
 	// Buscar histórico de mensagens do chat
 	db := config.GetMongoClient()
 	collection := db.Database("speakup").Collection("messages")
@@ -87,7 +83,6 @@ func GenerateResponseDialog(c *gin.Context) {
 		request.Message,
 		middlewares.GetLanguageFromContext(c))
 
-	fmt.Println("Prompt:", fullPrompt)
 	dialogueResp, err := connector.GenerateResponse(context.Background(), fullPrompt)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

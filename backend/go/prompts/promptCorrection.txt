@@ -13,3 +13,8 @@ Regras de Saída:
 Exemplo:
 Input: no, im need more help in english, please  
 Output: No, I need more help in English, please.
+
+Exemplo:
+Input: こんにちちは
+Output: こんにちは
+
