@@ -217,29 +217,71 @@
 
 .modalOverlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.6);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    padding: 16px;
 }
 
 .modalContent {
-    background-color: #1d1d1d;
-    border-radius: 10px;
-    padding: 25px;
-    animation: fadeIn 0.3s ease-out;
+    background: #1f1f1f;
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 500px;
+    width: 100%;
     color: #fff;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    animation: fadeIn 0.3s ease-out;
 }
 
-.modalContent h3 {
-    margin: 20px 0 0 0;
+.modalTitle {
+    font-size: 1.5rem;
+    margin-bottom: 16px;
     text-align: center;
 }
+
+.modalDescription {
+    font-size: 1rem;
+    text-align: center;
+    margin-bottom: 16px;
+    line-height: 1.6;
+}
+
+.modalList {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 16px 0;
+    line-height: 1.8;
+    text-align: center;
+}
+
+.modalExample {
+    background: #2a2a2a;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.optionButton {
+    background-color: #4ade80;
+    color: #000;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.optionButton:hover {
+    background-color: #22c55e;
+}
+
 
 @keyframes fadeIn {
     from {
@@ -405,7 +447,7 @@
     .message {
         width: 80%;
         padding: 15px;
-        font-size: 0.8rem ;
+        font-size: 0.8rem;
     }
 
     .btCreateChat {
@@ -422,11 +464,11 @@
         gap: 10px;
     }
 
-    .divSpeakUp h2{
+    .divSpeakUp h2 {
         display: none;
     }
 
-    .divSpeakUp img{
+    .divSpeakUp img {
         width: 30px;
         height: 30px;
     }
@@ -453,7 +495,7 @@
         font-size: 14px;
     }
 
-    p{
+    p {
         font-size: 10px;
         line-height: 1.5;
     }

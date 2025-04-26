@@ -201,31 +201,49 @@ function Chat() {
     <div className={styles.pageHome}>
       {showWelcomePopup && (
         <div className={styles.modalOverlay} onClick={closeWelcomePopup}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <h3 className={styles.modalTitle}>Bem-vindo ao Chat de Prática!</h3>
-            <h3>
-              Aqui você pode praticar o idioma conversando com nossa IA. <br />
-              Digite uma frase e receba correções, traduções e sugestões de como melhorar.
-            </h3>
-            <p>
-              ✅ Correção gramatical<br />
-              ✅ Tradução para o português<br />
-              ✅ Diálogos simulados para praticar<br />
+          <div
+            className={styles.modalContent}
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="welcomeTitle"
+          >
+            <h2 id="welcomeTitle" className={styles.modalTitle}>
+              👋 Bem-vindo ao Chat de Prática!
+            </h2>
+            <p className={styles.modalDescription}>
+              Aqui você pode praticar o idioma conversando com nossa IA.
+              Digite uma frase e receba:
             </p>
-            <p>
-              Exemplos de uso:<br /><br />
-              Entrada: "I ned a car"<br />
-              Saída: "I need a car"<br />
-            </p>
-            <button
-              className={styles.optionButton}
-              onClick={closeWelcomePopup}
-              style={{ marginTop: '15px' }}
-            >
+
+            <ul className={styles.modalList}>
+              <li>✅ Correção gramatical</li>
+              <li>✅ Tradução para o português</li>
+              <li>✅ Diálogos simulados para praticar</li>
+            </ul>
+
+            <div className={styles.modalExample}>
+              <strong>Exemplos:</strong><br /><br />
+
+              <em>Entrada:</em> "I ned a car"<br />
+              <em>Saída:</em> "I need a car"<br /><br />
+
+              <em>Entrada:</em> "How are you doin?"<br />
+              <em>Saída:</em> "How are you doing?"<br /><br />
+
+              <em>Entrada:</em> "Let's go beach tomorrow?"<br />
+              <em>Saída:</em> "Let's go to the beach tomorrow?"<br /><br />
+
+              <em>Entrada:</em> "I don't know how say this."<br />
+              <em>Saída:</em> "I don't know how to say this."
+            </div>
+
+            <button className={styles.optionButton} onClick={closeWelcomePopup}>
               Entendi!
             </button>
           </div>
         </div>
+
       )}
 
       <aside className={`${styles.sidebar} ${!isSidebarVisible ? styles.sidebarHidden : ''}`}>
