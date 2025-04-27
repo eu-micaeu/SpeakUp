@@ -143,7 +143,7 @@ function Index() {
 
         <section className={styles.hero}>
           <img src="logo.png" alt="Logo" className={styles.logo} />
-          <h1 className={styles.heroTitle}>Domine idiomas com a IA.</h1>
+          <h1 className={styles.heroTitle}>SpeakUp</h1>
           <p className={styles.heroSubtitle}>
             Aprendizado personalizado com correções, explicações e evolução contínua.
           </p>

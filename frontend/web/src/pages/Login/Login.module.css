@@ -95,6 +95,21 @@ form {
     cursor: not-allowed;
 }
 
+.buttonGoogle{
+    background-color: rgb(53, 53, 53);
+    border: none;
+    padding: 15px;
+    margin: 0 0 1.5rem 0;
+    border-radius: 10px;
+    width: 55px;
+    height: 55px;
+}
+
+.buttonGoogle:hover:not(:disabled) {
+    background-color: rgb(229, 231, 235);
+    cursor: pointer;
+}
+
 .errorMessage {
     background-color: rgb(239, 68, 68);
     color: white;
@@ -116,6 +131,12 @@ form {
 
 .styledLink span:hover {
     color: rgb(37, 99, 235);
+}
+
+.googleIcon{
+
+    width: 25px;
+
 }
 
 @media screen and (max-width: 768px) {

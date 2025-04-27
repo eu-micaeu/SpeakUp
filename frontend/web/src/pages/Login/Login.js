@@ -2,14 +2,27 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { initializeApp } from "firebase/app";
 
 import { useAuth } from '../../contexts/Auth';
-
-// Routes
 import { login as loginApi } from '../../utils/api';
-
-// CSS Module
 import styles from './Login.module.css';
+
+// Configuração do Firebase: depois dos imports
+const firebaseConfig = {
+    apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+    authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.REACT_APP_FIREBASE_APP_ID,
+    measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
+};
+
+// Inicialização do Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
 function Login() {
     const navigate = useNavigate();
@@ -43,9 +56,25 @@ function Login() {
             }
         } catch (err) {
             console.error(err);
-            toast.error('Email ou senha inválidos'); // Adicione esta linha
+            toast.error('Email ou senha inválidos');
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleGoogleLogin = async () => {
+        const provider = new GoogleAuthProvider();
+        try {
+            const result = await signInWithPopup(auth, provider);
+            const user = result.user;
+            login();
+            toast.success(`Bem-vindo, ${user.displayName}!`);
+            setTimeout(() => {
+                goToHome();
+            }, 2000);
+        } catch (error) {
+            console.error(error);
+            toast.error('Erro ao fazer login com Google');
         }
     };
 
@@ -101,10 +130,22 @@ function Login() {
                         {isLoading ? 'Entrando...' : 'Entrar'}
                     </button>
 
+                    <button
+                        type="button"
+                        onClick={handleGoogleLogin}
+                        disabled={isLoading}
+                        className={styles.buttonGoogle}
+                    >
+                        <img
+                            src="./google.png"
+                            alt="Google Icon"
+                            className={styles.googleIcon}
+                        />
+                    </button>
+
                     <div className={styles.textCenter}>
                         <Link to="/register" className={styles.styledLink}>
-                            Não tem uma conta ainda?{' '}
-                            <span>Registre-se</span>
+                            Não tem uma conta ainda? <span>Registre-se</span>
                         </Link>
                     </div>
                 </div>
