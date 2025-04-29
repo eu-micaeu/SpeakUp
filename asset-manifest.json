@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/SpeakUp/frontend/web/static/css/main.e7cde7b0.css",
-    "main.js": "/SpeakUp/frontend/web/static/js/main.e50c8aa1.js",
-    "static/js/453.c5eaf93b.chunk.js": "/SpeakUp/frontend/web/static/js/453.c5eaf93b.chunk.js",
-    "index.html": "/SpeakUp/frontend/web/index.html",
-    "main.e7cde7b0.css.map": "/SpeakUp/frontend/web/static/css/main.e7cde7b0.css.map",
-    "main.e50c8aa1.js.map": "/SpeakUp/frontend/web/static/js/main.e50c8aa1.js.map",
-    "453.c5eaf93b.chunk.js.map": "/SpeakUp/frontend/web/static/js/453.c5eaf93b.chunk.js.map"
+    "main.css": "/static/css/main.e7cde7b0.css",
+    "main.js": "/static/js/main.60473612.js",
+    "static/js/453.c5eaf93b.chunk.js": "/static/js/453.c5eaf93b.chunk.js",
+    "index.html": "/index.html",
+    "main.e7cde7b0.css.map": "/static/css/main.e7cde7b0.css.map",
+    "main.60473612.js.map": "/static/js/main.60473612.js.map",
+    "453.c5eaf93b.chunk.js.map": "/static/js/453.c5eaf93b.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.e7cde7b0.css",
-    "static/js/main.e50c8aa1.js"
+    "static/js/main.60473612.js"
   ]
 }
