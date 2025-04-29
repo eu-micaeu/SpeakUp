@@ -1,0 +1,71 @@
+name: CI - Test Automation
+
+on:
+  push:
+    paths:
+      - 'backend/go/**'
+      - 'frontend/web/**'
+      - '.github/workflows/**'
+  pull_request:
+    paths:
+      - 'backend/go/**'
+      - 'frontend/web/**'
+      - '.github/workflows/**'
+
+jobs:
+  backend-tests:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GO111MODULE: on
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go 1.23.0
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.23.0'
+          check-latest: true
+
+      - name: Update go.mod format
+        working-directory: ./backend/go
+        run: |
+          # Ensure go.mod uses correct format (1.23 without patch version)
+          if [ -f go.mod ]; then
+            # Update to standard format (1.23) while keeping toolchain if needed
+            sed -i 's/go 1\.23\.0/go 1.23/' go.mod
+            echo "Updated go.mod:"
+            cat go.mod
+          fi
+
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/go/pkg/mod
+            backend/go/go.sum
+          key: ${{ runner.os }}-go-${{ hashFiles('backend/go/go.mod') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Install dependencies
+        working-directory: ./backend/go
+        run: |
+          # Explicitly set toolchain if needed (uncomment if required)
+          # go env -w GOTOOLCHAIN=local
+          go mod tidy
+
+      - name: Run tests
+        working-directory: ./backend/go
+        run: go test ./... -v -coverprofile=coverage.out -covermode=atomic
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend/go/coverage.out

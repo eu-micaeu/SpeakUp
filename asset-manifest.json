@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/SpeakUp/static/css/main.e7cde7b0.css",
+    "main.js": "/SpeakUp/static/js/main.92f22aed.js",
+    "static/js/453.c5eaf93b.chunk.js": "/SpeakUp/static/js/453.c5eaf93b.chunk.js",
+    "index.html": "/SpeakUp/index.html",
+    "main.e7cde7b0.css.map": "/SpeakUp/static/css/main.e7cde7b0.css.map",
+    "main.92f22aed.js.map": "/SpeakUp/static/js/main.92f22aed.js.map",
+    "453.c5eaf93b.chunk.js.map": "/SpeakUp/static/js/453.c5eaf93b.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e7cde7b0.css",
+    "static/js/main.92f22aed.js"
+  ]
+}
