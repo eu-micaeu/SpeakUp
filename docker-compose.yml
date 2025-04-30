@@ -1,12 +1,7 @@
-version: '3.8'
-
 services:
-
   backend:
     build:
       context: ./backend/go
-      dockerfile: Dockerfile
-    container_name: backend
     volumes:
       - ./backend/go:/app
     ports:
@@ -18,8 +13,6 @@ services:
   ui-web:
     build:
       context: ./frontend/web
-      dockerfile: Dockerfile
-    container_name: frontend
     volumes:
       - ./frontend/web:/app
       - /app/node_modules
@@ -30,6 +23,3 @@ services:
       - CHOKIDAR_USEPOLLING=true
     depends_on:
       - backend
-
-volumes:
-  mongo-data:
