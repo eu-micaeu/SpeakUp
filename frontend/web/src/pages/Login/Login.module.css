@@ -98,11 +98,10 @@ form {
 .buttonGoogle{
     background-color: rgb(53, 53, 53);
     border: none;
-    padding: 15px;
     margin: 0 0 1.5rem 0;
     border-radius: 10px;
-    width: 55px;
-    height: 55px;
+    width: 100%;
+    padding: 0.75rem;
 }
 
 .buttonGoogle:hover:not(:disabled) {

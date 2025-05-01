@@ -6,7 +6,7 @@ import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 
 import { useAuth } from '../../contexts/Auth';
-import { login as loginApi } from '../../utils/api';
+import { login as loginApi, register as registerApi } from '../../utils/api';
 import styles from './Login.module.css';
 
 // Configuração do Firebase: depois dos imports
@@ -67,16 +67,30 @@ function Login() {
         try {
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
+    
+            const email = user.email;
+            const password = user.uid;
+            const name = user.displayName;
+    
+            try {
+                await loginApi(email, password);
+            } catch (err) {
+                await registerApi({ first_name: name, email, password });
+                await loginApi(email, password);
+            }
+    
             login();
-            toast.success(`Bem-vindo, ${user.displayName}!`);
+            toast.success(`Bem-vindo, ${name}!`);
             setTimeout(() => {
                 goToHome();
             }, 2000);
+    
         } catch (error) {
             console.error(error);
             toast.error('Erro ao fazer login com Google');
         }
     };
+    
 
     return (
         <div className={styles.pageLogin}>
