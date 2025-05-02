@@ -1,15 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {
-  getChatsByUserId,
-  createChat,
-  deleteChat,
-  getMessagesByChatId,
-  addMessageToChat,
-  generateAIResponseDialog,
-  generateAIResponseCorrection,
-  generateAIResponseTranslation,
-  generateAIResponseTopic
-} from '../../utils/api';
 import { useNavigate } from 'react-router-dom';
 import SendIcon from '@mui/icons-material/Send';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -17,9 +6,21 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import SettingsIcon from '@mui/icons-material/Settings';
 import AppsIcon from '@mui/icons-material/Apps';
 import { useAuth } from '../../contexts/Auth';
+import { 
+  getChatsByUserId, 
+  createChat, 
+  deleteChat, 
+  getMessagesByChatId, 
+  addMessageToChat, 
+  generateAIResponseDialog, 
+  generateAIResponseCorrection, 
+  generateAIResponseTranslation, 
+  generateAIResponseTopic 
+} from '../../utils/api';
 import styles from './Chat.module.css';
 
 function Chat() {
+  // State Variables
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [chats, setChats] = useState([]);
   const [messages, setMessages] = useState([]);
@@ -29,56 +30,46 @@ function Chat() {
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [isSendingMessage, setIsSendingMessage] = useState(false);
   const [showWelcomePopup, setShowWelcomePopup] = useState(true);
-  const { logout } = useAuth();
+
+  // Refs and Navigators
   const messagesEndRef = useRef(null);
   const navigate = useNavigate();
 
-  const closeWelcomePopup = () => {
-    setShowWelcomePopup(false);
-  };
+  // Auth context
+  const { logout } = useAuth();
 
-  const handleSettingsClick = () => {
-    setShowSettingsModal(true);
+  // Handlers
+  const closeWelcomePopup = () => setShowWelcomePopup(false);
+  const handleSettingsClick = () => setShowSettingsModal(true);
+  const closeModal = () => setShowSettingsModal(false);
+  const goToIndex = () => {
+    logout();
+    navigate('/');
   };
+  const goToHome = () => navigate('/home');
+  const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
 
   const handleOptionSelect = (option) => {
     setShowSettingsModal(false);
   };
 
-  const closeModal = () => {
-    setShowSettingsModal(false);
-  };
-
-  const goToIndex = () => {
-    logout();
-    navigate('/');
-  };
-
-  const goToHome = () => {
-    navigate('/home');
-  };
-
   const clearCookies = () => {
-    document.cookie.split(";").forEach((c) => {
-      document.cookie = c
-        .replace(/^ +/, "")
-        .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+    document.cookie.split(";").forEach(c => {
+      document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
     });
   };
 
-  const toggleSidebar = () => {
-    setIsSidebarVisible(!isSidebarVisible);
-  };
-
+  // Side effect to load chats
   useEffect(() => {
     getChatsByUserId().then((response) => {
       setChats(response.chats || []);
-    }).catch(error => {
+    }).catch((error) => {
       console.error("Erro ao buscar chats:", error);
       setChats([]);
     });
   }, []);
 
+  // Side effect to load messages for the current chat
   useEffect(() => {
     if (currentChatId) {
       loadChatMessages(currentChatId);
@@ -91,6 +82,7 @@ function Chat() {
     scrollToBottom();
   }, [messages]);
 
+  // Scroll to the bottom of the chat messages
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -126,6 +118,7 @@ function Chat() {
     try {
       let chatId = currentChatId;
 
+      // Create new chat if no current chat
       if (!chatId) {
         const topicResponse = await generateAIResponseTopic(messageContent);
         const newChat = await createChat(topicResponse.response);
@@ -137,37 +130,32 @@ function Chat() {
       const aiCorrectionResponse = await generateAIResponseCorrection(messageContent);
       const combinedMessageContent = `${messageContent}\n\nCorreção: ${aiCorrectionResponse.response}`;
 
+      // Save user message
       const savedMessage = await addMessageToChat(chatId, combinedMessageContent, 'user', 'request');
+      setMessages(prevMessages => [...prevMessages, {
+        id: savedMessage.id,
+        text: savedMessage.content,
+        sender: savedMessage.sender || 'user',
+        timestamp: savedMessage.timestamp,
+        chatId: savedMessage.chat_id,
+        type: 'request'
+      }]);
 
-      setMessages(prevMessages => [
-        ...prevMessages,
-        {
-          id: savedMessage.id,
-          text: savedMessage.content,
-          sender: savedMessage.sender || 'user',
-          timestamp: savedMessage.timestamp,
-          chatId: savedMessage.chat_id,
-          type: 'request'
-        }
-      ]);
-
+      // Get AI responses
       const aiResponseDialog = await generateAIResponseDialog(aiCorrectionResponse.response, chatId);
       const aiTranslation = await generateAIResponseTranslation(aiResponseDialog.response);
       const aiResponseWithTranslation = `${aiResponseDialog.response}\n\n[TRANSLATION]: ${aiTranslation.response}`;
 
+      // Save AI message
       const savedAIMessage = await addMessageToChat(chatId, aiResponseWithTranslation, 'ai', 'response');
-
-      setMessages(prevMessages => [
-        ...prevMessages,
-        {
-          id: savedAIMessage.id,
-          text: savedAIMessage.content,
-          sender: savedAIMessage.sender || 'ai',
-          timestamp: savedAIMessage.timestamp,
-          chatId: savedAIMessage.chat_id,
-          type: 'response'
-        }
-      ]);
+      setMessages(prevMessages => [...prevMessages, {
+        id: savedAIMessage.id,
+        text: savedAIMessage.content,
+        sender: savedAIMessage.sender || 'ai',
+        timestamp: savedAIMessage.timestamp,
+        chatId: savedAIMessage.chat_id,
+        type: 'response'
+      }]);
 
     } catch (error) {
       console.error("Erro ao processar mensagem:", error);
@@ -201,58 +189,32 @@ function Chat() {
     <div className={styles.pageHome}>
       {showWelcomePopup && (
         <div className={styles.modalOverlay} onClick={closeWelcomePopup}>
-          <div
-            className={styles.modalContent}
-            onClick={(e) => e.stopPropagation()}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="welcomeTitle"
-          >
-            <h2 id="welcomeTitle" className={styles.modalTitle}>
-              👋 Bem-vindo ao Chat de Prática!
-            </h2>
-            <p className={styles.modalDescription}>
-              Aqui você pode praticar o idioma conversando com nossa IA.
-              Digite uma frase e receba:
-            </p>
-
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+            <h2 className={styles.modalTitle}>👋 Bem-vindo ao Chat de Prática!</h2>
+            <p className={styles.modalDescription}>Aqui você pode praticar o idioma conversando com nossa IA.</p>
             <ul className={styles.modalList}>
               <li>✅ Correção gramatical</li>
               <li>✅ Tradução para o português</li>
               <li>✅ Diálogos simulados para praticar</li>
             </ul>
-
             <div className={styles.modalExample}>
               <strong>Exemplos:</strong><br /><br />
-
               <em>Entrada:</em> "I ned a car"<br />
               <em>Saída:</em> "I need a car"<br /><br />
-
               <em>Entrada:</em> "How are you doin?"<br />
               <em>Saída:</em> "How are you doing?"<br /><br />
-
               <em>Entrada:</em> "Let's go beach tomorrow?"<br />
               <em>Saída:</em> "Let's go to the beach tomorrow?"<br /><br />
-
               <em>Entrada:</em> "I don't know how say this."<br />
               <em>Saída:</em> "I don't know how to say this."
             </div>
-
-            <button className={styles.optionButton} onClick={closeWelcomePopup}>
-              Entendi!
-            </button>
+            <button className={styles.optionButton} onClick={closeWelcomePopup}>Entendi!</button>
           </div>
         </div>
-
       )}
 
       <aside className={`${styles.sidebar} ${!isSidebarVisible ? styles.sidebarHidden : ''}`}>
-        <button
-          className={`${styles.toggleButton} ${isSidebarVisible ? '' : styles.toggleButtonHidden}`}
-          onClick={toggleSidebar}
-        >
-          &times;
-        </button>
+        <button className={`${styles.toggleButton} ${isSidebarVisible ? '' : styles.toggleButtonHidden}`} onClick={toggleSidebar}>&times;</button>
         <ul>
           {chats?.length > 0 ? (
             chats.map((chat) => (
@@ -265,63 +227,32 @@ function Chat() {
                 }}
               >
                 {chat.topic || "Chat sem título"}
-                <DeleteIcon
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDeleteChat(chat.id);
-                  }}
-                />
+                <DeleteIcon onClick={(e) => { e.stopPropagation(); handleDeleteChat(chat.id); }} />
               </li>
             ))
           ) : (
             <ol>Crie um chat!</ol>
           )}
-          <button
-            className={styles.btCreateChat}
-            onClick={() => { setCurrentChatId(null); setMessages([]); setIsSidebarVisible(false) }}
-          >
-            +
-          </button>
+          <button className={styles.btCreateChat} onClick={() => { setCurrentChatId(null); setMessages([]); setIsSidebarVisible(false) }}>+</button>
         </ul>
-
         <div className={styles.actionsDiv}>
-          <LogoutIcon
-            onClick={() => { goToIndex(); clearCookies(); }}
-            style={{ color: "#ff0000", cursor: "pointer", margin: "20px" }}
-            onMouseEnter={(e) => e.target.style.color = "#ffffff"}
-            onMouseLeave={(e) => e.target.style.color = "#ff0000"}
-          />
-          <AppsIcon
-            onClick={goToHome}
-            style={{ color: "#fff", cursor: "pointer", margin: "20px" }}
-            onMouseEnter={(e) => e.target.style.color = "rgb(194, 194, 194)"}
-            onMouseLeave={(e) => e.target.style.color = "#fff"}
-          />
+          <LogoutIcon onClick={() => { goToIndex(); clearCookies(); }} style={{ color: "#ff0000" }} />
+          <AppsIcon onClick={goToHome} style={{ color: "#fff" }} />
         </div>
       </aside>
 
       <main className={styles.mainContent}>
-        <div
-          className={`${styles.modalOverlay} ${showSettingsModal ? '' : styles.modalOverlayHidden}`}
-          onClick={closeModal}
-        >
+        <div className={`${styles.modalOverlay} ${showSettingsModal ? '' : styles.modalOverlayHidden}`} onClick={closeModal}>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <button className={styles.closeButton} onClick={closeModal}>&times;</button>
             <h3 className={styles.modalTitle}>Escolha o Modelo</h3>
-            <button className={styles.optionButton} onClick={() => handleOptionSelect('OpenAI')}>
-              OpenAI
-            </button>
-            <button className={styles.optionButton} onClick={() => handleOptionSelect('Gemini')}>
-              Gemini
-            </button>
+            <button className={styles.optionButton} onClick={() => handleOptionSelect('OpenAI')}>OpenAI</button>
+            <button className={styles.optionButton} onClick={() => handleOptionSelect('Gemini')}>Gemini</button>
           </div>
         </div>
 
         {!isSidebarVisible && (
-          <button
-            className={`${styles.toggleButton} ${styles.toggleButtonMainContent} ${isSidebarVisible ? styles.toggleButtonMainContentSidebarVisible : ''}`}
-            onClick={toggleSidebar}
-          >
+          <button className={`${styles.toggleButton} ${styles.toggleButtonMainContent}`} onClick={toggleSidebar}>
             &#9776;
           </button>
         )}
@@ -330,29 +261,21 @@ function Chat() {
           <img src='./logo.png' width={50} alt="SpeakUp Logo" />
           <h2>SpeakUp</h2>
         </div>
+
         <div className={styles.chatContainer}>
           <div className={styles.messages}>
             {messages
               .filter(msg => msg.chatId === currentChatId || msg.chat_id === currentChatId)
               .map((message) => (
-                <div
-                  key={message.id}
-                  className={`${styles.message} ${message.sender === 'user' ? styles.user : styles.ai} ${message.type === 'correction' ? styles.correction : ''}`}
-                >
+                <div key={message.id} className={`${styles.message} ${message.sender === 'user' ? styles.user : styles.ai}`}>
                   {(message.text || message.content).split(/\n{1,}/).map((line, index, lines) => {
                     if (line.startsWith('[TRANSLATION]: ')) {
                       return (
-                        <div key={index} style={{
-                          marginTop: "10px",
-                          paddingTop: "10px",
-                          borderTop: "1px solid #555",
-                          color: "#aaa",
-                        }}>
+                        <div key={index} style={{ marginTop: "10px", paddingTop: "10px", borderTop: "1px solid #555", color: "#aaa" }}>
                           <strong>Tradução:</strong> {line.replace('[TRANSLATION]: ', '')}
                         </div>
                       );
                     }
-
                     if (index === 1 && line.startsWith('Correção: ')) {
                       return (
                         <React.Fragment key={index}>
@@ -361,7 +284,6 @@ function Chat() {
                         </React.Fragment>
                       );
                     }
-
                     return (
                       <React.Fragment key={index}>
                         {line}
@@ -375,11 +297,7 @@ function Chat() {
           </div>
 
           <div className={styles.chatInput}>
-            <SettingsIcon
-              className={styles.styledSettingsIcon}
-              onClick={handleSettingsClick}
-            />
-
+            <SettingsIcon className={styles.styledSettingsIcon} onClick={handleSettingsClick} />
             <input
               type="text"
               placeholder="Digite sua mensagem..."
@@ -388,12 +306,10 @@ function Chat() {
               onKeyPress={handleKeyPress}
               disabled={isSendingMessage}
             />
-
             {isSendingMessage ? (
               <div className={styles.loadingSpinner} style={{ margin: '0 10px' }} />
             ) : (
               <SendIcon
-                onKeyDown={handleKeyPress}
                 onClick={handleSendMessage}
                 style={{ color: "#fff", cursor: "pointer" }}
                 onMouseEnter={(e) => e.target.style.color = "rgb(187, 187, 187)"}
