@@ -1,25 +1,18 @@
-import Header from '../../components/Header/Header';
+import { useNavigate } from 'react-router-dom';
 import CreateIcon from '@mui/icons-material/Create';
 import BookIcon from '@mui/icons-material/Book';
 import PersonIcon from '@mui/icons-material/Person';
-import { useNavigate } from 'react-router-dom';
+
+import Header from '../../components/Header/Header';
 import styles from './Home.module.css';
 
 function Home() {
-
+    
     const navigate = useNavigate();
 
-    const goToChat = () => {
-        navigate('/chat');
-    }
-
-    const goToTeachingPlan = () => {
-        navigate('/teaching-plan');
-    }
-
-    const goToPerfil = () => {
-        navigate('/perfil');
-    }
+    const handleNavigate = (path) => {
+        navigate(path);
+    };
 
     return (
         <>
@@ -27,16 +20,18 @@ function Home() {
             <div className={styles.pageHome}>
                 <h1>Menu</h1>
                 <div className={styles.cardsContainer}>
-                    <div className={styles.card} onClick={() => goToChat()}>
-                        <CreateIcon sx={{ fontSize: "3rem" }}></CreateIcon>
+                    <div className={styles.card} onClick={() => handleNavigate('/chat')}>
+                        <CreateIcon sx={{ fontSize: '3rem' }} />
                         <h2>Praticar</h2>
                     </div>
-                    <div className={styles.card} onClick={() => goToTeachingPlan()}>
-                        <BookIcon sx={{ fontSize: "3rem" }}></BookIcon>
+
+                    <div className={styles.card} onClick={() => handleNavigate('/teaching-plan')}>
+                        <BookIcon sx={{ fontSize: '3rem' }} />
                         <h2>Plano de Ensino</h2>
                     </div>
-                    <div className={styles.card} onClick={() => goToPerfil()}>
-                        <PersonIcon sx={{ fontSize: "3rem" }}></PersonIcon>
+
+                    <div className={styles.card} onClick={() => handleNavigate('/perfil')}>
+                        <PersonIcon sx={{ fontSize: '3rem' }} />
                         <h2>Perfil</h2>
                     </div>
                 </div>
