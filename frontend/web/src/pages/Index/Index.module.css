@@ -22,6 +22,7 @@
 .heroTitle {
     font-size: 4rem;
     font-weight: 800;
+    margin: 0;
     margin-bottom: 1rem;
     background: linear-gradient(270deg,
             #e0e0e0, #bfbfbf, #a0a0a0, #8a8a8a, #bfbfbf, #e0e0e0);
