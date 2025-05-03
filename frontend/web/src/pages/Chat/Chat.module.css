@@ -347,9 +347,15 @@
 
 .actionsDiv {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: center;
     flex-direction: row;
+    margin-bottom: 25px;
+    gap: 20px;
+}
+
+.actionsDiv svg:hover {
+    cursor: pointer;
 }
 
 @keyframes loading {
