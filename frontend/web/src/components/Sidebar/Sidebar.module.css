@@ -1,0 +1,89 @@
+.sidebar {
+    width: 400px;
+    background-color: #000;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: width 0.1s ease-in-out;
+    overflow: hidden;
+}
+
+.sidebarHidden {
+    width: 0;
+    overflow: hidden;
+}
+
+.sidebar ul {
+    margin: 50px 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.sidebar ul li {
+    padding: 10px;
+    margin: 5px 0;
+    background-color: #313131;
+    border-radius: 10px;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 80%;
+}
+
+.toggleButton {
+    background-color: transparent;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #fff;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+}
+
+.activeChat {
+    background-color: #505050;
+}
+
+.btCreateChat {
+    background-color: #1f1f1f;
+    color: white;
+    font-size: 24px;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+.actionsDiv {
+    display: flex;
+    justify-content: space-around;
+    padding: 20px;
+}
+
+.actionsDiv svg:hover {
+    cursor: pointer;
+}
+
+.toggleButtonHidden {
+    display: none;
+}
+
+.deleteIcon {
+    color: #ff0000;
+}
+
+.deleteIcon:hover {
+    color: #fff;
+}
