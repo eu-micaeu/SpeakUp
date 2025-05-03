@@ -1,22 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SendIcon from '@mui/icons-material/Send';
-import DeleteIcon from '@mui/icons-material/Delete';
-import LogoutIcon from '@mui/icons-material/Logout';
 import SettingsIcon from '@mui/icons-material/Settings';
-import AppsIcon from '@mui/icons-material/Apps';
 import { useAuth } from '../../contexts/Auth';
-import { 
-  getChatsByUserId, 
-  createChat, 
-  deleteChat, 
-  getMessagesByChatId, 
-  addMessageToChat, 
-  generateAIResponseDialog, 
-  generateAIResponseCorrection, 
-  generateAIResponseTranslation, 
-  generateAIResponseTopic 
+import {
+  getChatsByUserId,
+  createChat,
+  deleteChat,
+  getMessagesByChatId,
+  addMessageToChat,
+  generateAIResponseDialog,
+  generateAIResponseCorrection,
+  generateAIResponseTranslation,
+  generateAIResponseTopic
 } from '../../utils/api';
+import Sidebar from '../../components/Sidebar/Sidebar';
 import styles from './Chat.module.css';
 
 function Chat() {
@@ -213,33 +211,19 @@ function Chat() {
         </div>
       )}
 
-      <aside className={`${styles.sidebar} ${!isSidebarVisible ? styles.sidebarHidden : ''}`}>
-        <button className={`${styles.toggleButton} ${isSidebarVisible ? '' : styles.toggleButtonHidden}`} onClick={toggleSidebar}>&times;</button>
-        <ul>
-          {chats?.length > 0 ? (
-            chats.map((chat) => (
-              <li
-                key={chat.id}
-                className={chat.id === currentChatId ? styles.activeChat : ''}
-                onClick={() => {
-                  setCurrentChatId(chat.id);
-                  loadChatMessages(chat.id);
-                }}
-              >
-                {chat.topic || "Chat sem título"}
-                <DeleteIcon onClick={(e) => { e.stopPropagation(); handleDeleteChat(chat.id); }} />
-              </li>
-            ))
-          ) : (
-            <ol>Crie um chat!</ol>
-          )}
-          <button className={styles.btCreateChat} onClick={() => { setCurrentChatId(null); setMessages([]); setIsSidebarVisible(false) }}>+</button>
-        </ul>
-        <div className={styles.actionsDiv}>
-          <LogoutIcon onClick={() => { goToIndex(); clearCookies(); }} style={{ color: "#ff0000" }} />
-          <AppsIcon onClick={goToHome} style={{ color: "#fff" }} />
-        </div>
-      </aside>
+      <Sidebar
+        isVisible={isSidebarVisible}
+        toggleSidebar={toggleSidebar}
+        chats={chats}
+        currentChatId={currentChatId}
+        setCurrentChatId={setCurrentChatId}
+        loadChatMessages={loadChatMessages}
+        handleDeleteChat={handleDeleteChat}
+        goToIndex={goToIndex}
+        clearCookies={clearCookies}
+        goToHome={goToHome}
+        setMessages={setMessages}
+      />
 
       <main className={styles.mainContent}>
         <div className={`${styles.modalOverlay} ${showSettingsModal ? '' : styles.modalOverlayHidden}`} onClick={closeModal}>
