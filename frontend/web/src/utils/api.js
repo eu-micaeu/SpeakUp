@@ -200,3 +200,24 @@ export const getUserById = async (userId) => {
         throw error;
     }
 }
+
+// update user 
+export const updateUser = async (userId, userData) => {
+    try {
+        if (!userId) {
+            throw new Error('ID do usuário é obrigatório');
+        }
+
+        const response = await axios.put(API_URL + `/user/${userId}`, userData, {
+            headers: {
+                Authorization: `Bearer ${Cookies.get('authToken')}`
+            }
+        });
+        
+        return response.data;
+    }
+    catch (error) {
+        console.error('Erro ao atualizar usuário:', error.response || error);
+        throw error;
+    }
+}
