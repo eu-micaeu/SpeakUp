@@ -2,13 +2,10 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
-RUN npm install
+COPY package*.json ./
 
-# Garantindo permissões para o diretório node_modules
-# Adicionando permissões para o node_modules
-RUN chown -R node:node /app
+RUN npm ci --legacy-peer-deps
 
-USER node
+COPY . .
 
 CMD ["npm", "start"]

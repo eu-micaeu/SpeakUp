@@ -4,7 +4,6 @@
     background-color: #0a0a0a;
     color: white;
     min-height: 100vh;
-    font-family: 'Inter', sans-serif;
 }
 
 .hero {
@@ -22,9 +21,10 @@
 .heroTitle {
     font-size: 4rem;
     font-weight: 800;
+    margin: 0;
     margin-bottom: 1rem;
     background: linear-gradient(270deg,
-            #e0e0e0, #bfbfbf, #a0a0a0, #8a8a8a, #bfbfbf, #e0e0e0);
+            #ffffff, #bfbfbf, #a0a0a0, #8a8a8a, #bfbfbf, #ffffff);
     background-size: 200% auto;
     background-clip: text;
     -webkit-background-clip: text;
@@ -64,44 +64,6 @@
 .cta:hover {
     background: #f0f0f0;
     transform: translateY(-2px);
-}
-
-.featureSection {
-    display: flex;
-    flex-direction: column;
-    gap: 4rem;
-    width: 100%;
-    margin: 50px 0;
-}
-
-.feature {
-    display: flex;
-    gap: 2rem;
-    align-items: center;
-    width: 800px;
-    margin: 0 auto;
-    justify-content: space-between;
-}
-
-.feature img {
-    width: 100px;
-    height: auto;
-}
-
-.feature h2 {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-}
-
-.feature p {
-    font-size: 1.2rem;
-    max-width: 600px;
-    margin-bottom: 0.5rem;
-}
-
-.feature div {
-    width: 600px;
-    opacity: 0.8;
 }
 
 .particles {
@@ -148,50 +110,49 @@
 
 @media screen and (max-width: 768px) {
     .hero {
-      height: auto;
-      padding: 4rem 2rem;
+        height: auto;
+        padding: 4rem 2rem;
     }
-  
+
     .heroTitle {
-      font-size: 2rem;
-      text-align: center;
+        font-size: 2rem;
+        text-align: center;
     }
-  
+
     .heroSubtitle {
-      font-size: 1rem;
-      max-width: 90%;
-      margin-bottom: 2rem;
+        font-size: 1rem;
+        max-width: 90%;
+        margin-bottom: 2rem;
     }
-  
+
     .cta {
-      font-size: 1rem;
-      padding: 0.8rem 1.5rem;
+        font-size: 1rem;
+        padding: 0.8rem 1.5rem;
     }
-  
+
     .featureSection {
-      gap: 2rem;
-      padding: 0;
-      margin: 30px 0;
+        gap: 2rem;
+        padding: 0;
+        margin: 30px 0;
     }
-  
+
     .feature {
-      flex-direction: column;
-      width: 100%;
-      text-align: center;
-      gap: 1.5rem;
+        flex-direction: column;
+        width: 100%;
+        text-align: center;
+        gap: 1.5rem;
     }
-  
+
     .feature img {
-      width: 80px;
+        width: 80px;
     }
-  
+
     .feature h2 {
-      font-size: 1.5rem;
+        font-size: 1.5rem;
     }
-  
+
     .feature div {
-      font-size: 1rem;
-      width: 100%;
+        font-size: 1rem;
+        width: 100%;
     }
-  }
-  
+}

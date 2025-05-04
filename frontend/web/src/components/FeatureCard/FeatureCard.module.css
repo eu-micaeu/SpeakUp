@@ -1,0 +1,52 @@
+.feature {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    width: 800px;
+    margin: 0 auto;
+    justify-content: space-between;
+    padding: 2rem;
+}
+
+.feature img {
+    width: 100px;
+    height: auto;
+}
+
+.feature h2 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.feature p {
+    font-size: 1.2rem;
+    max-width: 600px;
+    margin-bottom: 0.5rem;
+}
+
+.feature div {
+    width: 600px;
+    opacity: 0.8;
+}
+
+@media screen and (max-width: 768px) {
+    .feature {
+        flex-direction: column;
+        width: 100%;
+        text-align: center;
+        gap: 1.5rem;
+    }
+
+    .feature img {
+        width: 80px;
+    }
+
+    .feature h2 {
+        font-size: 1.5rem;
+    }
+
+    .feature div {
+        font-size: 1rem;
+        width: 100%;
+    }
+}
