@@ -5,13 +5,42 @@ const API_URL = process.env.REACT_APP_API_URL
 
 // Login
 export const login = async (email, password) => {
-    const response = await axios.post(API_URL + '/user/login', {
-        email,
-        password
-    });
-    const authToken = response.data.token;
-    Cookies.set('authToken', authToken);
-    return response.data;
+    try {
+        const response = await axios.post(API_URL + '/user/login', {
+            email,
+            password
+        });
+        
+        const { token, message } = response.data;
+        
+        if (token) {
+            Cookies.set('authToken', token);
+            
+            // Extrair o user_id do token JWT
+            try {
+                const tokenParts = token.split('.');
+                const tokenPayload = JSON.parse(atob(tokenParts[1]));
+                
+                if (tokenPayload.user_id) {
+                    Cookies.set('userId', tokenPayload.user_id);
+                    return {
+                        token,
+                        user: {
+                            id: tokenPayload.user_id
+                        }
+                    };
+                }
+            } catch (tokenError) {
+                console.error('Erro ao decodificar token:', tokenError);
+                throw new Error('Erro ao processar token');
+            }
+        }
+        
+        throw new Error('Dados de usuário não encontrados na resposta');
+    } catch (error) {
+        console.error('Erro no login:', error);
+        throw error;
+    }
 }
 
 // Register
@@ -148,5 +177,47 @@ export const generateAIResponseTopic = async (message) => {
     }
     catch (error) {
         console.log(error)
+    }
+}
+
+// get user by id
+export const getUserById = async (userId) => {
+    try {
+        if (!userId) {
+            throw new Error('ID do usuário é obrigatório');
+        }
+
+        const response = await axios.get(API_URL + `/user/${userId}`, {
+            headers: {
+                Authorization: `Bearer ${Cookies.get('authToken')}`
+            }
+        });
+        
+        return response.data;
+    }
+    catch (error) {
+        console.error('Erro ao buscar usuário:', error.response || error);
+        throw error;
+    }
+}
+
+// update user 
+export const updateUser = async (userId, userData) => {
+    try {
+        if (!userId) {
+            throw new Error('ID do usuário é obrigatório');
+        }
+
+        const response = await axios.put(API_URL + `/user/${userId}`, userData, {
+            headers: {
+                Authorization: `Bearer ${Cookies.get('authToken')}`
+            }
+        });
+        
+        return response.data;
+    }
+    catch (error) {
+        console.error('Erro ao atualizar usuário:', error.response || error);
+        throw error;
     }
 }

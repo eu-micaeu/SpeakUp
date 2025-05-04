@@ -139,21 +139,49 @@ func UpdateUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	// Preparar o documento de atualização apenas com campos fornecidos
+	updateDoc := bson.M{}
+
+	if user.FirstName != "" {
+		updateDoc["first_name"] = user.FirstName
+	}
+	if user.LastName != "" {
+		updateDoc["last_name"] = user.LastName
+	}
+	if user.Email != "" {
+		updateDoc["email"] = user.Email
+	}
+	if user.Language != "" {
+		updateDoc["language"] = user.Language
+	}
+	if user.Level != "" {
+		updateDoc["level"] = user.Level
+	}
+	if user.Password != "" {
+		// Hash do novo password
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
+			return
+		}
+		updateDoc["password"] = string(hashedPassword)
+	}
+
+	// Se não houver campos para atualizar, retorna sucesso
+	if len(updateDoc) == 0 {
+		c.JSON(http.StatusOK, gin.H{"message": "No fields to update"})
+		return
+	}
+
 	collection := client.Database("speakup").Collection("users")
-	_, err := collection.UpdateOne(c, bson.M{"id": id}, bson.M{"$set": bson.M{
-		"first_name": user.FirstName,
-		"last_name":  user.LastName,
-		"email":      user.Email,
-		"password":   user.Password,
-		"language":   user.Language,
-	}})
+	_, err := collection.UpdateOne(c, bson.M{"id": id}, bson.M{"$set": updateDoc})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
 		return
-	} else {
-		c.JSON(http.StatusOK, gin.H{"message": "User updated successfully"})
-		return
 	}
+	
+	c.JSON(http.StatusOK, gin.H{"message": "User updated successfully"})
 }
 
 // DeleteUser handles the deletion of a user

@@ -1,0 +1,223 @@
+.pagePerfil {
+    display: flex;
+    background: linear-gradient(135deg, #313131 0%, #1a1a1a 100%);
+    color: white;
+    min-height: 100vh;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.arrowBack {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    color: #fff;
+    font-size: 2rem !important;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.arrowBack:hover {
+    cursor: pointer;
+    color: #ccc;
+    transform: scale(1.2);
+}
+
+.profileContainer {
+    max-width: 800px;
+    width: 100%;
+    background-color: rgba(45, 45, 45, 0.9);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    padding: 30px;
+    margin-top: 40px;
+    animation: fadeIn 1.2s ease-in-out;
+}
+
+.profileHeader {
+    text-align: center;
+    margin-bottom: 40px;
+    animation: fadeIn 1.4s ease-in-out;
+    display: flex;
+    flex-direction: row;
+    
+}
+
+.avatarContainer {
+    width: 90px;
+    height: 90px;
+    margin-right: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #00bcd4;
+}
+
+.userNames {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.userName {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #fff;
+}
+
+.userEmail {
+    color: #a0a0a0;
+    font-size: 16px;
+}
+
+.infoSection {
+    margin-bottom: 40px;
+    animation: fadeIn 1.6s ease-in-out;
+}
+
+.infoSection h2 {
+    font-size: 20px;
+    color: #4dd0e1;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #00bcd4;
+    padding-bottom: 10px;
+}
+
+.infoField {
+    margin-bottom: 20px;
+    margin-right: 26px;
+}
+
+.infoField label {
+    display: block;
+    margin-bottom: 8px;
+    color: #a0a0a0;
+    font-size: 14px;
+}
+
+.infoField input {
+    width: 97%;
+    padding: 12px;
+    border: 1px solid #404040;
+    border-radius: 6px;
+    font-size: 16px;
+    color: #fff;
+    background-color: rgba(64, 64, 64, 0.5);
+}
+
+.infoField select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #404040;
+    border-radius: 6px;
+    font-size: 16px;
+    color: #fff;
+    background-color: rgba(64, 64, 64, 0.5);
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M10.293 3.293L6 7.586 1.707 3.293A1 1 0 00.293 4.707l5 5a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    cursor: pointer;
+}
+
+.infoField select:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.infoField select:focus {
+    outline: none;
+    border-color: #00bcd4;
+}
+
+.saveButton {
+    margin-top: 20px;
+    width: 100%;
+    background-color: #00bcd4;
+    color: #fff;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+.saveButton:hover {
+    background-color: #0097a7;
+    transform: scale(1.05);
+}
+
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    text-align: center;
+    animation: fadeIn 1.8s ease-in-out;
+}
+
+.statItem {
+    padding: 20px;
+    background-color: rgba(64, 64, 64, 0.5);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.3s ease;
+}
+
+.statItem:hover {
+    transform: translateY(-5px);
+}
+
+.statValue {
+    font-size: 24px;
+    font-weight: bold;
+    color: #00bcd4;
+    margin-bottom: 8px;
+}
+
+.statLabel {
+    color: #a0a0a0;
+    font-size: 14px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@media (max-width: 600px) {
+    .pagePerfil {
+        padding: 10px;
+    }
+
+    .profileContainer {
+        padding: 20px;
+        margin-top: 30px;
+    }
+
+    .statsGrid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .avatarContainer {
+        width: 120px;
+        height: 120px;
+    }
+
+    .arrowBack {
+        font-size: 1.5rem !important;
+        left: 15px;
+        top: 15px;
+    }
+}

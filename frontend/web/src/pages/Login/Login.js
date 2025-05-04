@@ -44,9 +44,11 @@ function Login() {
         const password = event.target.password.value;
         try {
             const response = await loginApi(email, password);
+            console.log('Resposta do login:', response);
 
-            if (response.message === 'Login successful') {
-                login();
+            if (response && response.user) {
+                console.log('Dados do usuário:', response.user);
+                login(response.user);
                 toast.success('Login realizado com sucesso!');
                 setTimeout(() => {
                     goToHome();
