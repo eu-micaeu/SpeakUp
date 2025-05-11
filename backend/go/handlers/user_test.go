@@ -72,7 +72,7 @@ func TestLogin(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Equal(t, "Login successful", response["message"])
 			assert.NotEmpty(t, response["token"])
-		})			
+		})
 
 	})
 
@@ -192,7 +192,7 @@ func TestLogin(t *testing.T) {
 			assert.Contains(t, response["error"], "invalid character")
 		})
 	})
-		
+
 }
 
 // TestCreateUser tests the CreateUser handler
@@ -211,11 +211,10 @@ func TestCreateUser(t *testing.T) {
 
 			// Create a test user
 			user := models.User{
-				FirstName: "John",
-				LastName:  "Doe",
-				Email:     "john.doe@example.com",
-				Password:  "password123",
-				Language:  "en",
+				Name:     "John Doe",
+				Email:    "john.doe@example.com",
+				Password: "password123",
+				Language: "en",
 			}
 
 			// Marshal user to JSON
@@ -258,11 +257,10 @@ func TestCreateUser(t *testing.T) {
 
 			// Create a test user
 			user := models.User{
-				FirstName: "Jane",
-				LastName:  "Doe",
-				Email:     "jane.doe@example.com",
-				Password:  "password123",
-				Language:  "en",
+				Name:     "John Doe",
+				Email:    "jane.doe@example.com",
+				Password: "password123",
+				Language: "en",
 			}
 
 			// Marshal user to JSON
@@ -302,12 +300,11 @@ func TestGetUsers(t *testing.T) {
 		mt.Run("find success", func(mt *mtest.T) {
 			// Mock MongoDB find response
 			user := models.User{
-				ID:        "12345",
-				FirstName: "John",
-				LastName:  "Doe",
-				Email:     "john.doe@example.com",
-				Password:  "hashedpassword",
-				Language:  "en",
+				ID:       "12345",
+				Name:     "John Doe",
+				Email:    "john.doe@example.com",
+				Password: "hashedpassword",
+				Language: "en",
 			}
 			var mockResponse bson.D
 			bsonBytes, _ := bson.Marshal(user)
@@ -388,8 +385,7 @@ func TestUpdateUser(t *testing.T) {
 
 			// Create a test user
 			user := models.User{
-				FirstName: "UpdatedFirstName",
-				LastName:  "UpdatedLastName",
+				Name:    "Updated Name",
 				Email:     "updated.email@example.com",
 				Password:  "updatedpassword123",
 				Language:  "fr",
@@ -468,8 +464,7 @@ func TestUpdateUser(t *testing.T) {
 
 			// Create a test user
 			user := models.User{
-				FirstName: "UpdatedFirstName",
-				LastName:  "UpdatedLastName",
+				Name:   "Updated Name",
 				Email:     "updated.email@example.com",
 				Password:  "updatedpassword123",
 				Language:  "fr",

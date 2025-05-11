@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -73,6 +74,20 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
+	collection := client.Database("speakup").Collection("users")
+
+	// Check if a user with the same email already exists
+	var existingUser models.User
+	err := collection.FindOne(c, bson.M{"email": user.Email}).Decode(&existingUser)
+	if err == nil {
+		c.JSON(http.StatusConflict, gin.H{"error": "User with this email already exists"})
+		return
+	}
+	if err != mongo.ErrNoDocuments {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+		return
+	}
+
 	// Generate a unique ID for the user
 	user.ID = uuid.New().String()
 
@@ -84,8 +99,7 @@ func CreateUser(c *gin.Context) {
 	}
 	user.Password = string(hashedPassword)
 
-	// Insert the user object directly into the database
-	collection := client.Database("speakup").Collection("users")
+	// Insert the user into the database
 	_, err = collection.InsertOne(c, user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
@@ -143,11 +157,8 @@ func UpdateUser(c *gin.Context) {
 	// Preparar o documento de atualização apenas com campos fornecidos
 	updateDoc := bson.M{}
 
-	if user.FirstName != "" {
-		updateDoc["first_name"] = user.FirstName
-	}
-	if user.LastName != "" {
-		updateDoc["last_name"] = user.LastName
+	if user.Name != "" {
+		updateDoc["name"] = user.Name
 	}
 	if user.Email != "" {
 		updateDoc["email"] = user.Email
