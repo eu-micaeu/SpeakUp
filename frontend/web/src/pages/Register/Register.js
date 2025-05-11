@@ -1,11 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
-
-// Routes
 import { register } from '../../utils/api';
-
-// CSS Module
 import styles from './Register.module.css';
 
 function Register() {
@@ -32,6 +28,11 @@ function Register() {
         }
     };
 
+    const isValidPassword = (password) => {
+        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+        return regex.test(password);
+    };
+
     const handleRegister = async (event) => {
         event.preventDefault();
         setIsLoading(true);
@@ -39,16 +40,23 @@ function Register() {
 
         try {
             const userData = {
-                first_name: event.target.first_name.value,
-                last_name: event.target.last_name.value,
+                name: event.target.name.value,
                 email: event.target.email.value,
                 password: event.target.password.value,
                 language: event.target.language.value,
                 level: event.target.level.value,
             };
 
-            if (userData.password !== event.target['confirm-password'].value) {
+            const confirmPassword = event.target['confirm-password'].value;
+
+            if (userData.password !== confirmPassword) {
                 setError('As senhas não coincidem');
+                setIsLoading(false);
+                return;
+            }
+
+            if (!isValidPassword(userData.password)) {
+                setError('A senha deve ter pelo menos 8 caracteres, uma letra maiúscula, uma minúscula, um número e um caractere especial.');
                 setIsLoading(false);
                 return;
             }
@@ -56,17 +64,21 @@ function Register() {
             const response = await register(userData);
 
             if (response.message === 'User created successfully') {
-
                 toast.success('Usuário criado com sucesso!');
                 setTimeout(() => {
                     navigate('/login');
                 }, 2000);
-
             } else {
-                setError('Erro ao criar usuário');
+                setError('Erro ao criar usuário.');
             }
         } catch (err) {
-            setError('Ocorreu um erro ao fazer login. Tente novamente.');
+
+            if (err.response && err.response.status === 409) {
+                setError('Email já cadastrado.');
+            } else {
+                setError('Erro ao criar usuário.');
+            }
+
         } finally {
             setIsLoading(false);
         }
@@ -94,34 +106,18 @@ function Register() {
                         </div>
                     )}
 
-                    <div className={styles.inputRow}>
-                        <div className={styles.inputContainer}>
-                            <label htmlFor="first_name" className={styles.inputLabel}>
-                                Primeiro nome
-                            </label>
-                            <input
-                                type="text"
-                                id="first_name"
-                                name="first_name"
-                                placeholder="Digite seu nome"
-                                required
-                                className={styles.input}
-                            />
-                        </div>
-
-                        <div className={styles.inputContainer}>
-                            <label htmlFor="last_name" className={styles.inputLabel}>
-                                Último nome
-                            </label>
-                            <input
-                                type="text"
-                                id="last_name"
-                                name="last_name"
-                                placeholder="Digite seu último sobrenome"
-                                required
-                                className={styles.input}
-                            />
-                        </div>
+                    <div className={styles.inputContainerFull}>
+                        <label htmlFor="name" className={styles.inputLabel}>
+                            Nome completo
+                        </label>
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            placeholder="Digite seu nome"
+                            required
+                            className={styles.input}
+                        />
                     </div>
 
                     <div className={styles.inputRow}>
