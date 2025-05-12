@@ -227,6 +227,14 @@ func GenerateResponseTopic(c *gin.Context) {
 // @Failure 500 {object} map[string]string "Erro interno do servidor" example({"error":"Internal server error"})
 // @Router /ai/generate-random-word [post]
 func GenerateRandomWord(c *gin.Context) {
+	var request struct {
+		PreviousWords []string `json:"previousWords"`
+	}
+
+	if err := c.ShouldBindJSON(&request); err != nil {
+		request.PreviousWords = []string{} // Se não houver palavras anteriores, usar array vazio
+	}
+
 	// Carregar o prompt
 	promptPath := filepath.Join("prompts", "promptRandomWord.txt")
 	promptBytes, err := os.ReadFile(promptPath)
@@ -254,8 +262,12 @@ func GenerateRandomWord(c *gin.Context) {
 		return
 	}
 
-	// Preparar o prompt com os dados do usuário
-	fullPrompt := fmt.Sprintf(prompt, user.Level, user.Language)
+	// Preparar o prompt com os dados do usuário e palavras anteriores
+	previousWordsStr := strings.Join(request.PreviousWords, ", ")
+	if previousWordsStr == "" {
+		previousWordsStr = "nenhuma palavra anterior"
+	}
+	fullPrompt := fmt.Sprintf(prompt, user.Level, user.Language, previousWordsStr)
 
 	// Gerar palavra usando IA
 	connector := connectors.NewGeminiConnector()
