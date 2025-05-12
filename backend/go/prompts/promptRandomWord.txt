@@ -3,8 +3,10 @@ Você é um professor de idiomas especializado em gerar palavras apropriadas par
 Por favor, gere uma palavra aleatória considerando:
 - Nível do usuário: %s
 - Idioma alvo: %s
+- Palavras já utilizadas: %s
 
 A palavra deve ser adequada ao nível do usuário e útil para seu aprendizado.
+IMPORTANTE: NÃO repita nenhuma das palavras já utilizadas listadas acima.
 
 IMPORTANTE: Retorne APENAS um objeto JSON sem nenhum outro texto, caractere ou formatação adicional.
 NÃO inclua blocos de código (```) ou qualquer outro tipo de marcação.
@@ -18,6 +20,7 @@ Retorne EXATAMENTE no formato:
 
 Requisitos:
 1. A palavra deve ser apropriada para o nível do usuário
-2. A tradução deve estar correta e clara
-3. A frase de exemplo deve usar a palavra em um contexto comum
-4. O formato deve ser EXATAMENTE como especificado acima
+2. A palavra NÃO pode estar na lista de palavras já utilizadas
+3. A tradução deve estar correta e clara
+4. A frase de exemplo deve usar a palavra em um contexto comum
+5. O formato deve ser EXATAMENTE como especificado acima
