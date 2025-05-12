@@ -2,11 +2,13 @@ package handlers
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"speakup/config"
 	"speakup/connectors"
@@ -14,6 +16,8 @@ import (
 	"speakup/models"
 
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // @Summary Gera uma resposta de diálogo usando IA
@@ -209,4 +213,91 @@ func GenerateResponseTopic(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"response": topicResp})
+}
+
+// @Summary Gera uma palavra aleatória usando IA
+// @Description Gera uma palavra aleatória baseada no nível e idioma do usuário
+// @Tags AI
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Token de autenticação"
+// @Success 200 {object} models.Word "Palavra gerada com sucesso"
+// @Failure 400 {object} map[string]string "Erro na requisição" example({"error":"Invalid request"})
+// @Failure 500 {object} map[string]string "Erro interno do servidor" example({"error":"Internal server error"})
+// @Router /ai/generate-random-word [post]
+func GenerateRandomWord(c *gin.Context) {
+	// Carregar o prompt
+	promptPath := filepath.Join("prompts", "promptRandomWord.txt")
+	promptBytes, err := os.ReadFile(promptPath)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Falha ao carregar o prompt: " + err.Error()})
+		return
+	}
+	prompt := string(promptBytes)
+
+	// Obter ID do usuário do contexto
+	userID := middlewares.GetUserIDFromContext(c)
+	if userID == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Usuário não autenticado"})
+		return
+	}
+
+	// Buscar dados completos do usuário
+	db := config.GetMongoClient()
+	collection := db.Database("speakup").Collection("users")
+	
+	var user models.User
+	err = collection.FindOne(c, bson.M{"id": userID}).Decode(&user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Falha ao buscar dados do usuário"})
+		return
+	}
+
+	// Preparar o prompt com os dados do usuário
+	fullPrompt := fmt.Sprintf(prompt, user.Level, user.Language)
+
+	// Gerar palavra usando IA
+	connector := connectors.NewGeminiConnector()
+	response, err := connector.GenerateResponse(context.Background(), fullPrompt)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao gerar palavra: " + err.Error()})
+		return
+	}
+
+	// Limpar a resposta - remover caracteres indesejados
+	response = strings.TrimSpace(response)
+	if strings.HasPrefix(response, "```json") {
+		response = strings.TrimPrefix(response, "```json")
+	}
+	if strings.HasSuffix(response, "```") {
+		response = strings.TrimSuffix(response, "```")
+	}
+	response = strings.TrimSpace(response)
+
+	// Converter resposta para struct
+	var word models.Word
+	err = json.Unmarshal([]byte(response), &word)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao processar resposta: " + err.Error()})
+		return
+	}
+
+	// Preencher campos adicionais
+	word.ID = primitive.NewObjectID().Hex()
+	word.UserID = userID
+	word.Language = user.Language
+	word.Level = user.Level
+	word.CreatedAt = time.Now().UTC().Format(time.RFC3339)
+
+	// Salvar no MongoDB
+	db = config.GetMongoClient()
+	collection = db.Database("speakup").Collection("words")
+	_, err = collection.InsertOne(c, word)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao salvar palavra: " + err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, word)
 }
