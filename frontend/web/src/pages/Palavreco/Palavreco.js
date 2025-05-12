@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { generateRandomWord } from '../../utils/api';
-import Header from '../../components/Header/Header';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import styles from './Palavreco.module.css';
 
 function Palavreco() {
+    const navigate = useNavigate();
     const [words, setWords] = useState([]);
     const [loading, setLoading] = useState(false);
     const containerRef = useRef(null);
@@ -50,8 +52,11 @@ function Palavreco() {
     };
 
     return (
-        <>
-            <Header />
+        <div className={styles.pageContainer}>
+            <ArrowBackIcon
+                className={styles.backArrow}
+                onClick={() => navigate('/home')}
+            />
             <div
                 className={styles.container}
                 ref={containerRef}
@@ -76,7 +81,7 @@ function Palavreco() {
                     </div>
                 )}
             </div>
-        </>
+        </div>
     );
 }
 
