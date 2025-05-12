@@ -16,6 +16,7 @@ func AIRoutes(router *gin.Engine) {
         aiRoutes.POST("/generate-response-correction", middlewares.AuthMiddleware(), handlers.GenerateResponseCorrection)
         aiRoutes.POST("/generate-response-translation", middlewares.AuthMiddleware(), handlers.GenerateResponseTranslate)
         aiRoutes.POST("/generate-response-topic", middlewares.AuthMiddleware(), handlers.GenerateResponseTopic)
+        aiRoutes.POST("/generate-random-word", middlewares.AuthMiddleware(), handlers.GenerateRandomWord)
     
     }
 
