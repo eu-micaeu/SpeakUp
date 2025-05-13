@@ -14,9 +14,7 @@ function Palavreco() {
     const loadNewWord = async () => {
         try {
             setLoading(true);
-            // Extrair apenas as palavras do histórico
-            const previousWords = words.map(w => w.word);
-            const newWord = await generateRandomWord(previousWords);
+            const newWord = await generateRandomWord();
             setWords(prevWords => [...prevWords, newWord]);
         } catch (error) {
             console.error('Erro ao carregar palavra:', error);

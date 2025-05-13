@@ -181,11 +181,9 @@ export const generateAIResponseTopic = async (message) => {
 }
 
 // generate random word
-export const generateRandomWord = async (previousWords = []) => {
+export const generateRandomWord = async () => {
     try {
-        const response = await axios.post(API_URL + `/ai/generate-random-word`, {
-            previousWords: previousWords.slice(-50) // Envia as últimas 50 palavras
-        }, {
+        const response = await axios.post(API_URL + `/ai/generate-random-word`, {}, {
             headers: {
                 Authorization: `Bearer ${Cookies.get('authToken')}`
             }

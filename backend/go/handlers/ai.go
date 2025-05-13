@@ -18,6 +18,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // @Summary Gera uma resposta de diálogo usando IA
@@ -227,14 +229,6 @@ func GenerateResponseTopic(c *gin.Context) {
 // @Failure 500 {object} map[string]string "Erro interno do servidor" example({"error":"Internal server error"})
 // @Router /ai/generate-random-word [post]
 func GenerateRandomWord(c *gin.Context) {
-	var request struct {
-		PreviousWords []string `json:"previousWords"`
-	}
-
-	if err := c.ShouldBindJSON(&request); err != nil {
-		request.PreviousWords = []string{} // Se não houver palavras anteriores, usar array vazio
-	}
-
 	// Carregar o prompt
 	promptPath := filepath.Join("prompts", "promptRandomWord.txt")
 	promptBytes, err := os.ReadFile(promptPath)
@@ -262,11 +256,36 @@ func GenerateRandomWord(c *gin.Context) {
 		return
 	}
 
-	// Preparar o prompt com os dados do usuário e palavras anteriores
-	previousWordsStr := strings.Join(request.PreviousWords, ", ")
-	if previousWordsStr == "" {
-		previousWordsStr = "nenhuma palavra anterior"
+	// Buscar últimas 50 palavras do usuário
+	wordsCollection := db.Database("speakup").Collection("words")
+	cursor, err := wordsCollection.Find(c, bson.M{
+		"user_id": userID,
+	}, options.Find().SetSort(bson.M{"created_at": -1}).SetLimit(50))
+	
+	if err != nil && err != mongo.ErrNoDocuments {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Falha ao buscar histórico de palavras"})
+		return
 	}
+
+	var previousWords []models.Word
+	if err != mongo.ErrNoDocuments {
+		if err = cursor.All(c, &previousWords); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Falha ao processar histórico de palavras"})
+			return
+		}
+	}
+
+	// Extrair apenas as palavras do histórico
+	previousWordsStr := "nenhuma palavra anterior"
+	if len(previousWords) > 0 {
+		wordsList := make([]string, len(previousWords))
+		for i, w := range previousWords {
+			wordsList[i] = w.Word
+		}
+		previousWordsStr = strings.Join(wordsList, ", ")
+	}
+
+	// Preparar o prompt com os dados do usuário e palavras anteriores
 	fullPrompt := fmt.Sprintf(prompt, user.Level, user.Language, previousWordsStr)
 
 	// Gerar palavra usando IA
