@@ -197,6 +197,23 @@ export const generateRandomWord = async () => {
     }
 }
 
+// get user words
+export const getUserWords = async () => {
+    try {
+        const response = await axios.get(API_URL + `/word/user`, {
+            headers: {
+                Authorization: `Bearer ${Cookies.get('authToken')}`
+            }
+        });
+
+        return response.data;
+    }
+    catch (error) {
+        console.error('Erro ao buscar palavras:', error);
+        throw error;
+    }
+}
+
 // get user by id
 export const getUserById = async (userId) => {
     try {
