@@ -8,6 +8,7 @@ import Chat from './pages/Chat/Chat';
 import Home from './pages/Home/Home';
 import TeachingPlan from './pages/TeachingPlan/TeachingPlan';
 import Perfil from './pages/Perfil/Perfil';
+import Palavreco from './pages/Palavreco/Palavreco';
 
 // Components
 import { AuthProvider } from './contexts/Auth';
@@ -51,9 +52,17 @@ function App() {
               <PrivateRoute>
                 <Perfil />
               </PrivateRoute>
-            }
-          />
-        </Routes>
+          }
+        />
+        <Route
+          path="/palavreco"
+          element={
+            <PrivateRoute>
+              <Palavreco />
+            </PrivateRoute>
+          }
+        />
+      </Routes>
       </AuthProvider>
     </Router>
   );
