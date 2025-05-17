@@ -14,8 +14,7 @@ function Perfil(){
     const [levels, setLevels] = useState([]);
     const { user } = useAuth();
     const [editedData, setEditedData] = useState({
-        first_name: '',
-        last_name: '',
+        name: '',
         email: '',
         language: '',
         level: ''
@@ -45,7 +44,7 @@ function Perfil(){
                     return;
                 }
 
-                const fullName = `${data.user.first_name} ${data.user.last_name}`;
+                const fullName = `${data.user.name}`;
                 
                 setProfileData({
                     name: fullName,
@@ -60,8 +59,7 @@ function Perfil(){
                 });
 
                 setEditedData({
-                    first_name: data.user.first_name,
-                    last_name: data.user.last_name,
+                    name: data.user.name,
                     email: data.user.email,
                     language: data.user.language,
                     level: data.user.level
@@ -123,7 +121,7 @@ function Perfil(){
             
             setProfileData(prev => ({
                 ...prev,
-                name: `${editedData.first_name} ${editedData.last_name}`,
+                name: `${editedData.name}`,
                 email: editedData.email,
                 language: editedData.language,
                 level: editedData.level
@@ -157,7 +155,7 @@ function Perfil(){
                         <PersonIcon style={{ width: '100%', height: '100%', color: '#fff' }} />
                     </div>
                     <div className={styles.userNames}>
-                        <h1 className={styles.userName}>{editedData.first_name} {editedData.last_name}</h1>
+                        <h1 className={styles.userName}>{editedData.name}</h1>
                         <p className={styles.userEmail}>{editedData.email}</p>
                     </div>
                 </div>
@@ -175,16 +173,8 @@ function Perfil(){
                             <label>Nome</label>
                             <input
                                 type="text"
-                                value={editedData.first_name}
-                                onChange={(e) => handleInputChange('first_name', e.target.value)}
-                            />
-                        </div>
-                        <div className={styles.infoField}>
-                            <label>Sobrenome</label>
-                            <input
-                                type="text"
-                                value={editedData.last_name}
-                                onChange={(e) => handleInputChange('last_name', e.target.value)}
+                                value={editedData.name}
+                                onChange={(e) => handleInputChange('name', e.target.value)}
                             />
                         </div>
                         <div className={styles.infoField}>
