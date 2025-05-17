@@ -44,10 +44,8 @@ function Login() {
         const password = event.target.password.value;
         try {
             const response = await loginApi(email, password);
-            console.log('Resposta do login:', response);
 
             if (response && response.user) {
-                console.log('Dados do usuário:', response.user);
                 login(response.user);
                 toast.success('Login realizado com sucesso!');
                 setTimeout(() => {
@@ -69,30 +67,38 @@ function Login() {
         try {
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
-    
+
             const email = user.email;
             const password = user.uid;
             const name = user.displayName;
-    
+
+            let isFirstTime = false;
+
             try {
                 await loginApi(email, password);
             } catch (err) {
-                await registerApi({ first_name: name, email, password });
+                isFirstTime = true;
+                await registerApi({ name, email, password });
                 await loginApi(email, password);
             }
-    
-            login();
+
+            login({ email, name }); // Armazene mais dados se quiser
+
             toast.success(`Bem-vindo, ${name}!`);
+
             setTimeout(() => {
-                goToHome();
+                if (isFirstTime) {
+                    navigate('/onboarding'); // redireciona para tela de seleção de level/language
+                } else {
+                    goToHome();
+                }
             }, 2000);
-    
+
         } catch (error) {
             console.error(error);
             toast.error('Erro ao fazer login com Google');
         }
     };
-    
 
     return (
         <div className={styles.pageLogin}>

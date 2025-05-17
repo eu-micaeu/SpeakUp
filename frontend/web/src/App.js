@@ -8,6 +8,7 @@ import Chat from './pages/Chat/Chat';
 import Home from './pages/Home/Home';
 import TeachingPlan from './pages/TeachingPlan/TeachingPlan';
 import Perfil from './pages/Perfil/Perfil';
+import OnBoarding from './pages/OnBoarding/OnBoarding';
 
 // Components
 import { AuthProvider } from './contexts/Auth';
@@ -21,6 +22,7 @@ function App() {
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/onboarding" element={<OnBoarding />} />
           <Route
             path="/chat"
             element={
