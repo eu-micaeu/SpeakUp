@@ -8,12 +8,16 @@
 }
 
 .cardsContainer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
+    width: 30%;
+    align-self: center;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 20px;
     border-radius: 10px;
+    padding: 20px;
+    justify-items: center;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .card {
@@ -26,6 +30,7 @@
     justify-content: center;
     align-items: center;
     transition: ease 0.3s all;
+    
 }
 
 .card:hover {

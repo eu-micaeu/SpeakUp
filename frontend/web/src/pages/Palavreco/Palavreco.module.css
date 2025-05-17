@@ -26,38 +26,62 @@
     flex-direction: column;
     align-items: center;
     height: 100vh;
-    padding-top: 80px; /* Espaço para o botão de voltar */
+    padding: 40px 0;
     overflow-y: scroll;
     scroll-snap-type: y mandatory;
     position: relative;
     scroll-behavior: smooth;
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    scroll-padding: 0;
 }
 
 .container::-webkit-scrollbar {
     display: none;
 }
 
+.progressIndicator {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(26, 26, 26, 0.9);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 1rem;
+    color: #fff;
+    z-index: 100;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
 .wordCard {
     background: linear-gradient(145deg, #1a1a1a, #2a2a2a);
     border-radius: 20px;
     padding: 40px;
-    height: calc(100vh - 120px); /* Ajusta altura considerando o padding-top do container */
+    min-height: 500px;
+    height: 100vh;
     width: 90%;
     max-width: 600px;
-    margin: 0 auto 40px;
+    margin: 5vh 0;
+    scroll-snap-align: center;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    opacity: 0;
+    opacity: 0.7;
     animation: fadeIn 0.5s forwards;
     scroll-snap-align: center;
     scroll-snap-stop: always;
-    transition: transform 0.3s ease;
+    transition: all 0.3s ease;
+    transform: scale(0.95);
+}
+
+.currentWord {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
 }
 
 .wordCard h2 {
@@ -165,7 +189,16 @@
     .wordCard {
         width: 95%;
         padding: 20px;
-        height: calc(100vh - 100px);
+        min-height: 400px;
+        height: 80vh;
+        margin: 10vh 0;
+    }
+
+    .progressIndicator {
+        top: 15px;
+        right: 15px;
+        font-size: 0.9rem;
+        padding: 6px 12px;
     }
 
     .backArrow {
