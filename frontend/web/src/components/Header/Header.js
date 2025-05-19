@@ -39,8 +39,8 @@ function Header() {
 
   return (
     <header className={styles.headerContainer}>
-      <img 
-        src="logo.png" 
+      <img
+        src="logo.png"
         alt="Logo"
         className={styles.logo}
       />
@@ -62,36 +62,58 @@ function Header() {
         onClose={handleDialogClose}
         PaperProps={{
           sx: {
-            backgroundColor: 'black',
+            background: 'linear-gradient(to bottom, #1a1a1a, #000)',
             color: 'white',
             textAlign: 'center',
-            p: 3,
-            borderRadius: 2,
-            boxShadow: 'none',
+            p: 4,
+            borderRadius: 3,
+            minWidth: 300,
           }
         }}
       >
-        <DialogTitle>
-          <Typography variant="h6" sx={{ color: 'white' }}>
-            Confirmar Logout
+        <DialogTitle sx={{ pb: 1 }}>
+          <Typography variant="h5" sx={{ color: '#ff4d4f', fontWeight: 'bold' }}>
+            Tem certeza?
           </Typography>
         </DialogTitle>
 
         <DialogContent>
-          <Typography sx={{ color: 'white' }}>
-            Tem certeza que deseja sair?
+          <Typography sx={{ color: '#ccc' }}>
+            Deseja mesmo sair da sua conta?
           </Typography>
         </DialogContent>
 
-        <DialogActions sx={{ justifyContent: 'center', mt: 2 }}>
-          <Button onClick={handleDialogClose} sx={{ color: 'white' }}>
+        <DialogActions sx={{ justifyContent: 'center', mt: 3 }}>
+          <Button
+            onClick={handleDialogClose}
+            sx={{
+              border: '1px solid #888',
+              color: '#ccc',
+              mr: 2,
+              '&:hover': {
+                backgroundColor: '#333',
+                color: 'white',
+              }
+            }}
+          >
             Cancelar
           </Button>
-          <Button onClick={handleLogoutConfirm} sx={{ color: 'red' }}>
+
+          <Button
+            onClick={handleLogoutConfirm}
+            sx={{
+              backgroundColor: '#ff4d4f',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: '#e60023',
+              }
+            }}
+          >
             Sair
           </Button>
         </DialogActions>
       </Dialog>
+
     </header>
   );
 }

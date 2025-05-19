@@ -5,6 +5,8 @@ import PersonIcon from '@mui/icons-material/Person';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 
 import Header from '../../components/Header/Header';
+import { Footer } from '../../components/Footer/Footer';
+
 import styles from './Home.module.css';
 
 function Home() {
@@ -42,6 +44,7 @@ function Home() {
                     </div>
                 </div>
             </div>
+            <Footer />
         </>
     );
 }
