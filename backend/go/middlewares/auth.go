@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"os"
 	"strings"
@@ -24,7 +23,6 @@ var jwtKey = []byte(os.Getenv("JWT_KEY"))
 
 // GenerateJWT generates a JWT token
 func GenerateJWT(id, email, language, level string) (string, error) {
-
 	expirationTime := time.Now().Add(24 * time.Hour)
 	
 	claims := &CustomClaims{
@@ -77,7 +75,6 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		claims, err := VerifyToken(token, secret)
 		if err != nil {
-			fmt.Println("Token verification error:", err)
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 			c.Abort()
 			return
@@ -85,6 +82,7 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		c.Set("user_id", claims.UserID)
 		c.Set("language", claims.Language)
+		c.Set("level", claims.Level)
 		
 		c.Next()
 	}
@@ -131,4 +129,14 @@ func GetLanguageFromContext(c *gin.Context) string {
 	}
 
 	return language.(string)
+}
+
+// GetLevelFromContext gets the user's level from the context
+func GetLevelFromContext(c *gin.Context) string {
+	level, exists := c.Get("level")
+	if !exists {
+		return ""
+	}
+
+	return level.(string)
 }

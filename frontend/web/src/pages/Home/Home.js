@@ -2,8 +2,11 @@ import { useNavigate } from 'react-router-dom';
 import CreateIcon from '@mui/icons-material/Create';
 import BookIcon from '@mui/icons-material/Book';
 import PersonIcon from '@mui/icons-material/Person';
+import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 
 import Header from '../../components/Header/Header';
+import { Footer } from '../../components/Footer/Footer';
+
 import styles from './Home.module.css';
 
 function Home() {
@@ -30,12 +33,18 @@ function Home() {
                         <h2>Plano de Ensino</h2>
                     </div>
 
+                    <div className={styles.card} onClick={() => handleNavigate('/palavreco')}>
+                        <AutoStoriesIcon sx={{ fontSize: '3rem' }} />
+                        <h2>Palavreco</h2>
+                    </div>
+
                     <div className={styles.card} onClick={() => handleNavigate('/perfil')}>
                         <PersonIcon sx={{ fontSize: '3rem' }} />
                         <h2>Perfil</h2>
                     </div>
                 </div>
             </div>
+            <Footer />
         </>
     );
 }

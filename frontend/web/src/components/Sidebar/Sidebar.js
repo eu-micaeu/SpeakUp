@@ -1,8 +1,6 @@
-import React from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
-import LogoutIcon from '@mui/icons-material/Logout';
 import AppsIcon from '@mui/icons-material/Apps';
-import CloseIcon from '@mui/icons-material/Close';  // Adicionando o CloseIcon
+import CloseIcon from '@mui/icons-material/Close';
 import styles from './Sidebar.module.css';
 
 function Sidebar({
@@ -13,11 +11,11 @@ function Sidebar({
     setCurrentChatId,
     loadChatMessages,
     handleDeleteChat,
-    goToIndex,
-    clearCookies,
     goToHome,
     setMessages
+
 }) {
+    
     return (
         <aside className={`${styles.sidebar} ${!isVisible ? styles.sidebarHidden : ''}`}>
             <button
@@ -49,7 +47,8 @@ function Sidebar({
                         </li>
                     ))
                 ) : (
-                    <ol>Crie um chat!</ol>
+                    <>
+                    </>
                 )}
                 <button
                     className={styles.btCreateChat}
@@ -64,7 +63,6 @@ function Sidebar({
             </ul>
 
             <div className={styles.actionsDiv}>
-                <LogoutIcon onClick={() => { goToIndex(); clearCookies(); }} style={{ color: "#ff0000" }} />
                 <AppsIcon onClick={goToHome} style={{ color: "#fff" }} />
             </div>
         </aside>
