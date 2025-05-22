@@ -9,6 +9,29 @@
     padding: 40px 20px;
 }
 
+.pageHome h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.pageHome h2 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
+.pageHome h3 {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+.pageHome p{
+    font-size: 1rem;
+    margin-bottom: 40px;
+    text-align: justify;
+    max-width: 600px;
+    line-height: 1.5;
+}
+
 .cardsContainer {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
