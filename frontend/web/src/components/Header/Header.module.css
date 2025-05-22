@@ -11,11 +11,26 @@
     margin: 25px 50px;
 }
 
+.icons {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 20px;
+}
+
 .icon {
-    margin: 25px 50px;
+    margin: 15px;
     font-size: 1.5rem !important;
     cursor: pointer;
     transition: color 0.3s ease;
+}
+
+.personIcon {
+    color: rgb(255, 255, 255);
+}
+
+.personIcon:hover {
+    color: rgb(182, 182, 182);
 }
 
 .logoutIcon {

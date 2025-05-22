@@ -2,6 +2,7 @@ import styles from './Header.module.css';
 import { useNavigate } from 'react-router-dom';
 import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
+import PersonIcon from '@mui/icons-material/Person';
 import { useAuth } from '../../contexts/Auth';
 import {
   Dialog,
@@ -9,7 +10,6 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  Box,
   Typography
 } from '@mui/material';
 import { useState } from 'react';
@@ -46,10 +46,17 @@ function Header() {
       />
 
       {user ? (
-        <LogoutIcon
-          className={`${styles.icon} ${styles.logoutIcon}`}
-          onClick={handleLogoutClick}
-        />
+        <div className={styles.icons}>
+          <PersonIcon
+            className={`${styles.icon} ${styles.personIcon}`}
+            onClick={() => handleNavigation('/perfil')}
+          />
+
+          <LogoutIcon
+            className={`${styles.icon} ${styles.logoutIcon}`}
+            onClick={handleLogoutClick}
+          />
+        </div>
       ) : (
         <LoginIcon
           className={`${styles.icon} ${styles.loginIcon}`}
