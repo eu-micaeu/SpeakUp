@@ -130,10 +130,8 @@
         padding: 0.8rem 1.5rem;
     }
 
-    .featureSection {
-        gap: 2rem;
+    .featureCard{
         padding: 0;
-        margin: 30px 0;
     }
 
     .feature {
@@ -141,6 +139,7 @@
         width: 100%;
         text-align: center;
         gap: 1.5rem;
+        align-items: center; /* Centraliza os itens flex (ex: img, h2) */
     }
 
     .feature img {

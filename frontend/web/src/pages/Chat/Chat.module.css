@@ -14,8 +14,8 @@
     width: 100%;
 }
 
-.mainContent h1 {
-    margin: 25px;
+.mainContent img {
+    margin: 5px;
 }
 
 .toggleButton {
@@ -441,7 +441,7 @@
     }
 
     p {
-        font-size: 10px;
+        font-size: 8px;
         line-height: 1.5;
     }
 }

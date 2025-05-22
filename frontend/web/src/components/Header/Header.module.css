@@ -66,9 +66,14 @@
         margin: 10px 30px;
     }
 
+    .icons {
+        padding: 0 10px;
+    }
+
     .icon {
         font-size: 2rem !important;
-        margin: 10px 0;
+        margin: 0 !important;
+        padding: 0;
     }
 
 }
