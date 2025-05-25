@@ -29,8 +29,6 @@ function Home() {
 
                 <h3>Menu</h3>
 
-                <p>Escolha uma das opções abaixo para começar a praticar seu inglês!</p>
-
                 {/* Cards */}
                 <div className={styles.cardsContainer}>
                     <div className={styles.card} onClick={() => handleNavigate('/chat')}>
