@@ -2,17 +2,15 @@ import styles from './Perfil.module.css';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PersonIcon from '@mui/icons-material/Person';
 import { useState, useEffect } from 'react';
-import { getUserById, updateUser } from '../../utils/api';
-import { useAuth } from '../../contexts/Auth';
-import Cookies from 'js-cookie';
+import { updateUser } from '../../utils/api';
+import { toast, ToastContainer } from 'react-toastify';
+import { getDecodedToken, isAuthTokenValid } from '../../utils/cookies';
 
 function Perfil(){
     const [profileData, setProfileData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [successMessage, setSuccessMessage] = useState('');
     const [levels, setLevels] = useState([]);
-    const { user } = useAuth();
     const [editedData, setEditedData] = useState({
         name: '',
         email: '',
@@ -23,34 +21,18 @@ function Perfil(){
     useEffect(() => {
         const fetchProfileData = async () => {
             try {
-                if (!user) {
-                    setLoading(false);
-                    return;
-                }
 
-                // Usa prioritariamente o ID do cookie, já que é extraído do token JWT
-                const userId = Cookies.get('userId');
-                
-                if (!userId) {
-                    setError("Usuário não encontrado");
-                    setLoading(false);
-                    return;
-                }
-                const data = await getUserById(userId);
+                console.log(getDecodedToken);
 
-                if (!data) {
-                    setError("Falha ao carregar dados do perfil");
-                    setLoading(false);
-                    return;
-                }
+                const data = getDecodedToken();
 
-                const fullName = `${data.user.name}`;
+                console.log('Dados do token decodificado:', data);
                 
                 setProfileData({
-                    name: fullName,
-                    email: data.user.email,
-                    language: data.user.language,
-                    level: data.user.level,
+                    name: data.name,
+                    email: data.email,
+                    language: data.language,
+                    level: data.level,
                     stats: {
                         conversations: 0,
                         messages: 0,
@@ -59,17 +41,14 @@ function Perfil(){
                 });
 
                 setEditedData({
-                    name: data.user.name,
-                    email: data.user.email,
-                    language: data.user.language,
-                    level: data.user.level
+                    name: data.name,
+                    email: data.email,
+                    language: data.language,
+                    level: data.level
                 });
 
-                // Inicializa os níveis disponíveis baseado no idioma do usuário
-                if (data.user.language === 'english') {
+                if (data.language === 'english') {
                     setLevels(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']);
-                } else if (data.user.language === 'japanese') {
-                    setLevels(['N5', 'N4', 'N3', 'N2', 'N1']);
                 }
 
                 setError(null);
@@ -81,10 +60,10 @@ function Perfil(){
             }
         };
 
-        if (Cookies.get('userId')) {
+        if (isAuthTokenValid) {
             fetchProfileData();
         }
-    }, [user]);
+    }, [isAuthTokenValid]);
 
     const handleInputChange = (field, value) => {
         setEditedData(prev => ({
@@ -92,7 +71,6 @@ function Perfil(){
             [field]: value
         }));
         
-        // Atualiza os níveis disponíveis quando o idioma é alterado
         if (field === 'language') {
             if (value === 'english') {
                 setLevels(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']);
@@ -108,16 +86,12 @@ function Perfil(){
         try {
             setLoading(true);
             setError(null);
-            setSuccessMessage('');
             
-            const userId = Cookies.get('userId');
-            if (!userId) {
-                throw new Error('ID do usuário não encontrado');
-            }
+            const userId = getDecodedToken().user.id;
 
             await updateUser(userId, editedData);
             
-            setSuccessMessage('Perfil atualizado com sucesso!');
+            toast.success('Perfil atualizado com sucesso!'); // Adiciona a notificação de toast
             
             setProfileData(prev => ({
                 ...prev,
@@ -130,6 +104,7 @@ function Perfil(){
         } catch (error) {
             console.error('Erro ao atualizar perfil:', error);
             setError('Falha ao atualizar o perfil. Por favor, tente novamente.');
+            toast.error('Falha ao atualizar o perfil.'); // Opcional: Adiciona toast de erro
         } finally {
             setLoading(false);
         }
@@ -141,7 +116,8 @@ function Perfil(){
         }
 
         if (error) {
-            return <p>Erro: {error}</p>;
+            // Mantém a exibição de erro no componente, mas o toast também pode ser usado
+            return <p>Erro: {error}</p>; 
         }
 
         if (!profileData) {
@@ -159,12 +135,6 @@ function Perfil(){
                         <p className={styles.userEmail}>{editedData.email}</p>
                     </div>
                 </div>
-
-                {successMessage && (
-                    <div className={styles.successMessage}>
-                        {successMessage}
-                    </div>
-                )}
 
                 <div className={styles.profileInfo}>
                     <div className={styles.infoSection}>
@@ -194,7 +164,7 @@ function Perfil(){
                             >
                                 <option value="" disabled>Selecione</option>
                                 <option value="english">Inglês</option>
-                                <option value="japanese">Japonês</option>
+                                {/* <option value="japanese">Japonês</option> */}
                             </select>
                         </div>
                         <div className={styles.infoField}>
@@ -239,24 +209,7 @@ function Perfil(){
                             </button>
                         </div>
                     </div>
-
-                    <div className={styles.infoSection}>
-                        <h2>Estatísticas de Uso</h2>
-                        <div className={styles.statsGrid}>
-                            <div className={styles.statItem}>
-                                <span className={styles.statValue}>{profileData.stats?.conversations || 0}</span>
-                                <span className={styles.statLabel}>Conversas</span>
-                            </div>
-                            <div className={styles.statItem}>
-                                <span className={styles.statValue}>{profileData.stats?.messages || 0}</span>
-                                <span className={styles.statLabel}>Mensagens</span>
-                            </div>
-                            <div className={styles.statItem}>
-                                <span className={styles.statValue}>{profileData.stats?.minutesPracticed || 0}</span>
-                                <span className={styles.statLabel}>Minutos Praticados</span>
-                            </div>
-                        </div>
-                    </div>
+                    
                 </div>
             </div>
         );
@@ -264,6 +217,7 @@ function Perfil(){
 
     return (
         <div className={styles.pagePerfil}>
+            <ToastContainer />
             <ArrowBackIcon
                 className={styles.arrowBack}
                 onClick={() => window.history.back()}

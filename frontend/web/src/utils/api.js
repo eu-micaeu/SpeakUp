@@ -15,25 +15,7 @@ export const login = async (email, password) => {
         
         if (token) {
             Cookies.set('authToken', token);
-            
-            // Extrair o user_id do token JWT
-            try {
-                const tokenParts = token.split('.');
-                const tokenPayload = JSON.parse(atob(tokenParts[1]));
-                
-                if (tokenPayload.user_id) {
-                    Cookies.set('userId', tokenPayload.user_id);
-                    return {
-                        token,
-                        user: {
-                            id: tokenPayload.user_id
-                        }
-                    };
-                }
-            } catch (tokenError) {
-                console.error('Erro ao decodificar token:', tokenError);
-                throw new Error('Erro ao processar token');
-            }
+            return { token };
         }
         
         throw new Error('Dados de usuário não encontrados na resposta');

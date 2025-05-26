@@ -6,9 +6,20 @@
     height: 12vh;
 }
 
+.headerContainer .logoContainer{
+    display: flex;
+    align-items: center;
+}
+
+.headerContainer .logoContainer h1{
+    color: #ffffff;
+    font-size: 1.5rem;
+    margin-left: 10px;
+}
+
 .logo {
     width: 2.5rem;
-    margin: 25px 50px;
+    margin: 25px;
 }
 
 .icons {

@@ -22,6 +22,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+var aiConnectorBuilder func() connectors.AIConnector = func() connectors.AIConnector {
+	return connectors.NewGeminiConnector()
+}
+
 // @Summary Gera uma resposta de diálogo usando IA
 // @Description Gera uma resposta de diálogo contextual baseada na mensagem fornecida
 // @Tags AI
@@ -35,8 +39,8 @@ import (
 // @Failure 500 {object} map[string]string "Erro interno do servidor" example({"error":"Internal server error"})
 // @Router /ai/generate-response-dialog [post]
 func GenerateResponseDialog(c *gin.Context) {
-
-	promptPath := filepath.Join("prompts", "promptDialog.txt")
+	// ... (prompt loading, request binding)
+    promptPath := filepath.Join("prompts", "promptDialog.txt")
 	promptBytes, err := os.ReadFile(promptPath)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load prompt: " + err.Error()})
@@ -54,7 +58,6 @@ func GenerateResponseDialog(c *gin.Context) {
 		return
 	}
 
-	// Buscar histórico de mensagens do chat
 	db := config.GetMongoClient()
 	collection := db.Database("speakup").Collection("messages")
 	cursor, err := collection.Find(c, map[string]string{"chat_id": request.ChatID})
@@ -69,12 +72,13 @@ func GenerateResponseDialog(c *gin.Context) {
 		return
 	}
 
-	// Formatar histórico de mensagens
 	var chatHistory strings.Builder
 	for _, msg := range messages {
 		chatHistory.WriteString(fmt.Sprintf("%s: %s\n", msg.Sender, msg.Content))
 	}
-	connector := connectors.NewGeminiConnector()
+
+	// Use the builder to get a connector instance
+	connector := aiConnectorBuilder() // MODIFIED LINE
 
 	resumeHist, err := connector.GenerateResponse(context.Background(), "Format the following chat history to only show user reponse and AI response: "+chatHistory.String())
 	if err != nil {
@@ -82,7 +86,6 @@ func GenerateResponseDialog(c *gin.Context) {
 		return
 	}
 
-	// Gerar resposta com histórico
 	fullPrompt := fmt.Sprintf("%s\nChat history:\n%s\nATENTION! All Before this point is system instructions and chat history, to generate your response consider the current user message -> = %s\nAnswer me in this language: %s",
 		prePrompt,
 		resumeHist,
@@ -111,8 +114,8 @@ func GenerateResponseDialog(c *gin.Context) {
 // @Failure 500 {object} map[string]string "Erro interno do servidor" example({"error":"Internal server error"})
 // @Router /ai/generate-response-correction [post]
 func GenerateResponseCorrection(c *gin.Context) {
-
-	promptPath := filepath.Join("prompts", "promptCorrection.txt")
+	// ... (prompt loading, request binding)
+    promptPath := filepath.Join("prompts", "promptCorrection.txt")
 	promptBytes, err := os.ReadFile(promptPath)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load prompt: " + err.Error()})
@@ -129,9 +132,9 @@ func GenerateResponseCorrection(c *gin.Context) {
 		return
 	}
 
-	connector := connectors.NewGeminiConnector()
+	// Use the builder to get a connector instance
+	connector := aiConnectorBuilder() // MODIFIED LINE
 
-	// Generate a correction for the dialogue
 	correctionResp, err := connector.GenerateResponse(context.Background(), "Answer me in this language: " + middlewares.GetLanguageFromContext(c) + prompt + request.Message)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -154,8 +157,7 @@ func GenerateResponseCorrection(c *gin.Context) {
 // @Failure 500 {object} map[string]string "Erro interno" example({"error":"Internal server error"})
 // @Router /ai/generate-response-translation [post]
 func GenerateResponseTranslate(c *gin.Context) {
-	promptPath := filepath.Join("prompts", "promptTranslate.txt")
-
+    promptPath := filepath.Join("prompts", "promptTranslate.txt")
 	promptBytes, err := os.ReadFile(promptPath)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao carregar o prompt: " + err.Error()})
@@ -172,7 +174,8 @@ func GenerateResponseTranslate(c *gin.Context) {
 		return
 	}
 
-	connector := connectors.NewGeminiConnector()
+	// Use the builder to get a connector instance
+	connector := aiConnectorBuilder() // MODIFIED LINE
 
 	response, err := connector.GenerateResponse(context.Background(), prompt+req.Message)
 	if err != nil {
@@ -205,9 +208,9 @@ func GenerateResponseTopic(c *gin.Context) {
 		return
 	}
 
-	connector := connectors.NewGeminiConnector()
+	// Use the builder to get a connector instance
+	connector := aiConnectorBuilder() // MODIFIED LINE
 
-	// Generate a response for the topic
 	topicResp, err := connector.GenerateResponse(context.Background(), "Please generate a topic for the following text, return only words ,generate with 2 words only: "+request.Message)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -229,8 +232,8 @@ func GenerateResponseTopic(c *gin.Context) {
 // @Failure 500 {object} map[string]string "Erro interno do servidor" example({"error":"Internal server error"})
 // @Router /ai/generate-random-word [post]
 func GenerateRandomWord(c *gin.Context) {
-	// Carregar o prompt
-	promptPath := filepath.Join("prompts", "promptRandomWord.txt")
+	// ... (prompt loading, user fetching, etc.)
+    promptPath := filepath.Join("prompts", "promptRandomWord.txt")
 	promptBytes, err := os.ReadFile(promptPath)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Falha ao carregar o prompt: " + err.Error()})
@@ -238,30 +241,27 @@ func GenerateRandomWord(c *gin.Context) {
 	}
 	prompt := string(promptBytes)
 
-	// Obter ID do usuário do contexto
 	userID := middlewares.GetUserIDFromContext(c)
 	if userID == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Usuário não autenticado"})
 		return
 	}
 
-	// Buscar dados completos do usuário
 	db := config.GetMongoClient()
-	collection := db.Database("speakup").Collection("users")
-	
+	collectionUsers := db.Database("speakup").Collection("users")
+
 	var user models.User
-	err = collection.FindOne(c, bson.M{"id": userID}).Decode(&user)
+	err = collectionUsers.FindOne(c, bson.M{"id": userID}).Decode(&user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Falha ao buscar dados do usuário"})
 		return
 	}
 
-	// Buscar últimas 50 palavras do usuário
 	wordsCollection := db.Database("speakup").Collection("words")
 	cursor, err := wordsCollection.Find(c, bson.M{
 		"user_id": userID,
 	}, options.Find().SetSort(bson.M{"created_at": -1}).SetLimit(50))
-	
+
 	if err != nil && err != mongo.ErrNoDocuments {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Falha ao buscar histórico de palavras"})
 		return
@@ -275,7 +275,6 @@ func GenerateRandomWord(c *gin.Context) {
 		}
 	}
 
-	// Extrair apenas as palavras do histórico
 	previousWordsStr := "nenhuma palavra anterior"
 	if len(previousWords) > 0 {
 		wordsList := make([]string, len(previousWords))
@@ -285,19 +284,19 @@ func GenerateRandomWord(c *gin.Context) {
 		previousWordsStr = strings.Join(wordsList, ", ")
 	}
 
-	// Preparar o prompt com os dados do usuário e palavras anteriores
 	fullPrompt := fmt.Sprintf(prompt, user.Level, user.Language, previousWordsStr)
 
-	// Gerar palavra usando IA
-	connector := connectors.NewGeminiConnector()
+	// Use the builder to get a connector instance
+	connector := aiConnectorBuilder() // MODIFIED LINE
+
 	response, err := connector.GenerateResponse(context.Background(), fullPrompt)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao gerar palavra: " + err.Error()})
 		return
 	}
 
-	// Limpar a resposta - remover caracteres indesejados
-	response = strings.TrimSpace(response)
+	// ... (response cleaning, JSON unmarshal, DB saving)
+    response = strings.TrimSpace(response)
 	if strings.HasPrefix(response, "```json") {
 		response = strings.TrimPrefix(response, "```json")
 	}
@@ -306,7 +305,6 @@ func GenerateRandomWord(c *gin.Context) {
 	}
 	response = strings.TrimSpace(response)
 
-	// Converter resposta para struct
 	var word models.Word
 	err = json.Unmarshal([]byte(response), &word)
 	if err != nil {
@@ -314,17 +312,14 @@ func GenerateRandomWord(c *gin.Context) {
 		return
 	}
 
-	// Preencher campos adicionais
 	word.ID = primitive.NewObjectID().Hex()
 	word.UserID = userID
 	word.Language = user.Language
 	word.Level = user.Level
 	word.CreatedAt = time.Now().UTC().Format(time.RFC3339)
 
-	// Salvar no MongoDB
-	db = config.GetMongoClient()
-	collection = db.Database("speakup").Collection("words")
-	_, err = collection.InsertOne(c, word)
+	collectionWords := db.Database("speakup").Collection("words") // Re-get collection or pass db
+	_, err = collectionWords.InsertOne(c, word)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao salvar palavra: " + err.Error()})
 		return

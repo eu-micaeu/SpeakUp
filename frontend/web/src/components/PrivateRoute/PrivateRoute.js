@@ -1,16 +1,8 @@
-import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/Auth';
+import { isAuthTokenValid } from '../../utils/cookies';
 
 const PrivateRoute = ({ children }) => {
-  const { user } = useAuth();
-
-  if (user === null) {
-    return <div>Carregando...</div>;
-  }
-
-  return user ? children : <Navigate to="/login" />;
-  
+  return isAuthTokenValid() ? children : <Navigate to="/login" />;
 };
 
 export default PrivateRoute;

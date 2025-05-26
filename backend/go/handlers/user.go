@@ -43,7 +43,7 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid password"})
 		return
 	}
-	token, err := middlewares.GenerateJWT(result.ID, result.Email, result.Language, result.Level)
+	token, err := middlewares.GenerateJWT(result.ID, result.Name, result.Email, result.Language, result.Level)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
 		return
