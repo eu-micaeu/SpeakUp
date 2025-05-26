@@ -2,18 +2,15 @@ import styles from './Perfil.module.css';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PersonIcon from '@mui/icons-material/Person';
 import { useState, useEffect } from 'react';
-import { getUserById, updateUser } from '../../utils/api';
-import { useAuth } from '../../contexts/Auth';
-import Cookies from 'js-cookie';
+import { updateUser } from '../../utils/api';
 import { toast, ToastContainer } from 'react-toastify';
+import { getDecodedToken, isAuthTokenValid } from '../../utils/cookies';
 
 function Perfil(){
     const [profileData, setProfileData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    // const [successMessage, setSuccessMessage] = useState(''); // Remove o estado de mensagem de sucesso
     const [levels, setLevels] = useState([]);
-    const { user } = useAuth();
     const [editedData, setEditedData] = useState({
         name: '',
         email: '',
@@ -24,33 +21,18 @@ function Perfil(){
     useEffect(() => {
         const fetchProfileData = async () => {
             try {
-                if (!user) {
-                    setLoading(false);
-                    return;
-                }
 
-                const userId = Cookies.get('userId');
-                
-                if (!userId) {
-                    setError("Usuário não encontrado");
-                    setLoading(false);
-                    return;
-                }
-                const data = await getUserById(userId);
+                console.log(getDecodedToken);
 
-                if (!data) {
-                    setError("Falha ao carregar dados do perfil");
-                    setLoading(false);
-                    return;
-                }
+                const data = getDecodedToken();
 
-                const fullName = `${data.user.name}`;
+                console.log('Dados do token decodificado:', data);
                 
                 setProfileData({
-                    name: fullName,
-                    email: data.user.email,
-                    language: data.user.language,
-                    level: data.user.level,
+                    name: data.name,
+                    email: data.email,
+                    language: data.language,
+                    level: data.level,
                     stats: {
                         conversations: 0,
                         messages: 0,
@@ -59,16 +41,14 @@ function Perfil(){
                 });
 
                 setEditedData({
-                    name: data.user.name,
-                    email: data.user.email,
-                    language: data.user.language,
-                    level: data.user.level
+                    name: data.name,
+                    email: data.email,
+                    language: data.language,
+                    level: data.level
                 });
 
-                if (data.user.language === 'english') {
+                if (data.language === 'english') {
                     setLevels(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']);
-                } else if (data.user.language === 'japanese') {
-                    setLevels(['N5', 'N4', 'N3', 'N2', 'N1']);
                 }
 
                 setError(null);
@@ -80,10 +60,10 @@ function Perfil(){
             }
         };
 
-        if (Cookies.get('userId')) {
+        if (isAuthTokenValid) {
             fetchProfileData();
         }
-    }, [user]);
+    }, [isAuthTokenValid]);
 
     const handleInputChange = (field, value) => {
         setEditedData(prev => ({
@@ -106,12 +86,8 @@ function Perfil(){
         try {
             setLoading(true);
             setError(null);
-            // setSuccessMessage(''); // Remove a limpeza da mensagem de sucesso
             
-            const userId = Cookies.get('userId');
-            if (!userId) {
-                throw new Error('ID do usuário não encontrado');
-            }
+            const userId = getDecodedToken().user.id;
 
             await updateUser(userId, editedData);
             
@@ -159,13 +135,6 @@ function Perfil(){
                         <p className={styles.userEmail}>{editedData.email}</p>
                     </div>
                 </div>
-
-                {/* Remove a exibição da mensagem de sucesso anterior
-                {successMessage && (
-                    <div className={styles.successMessage}>
-                        {successMessage}
-                    </div>
-                )} */}
 
                 <div className={styles.profileInfo}>
                     <div className={styles.infoSection}>

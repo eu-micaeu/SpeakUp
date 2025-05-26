@@ -13,6 +13,7 @@ import (
 
 type CustomClaims struct {
 	UserID string `json:"user_id"`
+	Name    string `json:"name"`
 	Email  string `json:"email"`
 	Language string `json:"language"`
 	Level   string `json:"level"`
@@ -22,11 +23,12 @@ type CustomClaims struct {
 var jwtKey = []byte(os.Getenv("JWT_KEY"))
 
 // GenerateJWT generates a JWT token
-func GenerateJWT(id, email, language, level string) (string, error) {
+func GenerateJWT(id, name, email, language, level string) (string, error) {
 	expirationTime := time.Now().Add(24 * time.Hour)
 	
 	claims := &CustomClaims{
 		UserID: id,
+		Name: name,
 		Email: email,
 		Language: language,
 		Level: level,

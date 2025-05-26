@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SendIcon from '@mui/icons-material/Send';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { useAuth } from '../../contexts/Auth';
 import {
   getChatsByUserId,
   createChat,
@@ -33,15 +32,11 @@ function Chat() {
   const messagesEndRef = useRef(null);
   const navigate = useNavigate();
 
-  // Auth context
-  const { logout } = useAuth();
-
   // Handlers
   const closeWelcomePopup = () => setShowWelcomePopup(false);
   const handleSettingsClick = () => setShowSettingsModal(true);
   const closeModal = () => setShowSettingsModal(false);
   const goToIndex = () => {
-    logout();
     navigate('/');
   };
   const goToHome = () => navigate('/home');

@@ -5,7 +5,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 
-import { useAuth } from '../../contexts/Auth';
 import { login as loginApi, register as registerApi } from '../../utils/api';
 import styles from './Login.module.css';
 
@@ -27,7 +26,6 @@ const auth = getAuth(app);
 function Login() {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
-    const { login } = useAuth();
 
     const goToIndex = () => {
         navigate('/');
@@ -45,8 +43,7 @@ function Login() {
         try {
             const response = await loginApi(email, password);
 
-            if (response && response.user) {
-                login(response.user);
+            if (response) {
                 toast.success('Login realizado com sucesso!');
                 setTimeout(() => {
                     goToHome();
@@ -81,8 +78,6 @@ function Login() {
                 await registerApi({ name, email, password });
                 await loginApi(email, password);
             }
-
-            login({ email, name }); // Armazene mais dados se quiser
 
             toast.success(`Bem-vindo, ${name}!`);
 

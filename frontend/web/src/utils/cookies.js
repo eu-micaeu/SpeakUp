@@ -11,8 +11,7 @@ export function getAuthTokenFromCookies() {
 
 // Remove o valor de um cookie pelo nome
 export function removeAuthTokenFromCookies() {
-    Cookies.remove('authToken', { path: '/' });
-    console.info('authToken removido dos cookies.');
+    Cookies.remove('authToken');
 }
 
 // Verifica se o token de autenticação é válido

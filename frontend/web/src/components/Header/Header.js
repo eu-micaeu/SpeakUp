@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
 import PersonIcon from '@mui/icons-material/Person';
-import { useAuth } from '../../contexts/Auth';
 import {
   Dialog,
   DialogTitle,
@@ -13,9 +12,9 @@ import {
   Typography
 } from '@mui/material';
 import { useState } from 'react';
+import { isAuthTokenValid, removeAuthTokenFromCookies } from '../../utils/cookies';
 
 function Header() {
-  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [openDialog, setOpenDialog] = useState(false);
 
@@ -28,7 +27,7 @@ function Header() {
   };
 
   const handleLogoutConfirm = () => {
-    logout();
+    removeAuthTokenFromCookies();
     handleNavigation('/login');
     setOpenDialog(false);
   };
@@ -45,7 +44,7 @@ function Header() {
         className={styles.logo}
       />
 
-      {user ? (
+      {isAuthTokenValid ? (
         <div className={styles.icons}>
           <PersonIcon
             className={`${styles.icon} ${styles.personIcon}`}
@@ -79,7 +78,7 @@ function Header() {
         }}
       >
         <DialogTitle sx={{ pb: 1 }}>
-          <Typography variant="h5" sx={{ color: '#ff4d4f', fontWeight: 'bold' }}>
+          <Typography variant="h2" sx={{ color: '#ff4d4f', fontWeight: 'bold' }}>
             Tem certeza?
           </Typography>
         </DialogTitle>

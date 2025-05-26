@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import styles from './Index.module.css';
-import { useAuth } from '../../contexts/Auth';
 import { FeatureCard } from '../../components/FeatureCard/FeatureCard';
 import { Footer } from '../../components/Footer/Footer';
+import { isAuthTokenValid } from '../../utils/cookies';
 
 const cardData = [
   {
@@ -24,21 +24,20 @@ const cardData = [
 ];
 function Index() {
   const [activeIndex, setActiveIndex] = useState(1);
-  const { user } = useAuth();
   const mountRef = useRef(null);
 
   useEffect(() => {
-    if (user) {
+    if (isAuthTokenValid()) {
       window.location.href = '/home';
     }
-  }, [user]);
+  }, [isAuthTokenValid]);
 
   useEffect(() => {
 
     const interval = setInterval(() => {
 
       setActiveIndex((prevIndex) => (prevIndex + 1) % cardData.length);
-      
+
     }, 5000);
 
     return () => clearInterval(interval);

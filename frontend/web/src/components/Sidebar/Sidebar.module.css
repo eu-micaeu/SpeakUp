@@ -15,7 +15,7 @@
 }
 
 .sidebar ul {
-    margin: 50px 0;
+    margin: 70px 0;
     padding: 0;
     list-style: none;
     display: flex;
@@ -36,6 +36,10 @@
     justify-content: space-between;
     align-items: center;
     width: 80%;
+}
+
+.sidebar ul li:hover {
+    background-color: #424242;
 }
 
 .toggleButton {
@@ -64,6 +68,10 @@
     height: 50px;
     margin-top: 10px;
     cursor: pointer;
+}
+
+.btCreateChat:hover {
+    background-color: #2f2f2f;
 }
 
 .actionsDiv {

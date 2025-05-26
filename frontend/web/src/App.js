@@ -11,49 +11,47 @@ import Perfil from './pages/Perfil/Perfil';
 import OnBoarding from './pages/OnBoarding/OnBoarding';
 import Palavreco from './pages/Palavreco/Palavreco';
 
-// Components
-import { AuthProvider } from './contexts/Auth';
+// Private Route
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 
 function App() {
   return (
     <Router>
-      <AuthProvider>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/onboarding" element={<OnBoarding />} />
-          <Route
-            path="/chat"
-            element={
-              <PrivateRoute>
-                <Chat />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/teaching-plan"
-            element={
-              <PrivateRoute>
-                <TeachingPlan />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/home"
-            element={
-              <PrivateRoute>
-                <Home />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/perfil"
-            element={
-              <PrivateRoute>
-                <Perfil />
-              </PrivateRoute>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/onboarding" element={<OnBoarding />} />
+        <Route
+          path="/chat"
+          element={
+            <PrivateRoute>
+              <Chat />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/teaching-plan"
+          element={
+            <PrivateRoute>
+              <TeachingPlan />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/home"
+          element={
+            <PrivateRoute>
+              <Home />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/perfil"
+          element={
+            <PrivateRoute>
+              <Perfil />
+            </PrivateRoute>
           }
         />
         <Route
@@ -65,7 +63,6 @@ function App() {
           }
         />
       </Routes>
-      </AuthProvider>
     </Router>
   );
 }
