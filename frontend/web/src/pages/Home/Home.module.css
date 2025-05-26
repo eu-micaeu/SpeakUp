@@ -34,11 +34,10 @@
 
 .cardsContainer {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 24px;
     width: 100%;
-    max-width: 800px;
-    margin-top: 40px;
+    max-width: 400px;
+    margin-top: 20px;
 }
 
 .card {
@@ -47,8 +46,8 @@
     padding: 20px;
     height: 160px;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    flex-direction: row;
+    justify-content: space-around;
     align-items: center;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     transition: transform 0.3s ease, background 0.3s ease;
@@ -61,8 +60,10 @@
 }
 
 .card h2 {
-    font-size: 1.1rem;
+    font-size: 1rem;
+    width: 40%;
     margin-top: 10px;
+    text-align: center;
 }
 
 @media screen and (max-width: 768px) {

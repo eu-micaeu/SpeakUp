@@ -38,11 +38,18 @@ function Header() {
 
   return (
     <header className={styles.headerContainer}>
-      <img
-        src="logo.png"
-        alt="Logo"
-        className={styles.logo}
-      />
+
+      <div className={styles.logoContainer} onClick={() => handleNavigation('/')}>
+
+        <img
+          src="logo.png"
+          alt="Logo"
+          className={styles.logo}
+        />
+
+        <h1 className={styles.logoText}>SpeakUp</h1>
+
+      </div>
 
       {isAuthTokenValid ? (
         <div className={styles.icons}>
@@ -68,7 +75,7 @@ function Header() {
         onClose={handleDialogClose}
         PaperProps={{
           sx: {
-            background: 'linear-gradient(to bottom, #1a1a1a, #000)',
+            background: '#000',
             color: 'white',
             textAlign: 'center',
             p: 4,
@@ -77,11 +84,6 @@ function Header() {
           }
         }}
       >
-        <DialogTitle sx={{ pb: 1 }}>
-          <Typography variant="h2" sx={{ color: '#ff4d4f', fontWeight: 'bold' }}>
-            Tem certeza?
-          </Typography>
-        </DialogTitle>
 
         <DialogContent>
           <Typography sx={{ color: '#ccc' }}>

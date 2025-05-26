@@ -330,7 +330,8 @@
 @media (max-width: 768px) {
     .profileContainer {
         padding: 30px 20px;
-        margin-top: 50px;
+        margin-top: 100px;
+        width: 90%;
     }
     
     .profileHeader {
@@ -353,39 +354,3 @@
     }
 }
 
-@media (max-width: 600px) {
-    .pagePerfil {
-        padding: 15px;
-    }
-
-    .profileContainer {
-        padding: 25px 15px;
-        margin-top: 40px;
-        border-radius: 12px;
-    }
-
-    .statsGrid {
-        grid-template-columns: 1fr;
-        gap: 15px;
-    }
-
-    .avatarContainer {
-        width: 90px;
-        height: 90px;
-    }
-
-    .arrowBack {
-        font-size: 1.5rem !important;
-        left: 15px;
-        top: 15px;
-    }
-    
-    .userName {
-        font-size: 24px;
-    }
-    
-    .infoField input,
-    .infoField select {
-        padding: 12px 14px;
-    }
-}

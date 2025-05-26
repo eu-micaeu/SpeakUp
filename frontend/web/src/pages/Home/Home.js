@@ -9,7 +9,7 @@ import { Footer } from '../../components/Footer/Footer';
 import styles from './Home.module.css';
 
 function Home() {
-    
+
     const navigate = useNavigate();
 
     const handleNavigate = (path) => {
@@ -21,13 +21,7 @@ function Home() {
             <Header />
             <div className={styles.pageHome}>
 
-                <h1>SpeakUp</h1>
-
-                <h2>Aprenda e pratique inglês de uma inteligência artificial!</h2>
-
-                <p>O SpeakUp é um aplicativo de aprendizado de inglês que utiliza inteligência artificial para ajudar os usuários a praticar conversação e melhorar suas habilidades linguísticas. Com uma interface amigável e recursos interativos, o SpeakUp torna o aprendizado de inglês mais acessível e envolvente.</p>
-
-                <h3>Menu</h3>
+                <h2>Aprenda e pratique inglês com uma inteligência artificial!</h2>
 
                 {/* Cards */}
                 <div className={styles.cardsContainer}>
@@ -47,6 +41,7 @@ function Home() {
                     </div> */}
 
                 </div>
+                        
             </div>
             <Footer />
         </>
