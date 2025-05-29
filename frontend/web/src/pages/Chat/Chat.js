@@ -1,20 +1,11 @@
-import { use, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import styles from './Chat.module.css';
 import {
-  Add,
-  Delete,
-  AccountCircle,
-  Mic,
-  AttachFile,
   Send,
   Dehaze,
 } from '@mui/icons-material';
-import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
-import TryIcon from '@mui/icons-material/Try';
-import AutoStoriesIcon from '@mui/icons-material/AutoStories';
-import { removeAuthTokenFromCookies } from '../../utils/cookies';
 
+// Api functions
 import {
   getChatsByUserId,
   createChat,
@@ -26,6 +17,9 @@ import {
   generateAIResponseTopic
 } from '../../utils/api';
 
+// Components
+import Sidebar from '../../components/Sidebar/Sidebar';
+
 export default function Chat() {
   const [chats, setChats] = useState([]);
   const [messages, setMessages] = useState([]);
@@ -33,25 +27,6 @@ export default function Chat() {
   const [currentChatId, setCurrentChatId] = useState(null);
   const [isSending, setIsSending] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-
-  const navigate = useNavigate();
-
-  function goToPerfil() {
-    navigate('/perfil');
-  }
-
-  function goToIndex() {
-    removeAuthTokenFromCookies();
-    navigate('/');
-  }
-
-  function goToPalavreco() {
-    navigate('/palavreco');
-  }
-
-  function goToPlanoDeEstudos() {
-    navigate('/teaching-plan');
-  }
 
   useEffect(() => {
     getChatsByUserId()
@@ -132,45 +107,16 @@ export default function Chat() {
 
   return (
     <div className={styles.Chat}>
-      <aside className={`${styles.sidebar} ${!sidebarOpen ? styles.sidebarClosed : ''}`}>
 
-        <div>
-          <div className={styles.header}>
-            <img src="/logo.png" alt="Logo" width={30} />
-            <h3>SpeakUp</h3>
-          </div>
-
-          <button className={styles.newChat} onClick={() => {
-            setCurrentChatId(null);
-            setMessages([]);
-            setInputMessage('');
-            setSidebarOpen(false);
-          }}>
-            <Add />
-          </button>
-
-          <nav>
-            {chats.map(chat => (
-              <a
-                key={chat.id}
-                className={styles.navItem}
-                href="#"
-                onClick={() => setCurrentChatId(chat.id)}
-              >
-                <span>{chat.topic}</span>
-                <Delete />
-              </a>
-            ))}
-          </nav>
-        </div>
-
-        <div className={styles.footer}>
-          <button onClick={goToPlanoDeEstudos}><AutoStoriesIcon /> Plano de Estudo</button>
-          <button onClick={goToPalavreco}><TryIcon /> Palavreco</button>
-          <button onClick={goToPerfil}><AccountCircle /> Perfil</button>
-          <button onClick={goToIndex}><MeetingRoomIcon /> Sair</button>
-        </div>
-      </aside>
+      <Sidebar
+        chats={chats}
+        setChats={setChats}
+        setCurrentChatId={setCurrentChatId}
+        setMessages={setMessages}
+        setInputMessage={setInputMessage}
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+      />
 
       <main className={styles.main}>
         <header className={styles.chatHeader}>
