@@ -1,11 +1,23 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import SendIcon from '@mui/icons-material/Send';
-import SettingsIcon from '@mui/icons-material/Settings';
+import React, { useEffect, useState } from 'react';
+import styles from './Chat.module.css';
+import {
+  Translate,
+  Add,
+  Delete,
+  Settings,
+  AccountCircle,
+  Apps,
+  VolumeUp,
+  ExpandMore,
+  Mic,
+  AttachFile,
+  Send,
+  Dehaze
+} from '@mui/icons-material';
+
 import {
   getChatsByUserId,
   createChat,
-  deleteChat,
   getMessagesByChatId,
   addMessageToChat,
   generateAIResponseDialog,
@@ -13,295 +25,170 @@ import {
   generateAIResponseTranslation,
   generateAIResponseTopic
 } from '../../utils/api';
-import Sidebar from '../../components/Sidebar/Sidebar';
-import styles from './Chat.module.css';
 
-function Chat() {
-  // State Variables
-  const [isSidebarVisible, setIsSidebarVisible] = useState(false);
+export default function Chat() {
   const [chats, setChats] = useState([]);
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [currentChatId, setCurrentChatId] = useState(null);
-  const [showSettingsModal, setShowSettingsModal] = useState(false);
-  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
-  const [isSendingMessage, setIsSendingMessage] = useState(false);
-  const [showWelcomePopup, setShowWelcomePopup] = useState(true);
+  const [isSending, setIsSending] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  // Refs and Navigators
-  const messagesEndRef = useRef(null);
-  const navigate = useNavigate();
-
-  // Handlers
-  const closeWelcomePopup = () => setShowWelcomePopup(false);
-  const handleSettingsClick = () => setShowSettingsModal(true);
-  const closeModal = () => setShowSettingsModal(false);
-  const goToIndex = () => {
-    navigate('/');
-  };
-  const goToHome = () => navigate('/home');
-  const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
-
-  const handleOptionSelect = (option) => {
-    setShowSettingsModal(false);
-  };
-
-  const clearCookies = () => {
-    document.cookie.split(";").forEach(c => {
-      document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-    });
-  };
-
-  // Side effect to load chats
   useEffect(() => {
-    getChatsByUserId().then((response) => {
-      setChats(response.chats || []);
-    }).catch((error) => {
-      console.error("Erro ao buscar chats:", error);
-      setChats([]);
-    });
+    getChatsByUserId()
+      .then(res => setChats(res.chats || []))
+      .catch(() => setChats([]));
   }, []);
 
-  // Side effect to load messages for the current chat
   useEffect(() => {
     if (currentChatId) {
-      loadChatMessages(currentChatId);
-    } else {
-      setMessages([]);
+      getMessagesByChatId(currentChatId)
+        .then(res => {
+          const msgs = res.map(m => ({
+            id: m.id,
+            text: m.content,
+            sender: m.sender,
+            type: m.type
+          }));
+          setMessages(msgs);
+        })
+        .catch(() => setMessages([]));
     }
   }, [currentChatId]);
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  const handleSend = async () => {
+    if (!inputMessage.trim() || isSending) return;
 
-  // Scroll to the bottom of the chat messages
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const loadChatMessages = async (chatId) => {
-    try {
-      setIsLoadingMessages(true);
-      const response = await getMessagesByChatId(chatId);
-      const formattedMessages = response.map(msg => ({
-        id: msg.id,
-        text: msg.content,
-        sender: msg.sender,
-        created_id: msg.created_at,
-        chat_id: msg.chat_id,
-        type: msg.type
-      }));
-      setMessages(formattedMessages);
-    } catch (error) {
-      console.error("Erro ao carregar mensagens:", error);
-      setMessages([]);
-    } finally {
-      setIsLoadingMessages(false);
-    }
-  };
-
-  const handleSendMessage = async () => {
-    if (inputMessage.trim() === '' || isSendingMessage) return;
-
-    setIsSendingMessage(true);
-    const messageContent = inputMessage.trim();
+    setIsSending(true);
+    const userInput = inputMessage.trim();
     setInputMessage('');
 
     try {
       let chatId = currentChatId;
 
-      // Create new chat if no current chat
       if (!chatId) {
-        const topicResponse = await generateAIResponseTopic(messageContent);
-        const newChat = await createChat(topicResponse.response);
+        const topicRes = await generateAIResponseTopic(userInput);
+        const newChat = await createChat(topicRes.response);
         chatId = newChat.id;
         setCurrentChatId(chatId);
-        setChats(prevChats => [...prevChats, newChat]);
+        setChats(prev => [...prev, newChat]);
       }
 
-      const aiCorrectionResponse = await generateAIResponseCorrection(messageContent);
-      const combinedMessageContent = `${messageContent}\n\nCorreção: ${aiCorrectionResponse.response}`;
+      const correction = await generateAIResponseCorrection(userInput);
+      const fullUserMsg = `${userInput}\n\nCorreção: ${correction.response}`;
 
-      // Save user message
-      const savedMessage = await addMessageToChat(chatId, combinedMessageContent, 'user', 'request');
-      setMessages(prevMessages => [...prevMessages, {
-        id: savedMessage.id,
-        text: savedMessage.content,
-        sender: savedMessage.sender || 'user',
-        timestamp: savedMessage.timestamp,
-        chatId: savedMessage.chat_id,
+      const savedUserMsg = await addMessageToChat(chatId, fullUserMsg, 'user', 'request');
+      setMessages(prev => [...prev, {
+        id: savedUserMsg.id,
+        text: fullUserMsg,
+        sender: 'user',
         type: 'request'
       }]);
 
-      // Get AI responses
-      const aiResponseDialog = await generateAIResponseDialog(aiCorrectionResponse.response, chatId);
-      const aiTranslation = await generateAIResponseTranslation(aiResponseDialog.response);
-      const aiResponseWithTranslation = `${aiResponseDialog.response}\n\n[TRANSLATION]: ${aiTranslation.response}`;
+      const dialogRes = await generateAIResponseDialog(correction.response, chatId);
+      const translation = await generateAIResponseTranslation(dialogRes.response);
+      const fullAIResponse = `${dialogRes.response}\n\n[TRANSLATION]: ${translation.response}`;
 
-      // Save AI message
-      const savedAIMessage = await addMessageToChat(chatId, aiResponseWithTranslation, 'ai', 'response');
-      setMessages(prevMessages => [...prevMessages, {
-        id: savedAIMessage.id,
-        text: savedAIMessage.content,
-        sender: savedAIMessage.sender || 'ai',
-        timestamp: savedAIMessage.timestamp,
-        chatId: savedAIMessage.chat_id,
+      const savedBotMsg = await addMessageToChat(chatId, fullAIResponse, 'ai', 'response');
+      setMessages(prev => [...prev, {
+        id: savedBotMsg.id,
+        text: fullAIResponse,
+        sender: 'ai',
         type: 'response'
       }]);
 
-    } catch (error) {
-      console.error("Erro ao processar mensagem:", error);
-      setInputMessage(messageContent);
+    } catch (err) {
+      console.error(err);
+      setInputMessage(userInput);
     } finally {
-      setIsSendingMessage(false);
-    }
-  };
-
-  const handleDeleteChat = async (chatId) => {
-    try {
-      await deleteChat(chatId);
-      setChats(prevChats => prevChats.filter(chat => chat.id !== chatId));
-      if (currentChatId === chatId) {
-        setCurrentChatId(null);
-        setMessages([]);
-        loadChatMessages(null);
-      }
-    } catch (error) {
-      console.error("Erro ao excluir chat:", error);
-    }
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSendMessage();
+      setIsSending(false);
     }
   };
 
   return (
-    <div className={styles.pageHome}>
-      {showWelcomePopup && (
-        <div className={styles.modalOverlay} onClick={closeWelcomePopup}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
-            <h2 className={styles.modalTitle}>👋 Bem-vindo ao Chat de Prática!</h2>
-            <p className={styles.modalDescription}>Aqui você pode praticar o idioma conversando com nossa IA.</p>
-            <ul className={styles.modalList}>
-              <li>✅ Correção gramatical</li>
-              <li>✅ Tradução para o português</li>
-              <li>✅ Diálogos simulados para praticar</li>
-            </ul>
-            <div className={styles.modalExample}>
-              <strong>Exemplos:</strong><br /><br />
-              <em>Entrada:</em> "I ned a car"<br />
-              <em>Saída:</em> "I need a car"<br /><br />
-              <em>Entrada:</em> "How are you doin?"<br />
-              <em>Saída:</em> "How are you doing?"<br /><br />
-              <em>Entrada:</em> "Let's go beach tomorrow?"<br />
-              <em>Saída:</em> "Let's go to the beach tomorrow?"<br /><br />
-              <em>Entrada:</em> "I don't know how say this."<br />
-              <em>Saída:</em> "I don't know how to say this."
-            </div>
-            <button className={styles.optionButton} onClick={closeWelcomePopup}>Entendi!</button>
+    <div className={styles.Chat}>
+      <aside className={`${styles.sidebar} ${!sidebarOpen ? styles.sidebarClosed : ''}`}>
+
+        <div>
+          <div className={styles.header}>
+            <img src="/logo.png" alt="Logo" width={30} />
           </div>
-        </div>
-      )}
 
-      <Sidebar
-        isVisible={isSidebarVisible}
-        toggleSidebar={toggleSidebar}
-        chats={chats}
-        currentChatId={currentChatId}
-        setCurrentChatId={setCurrentChatId}
-        loadChatMessages={loadChatMessages}
-        handleDeleteChat={handleDeleteChat}
-        goToIndex={goToIndex}
-        clearCookies={clearCookies}
-        goToHome={goToHome}
-        setMessages={setMessages}
-      />
-
-      <main className={styles.mainContent}>
-        <div className={`${styles.modalOverlay} ${showSettingsModal ? '' : styles.modalOverlayHidden}`} onClick={closeModal}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <button className={styles.closeButton} onClick={closeModal}>&times;</button>
-            <h3 className={styles.modalTitle}>Escolha o Modelo</h3>
-            <button className={styles.optionButton} onClick={() => handleOptionSelect('OpenAI')}>OpenAI</button>
-            <button className={styles.optionButton} onClick={() => handleOptionSelect('Gemini')}>Gemini</button>
-          </div>
-        </div>
-
-        {!isSidebarVisible && (
-          <button className={`${styles.toggleButton} ${styles.toggleButtonMainContent}`} onClick={toggleSidebar}>
-            &#9776;
+          <button className={styles.newChat} onClick={() => {
+            setCurrentChatId(null);
+            setMessages([]);
+            setInputMessage('');
+          }}>
+            <Add />
           </button>
-        )}
 
-        <div className={styles.divSpeakUp}>
-          <img src='./logo.png' width={50} alt="SpeakUp Logo" />
-          <h2>SpeakUp</h2>
+          <nav>
+            {chats.map(chat => (
+              <a
+                key={chat.id}
+                className={styles.navItem}
+                href="#"
+                onClick={() => setCurrentChatId(chat.id)}
+              >
+                <span>{chat.topic}</span>
+                <Delete />
+              </a>
+            ))}
+          </nav>
         </div>
 
-        <div className={styles.chatContainer}>
-          <div className={styles.messages}>
-            {messages
-              .filter(msg => msg.chatId === currentChatId || msg.chat_id === currentChatId)
-              .map((message) => (
-                <div key={message.id} className={`${styles.message} ${message.sender === 'user' ? styles.user : styles.ai}`}>
-                  {(message.text || message.content).split(/\n{1,}/).map((line, index, lines) => {
-                    if (line.startsWith('[TRANSLATION]: ')) {
-                      return (
-                        <div key={index} style={{ marginTop: "10px", paddingTop: "10px", borderTop: "1px solid #555", color: "#aaa" }}>
-                          <strong>Tradução:</strong> {line.replace('[TRANSLATION]: ', '')}
-                        </div>
-                      );
-                    }
-                    if (index === 1 && line.startsWith('Correção: ')) {
-                      return (
-                        <React.Fragment key={index}>
-                          <hr />
-                          <span style={{ color: '#1eff00' }}>{line.replace('Correção: ', '')}</span>
-                        </React.Fragment>
-                      );
-                    }
-                    return (
-                      <React.Fragment key={index}>
-                        {line}
-                        {index < lines.length - 1 && <br />}
-                      </React.Fragment>
-                    );
-                  })}
-                </div>
-              ))}
-            <div ref={messagesEndRef} />
-          </div>
+        <div className={styles.footer}>
+          <button><Settings /> Configurações</button>
+          <button><AccountCircle /> Perfil</button>
+          <button><Apps /> Menu</button>
+        </div>
+      </aside>
 
-          <div className={styles.chatInput}>
-            <SettingsIcon className={styles.styledSettingsIcon} onClick={handleSettingsClick} />
+      <main className={styles.main}>
+        <header className={styles.chatHeader}>
+          <Dehaze onClick={() => setSidebarOpen(prev => !prev)} className={`${styles.toggleIcon} ${!sidebarOpen ? styles.rotated : ''}`} />
+        </header>
+
+        <div className={styles.chatBody}>
+          {messages.map(msg => (
+            <div
+              key={msg.id}
+              className={msg.sender === 'user' ? styles.userMessage : styles.botMessage}
+            >
+              <div>
+                <p>{msg.text.split('\n\n')[0]}</p>
+                {msg.type === 'request' && (
+                  <div className={styles.responseExtras}>
+                    <p><strong>Correção:</strong> {msg.text.split('\n\n')[1]?.replace('Correção: ', '')}</p>
+                  </div>
+                )}
+                {msg.type === 'response' && (
+                  <div className={styles.responseExtras}>
+                    <p><strong>Tradução:</strong> {msg.text.split('[TRANSLATION]: ')[1]}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <footer className={styles.chatFooter}>
+          <div className={styles.inputBox}>
+            <button><Mic /></button>
             <input
               type="text"
-              placeholder="Digite sua mensagem..."
+              placeholder="Digite sua mensagem aqui..."
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
-              disabled={isSendingMessage}
+              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
             />
-            {isSendingMessage ? (
-              <div className={styles.loadingSpinner} style={{ margin: '0 10px' }} />
-            ) : (
-              <SendIcon
-                onClick={handleSendMessage}
-                style={{ color: "#fff", cursor: "pointer" }}
-                onMouseEnter={(e) => e.target.style.color = "rgb(187, 187, 187)"}
-                onMouseLeave={(e) => e.target.style.color = "#fff"}
-              />
-            )}
+            <button><AttachFile /></button>
+            <button onClick={handleSend} disabled={isSending}>
+              <Send />
+            </button>
           </div>
-        </div>
-
-        <p>Converse com nosso assistente de IA para praticar esse idioma em tempo real, recebendo feedback instantâneo.</p>
+        </footer>
       </main>
     </div>
   );
 }
-
-export default Chat;

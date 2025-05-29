@@ -23,7 +23,7 @@ import (
 )
 
 var aiConnectorBuilder func() connectors.AIConnector = func() connectors.AIConnector {
-	return connectors.NewGeminiConnector()
+	return connectors.NewOpenAIConnector()
 }
 
 // @Summary Gera uma resposta de diálogo usando IA

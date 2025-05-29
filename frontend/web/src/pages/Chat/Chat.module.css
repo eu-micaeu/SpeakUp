@@ -1,447 +1,249 @@
-.pageHome {
+.Chat {
     display: flex;
     height: 100vh;
+    background-color: #111;
+    color: #f0f0f0;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
 }
 
-.mainContent {
-    padding: 10px 20px;
-    background-color: #313131;
+.sidebar {
+    width: 18rem;
+    background-color: #1a1a1a;
+    padding: 1.5rem;
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
+    justify-content: space-between;
+    border-right: 1px solid #333;
+}
+
+.header {
+    display: flex;
+    justify-content: center;
     align-items: center;
-    color: #fff;
+    margin-bottom: 2rem;
+}
+
+.logoArea {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
     width: 100%;
 }
 
-.mainContent img {
-    margin: 5px;
+.logoArea span {
+    font-size: 2rem;
+    color: #ccc;
 }
 
-.toggleButton {
-    background-color: transparent;
-    border: none;
-    font-size: 24px;
+.logoArea h1 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+}
+
+.newChat {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #333;
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
     cursor: pointer;
-    color: #fff;
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    z-index: 1000;
+    gap: 0.5rem;
+    border: none;
 }
 
-.chatContainer {
+.navItem {
+    display: flex;
+    justify-content: space-between;
+    background-color: #2a2a2a;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    color: white;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.navItem:hover {
+    background-color: #1f1f1f;
+}
+
+.footer button {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: none;
+    border: none;
+    color: #ccc;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+}
+
+.footer button:hover {
+    background-color: #333;
+}
+
+.main {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    height: 100%;
-    width: 50%;
-    justify-content: space-between;
+    background-color: #111;
 }
 
-.messages {
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-    max-height: 70vh;
-}
-
-.messages::-webkit-scrollbar {
-    width: 8px;
-}
-
-.messages::-webkit-scrollbar-track {
-    border-radius: 4px;
-}
-
-.messages::-webkit-scrollbar-thumb {
-    background: #555;
-    border-radius: 4px;
-}
-
-.messages::-webkit-scrollbar-thumb:hover {
-    background: #777;
-}
-
-.message {
-    padding: 20px;
-    margin: 8px;
-    line-height: 2;
-    width: 75%;
-}
-
-.message.user {
-    color: #e3f2fd;
-    background-color: #1d1d1d;
-    margin-left: auto;
-    border-radius: 20px 1px 20px 20px;
-}
-
-.message.ai {
-    background-color: #242424;
-    margin-right: auto;
-    position: relative;
-    border-radius: 1px 20px 20px 20px;
-}
-
-.message.ai.correction {
-    background-color: #1eff00;
-    color: #000000;
-    text-align: center;
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-}
-
-.chatInput {
+.chatHeader {
+    background-color: #1a1a1a;
+    padding: 1rem;
+    border-bottom: 1px solid #333;
     display: flex;
-    gap: 10px;
-    width: 100%;
     justify-content: space-between;
     align-items: center;
 }
 
-.chatInput input {
-    flex: 1;
-    padding: 20px;
-    width: 100%;
-    border: none;
-    font-size: 1rem;
-    border-radius: 4px;
-    background-color: #3d3d3d;
-    color: #fff;
-    margin: 10px 0;
+.chatHeader h2 {
+    font-size: 1.25rem;
 }
 
-.chatInput input:focus {
+.langSelector {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #aaa;
+    font-size: 0.875rem;
+}
+
+.chatBody {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    
+    scrollbar-width: none;
+    
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.userMessage,
+.botMessage {
+    display: flex;
+}
+
+.userMessage {
+    justify-content: flex-end;
+}
+
+.botMessage {
+    justify-content: flex-start;
+}
+
+.userMessage div,
+.botMessage div {
+    max-width: 32rem;
+    background-color: #222;
+    color: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.botMessage div {
+    background-color: #1f1f1f;
+    color: #e0e0e0;
+}
+
+.responseExtras {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #333;
+    font-size: 0.75rem;
+}
+
+.responseExtras p {
+    margin-bottom: 0.25rem;
+    color: #aaa;
+}
+
+.chatFooter {
+    background-color: #1a1a1a;
+    padding: 1rem;
+    border-top: 1px solid #333;
+}
+
+.inputBox {
+    display: flex;
+    align-items: center;
+    background-color: #2a2a2a;
+    border-radius: 0.5rem;
+    padding: 0.25rem;
+    gap: 0.5rem;
+}
+
+.inputBox input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: white;
+    padding: 0.75rem;
+    font-size: 0.875rem;
     outline: none;
 }
 
-.btCreateChat {
-    border: none;
-    border-radius: 10px;
-    color: #4CAF50;
-    background-color: transparent;
-    padding: 10px;
-    font-size: 1.2em;
-    cursor: pointer;
-    font-weight: bold;
-    margin: 20px 0;
-    width: 50%;
-    font-family: 'Karla', sans-serif;
-}
-
-.btCreateChat:hover {
-    background-color: #4CAF50;
-    color: #000000;
-}
-
-.divSpeakUp {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-direction: row;
-    margin-bottom: 25px;
-    gap: 20px;
-}
-
-@keyframes rotate {
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-.modalOverlay {
-    position: fixed;
-    inset: 0;
-    background-color: rgba(0, 0, 0, 0.6);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    padding: 16px;
-}
-
-.modalContent {
-    background: #1f1f1f;
-    border-radius: 16px;
-    padding: 32px;
-    max-width: 500px;
-    width: 100%;
-    color: #fff;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    animation: fadeIn 0.3s ease-out;
-}
-
-.modalTitle {
-    font-size: 1.5rem;
-    margin-bottom: 16px;
-    text-align: center;
-}
-
-.modalDescription {
-    font-size: 1rem;
-    text-align: center;
-    margin-bottom: 16px;
-    line-height: 1.6;
-}
-
-.modalList {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 16px 0;
-    line-height: 1.8;
-    text-align: center;
-}
-
-.modalExample {
-    background: #2a2a2a;
-    padding: 12px;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.optionButton {
-    background-color: #4ade80;
-    color: #000;
-    border: none;
-    padding: 10px 24px;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
-.optionButton:hover {
-    background-color: #22c55e;
-}
-
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.optionButton {
-    display: block;
-    width: 100%;
-    padding: 12px 15px;
-    margin: 10px 0;
-    background-color: #313131;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.2s;
-    font-size: 16px;
-}
-
-.optionButton:hover {
-    background-color: #4CAF50;
-    transform: scale(1.005);
-}
-
-.optionButton:active {
-    transform: scale(0.98);
-}
-
-.closeButton {
-    position: absolute;
-    top: 10px;
-    right: 10px;
+.inputBox button {
     background: none;
     border: none;
-    color: #777;
-    font-size: 20px;
+    color: #bbb;
     cursor: pointer;
+    padding: 0.5rem;
 }
 
-.closeButton:hover {
+.inputBox button:hover {
     color: #fff;
 }
 
-.styledSettingsIcon {
-    color: #fff;
-    cursor: pointer;
-    transition: all 0.2s;
+.chatFooter p {
+    text-align: center;
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 0.5rem;
 }
 
-.styledSettingsIcon:hover {
-    animation: rotate 0.5s linear;
-    color: rgb(187, 187, 187);
+.sidebar {
+  width: 250px;
+  background-color: #1a1a1a;
+  padding: 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-right: 1px solid #333;
+  transition: width 0.1s ease;
+  overflow: hidden;
 }
 
-.actionsDiv {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    flex-direction: row;
-    margin-bottom: 25px;
-    gap: 20px;
+.sidebarClosed {
+  width: 30px;
 }
 
-.actionsDiv svg:hover {
-    cursor: pointer;
-}
-
-@keyframes loading {
-    0% {
-        transform: translateX(-100%);
-    }
-
-    100% {
-        transform: translateX(100%);
-    }
-}
-
-.sidebarHidden {
-    width: 0;
-}
-
-.toggleButtonHidden {
+.sidebarClosed .newChat, .sidebarClosed nav, .sidebarClosed .footer {
     display: none;
 }
 
-.toggleButtonMainContent {
-    color: #fff;
-    position: fixed;
-    display: block;
-    left: 20px;
+.toggleIcon {
+    cursor: pointer;
+    transition: transform 0.5s ease;
+    margin: 0.25rem 0;
 }
 
-.toggleButtonMainContentSidebarVisible {
-    left: 320px;
-}
-
-.modalOverlayHidden {
-    display: none;
-}
-
-.loadingSpinner {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 3px solid rgba(255, 255, 255, .3);
-    border-radius: 50%;
-    border-top-color: #fff;
-    animation: spin 1s ease-in-out infinite;
-}
-
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-.spinnerContainer {
-    display: flex;
-    justify-content: center;
-    padding: 20px;
-}
-
-@media screen and (max-width: 768px) {
-
-    .sidebar {
-        width: 100%;
-        height: auto;
-        position: relative;
-        overflow-x: auto;
-        overflow-y: hidden;
-    }
-
-    .sidebar ul {
-        flex-wrap: nowrap;
-        margin: 50px 0;
-    }
-
-    .sidebar ul li {
-        margin: 0 10px;
-        width: auto;
-        padding: 10px 15px;
-        font-size: 0.8rem;
-    }
-
-    .sidebarHidden {
-        display: none;
-    }
-
-    .mainContent {
-        padding: 10px;
-        width: 100%;
-    }
-
-
-    .chatContainer {
-        width: 100%;
-        justify-content: space-between;
-    }
-
-    .message {
-        width: 80%;
-        padding: 15px;
-        font-size: 0.8rem;
-    }
-
-    .btCreateChat {
-        width: 100%;
-    }
-
-    .toggleButton {
-        top: 10px;
-        left: 10px;
-        font-size: 20px;
-    }
-
-    .divSpeakUp {
-        gap: 10px;
-    }
-
-    .divSpeakUp h2 {
-        display: none;
-    }
-
-    .divSpeakUp img {
-        width: 30px;
-        height: 30px;
-    }
-
-    .chatInput {
-        gap: 10px;
-    }
-
-    .chatInput input {
-        width: 100%;
-        margin: 0;
-    }
-
-    .toggleButtonMainContentSidebarVisible {
-        left: 20px;
-    }
-
-    .modalContent {
-        width: 90%;
-        padding: 20px;
-    }
-
-    .optionButton {
-        font-size: 14px;
-    }
-
-    p {
-        font-size: 8px;
-        line-height: 1.5;
-    }
+.rotated {
+    transform: rotate(360deg);
 }
