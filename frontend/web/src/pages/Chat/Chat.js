@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './Chat.module.css';
 import {
-  Translate,
   Add,
   Delete,
-  Settings,
   AccountCircle,
-  Apps,
-  VolumeUp,
-  ExpandMore,
   Mic,
   AttachFile,
   Send,
-  Dehaze
+  Dehaze,
 } from '@mui/icons-material';
+import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
+import TryIcon from '@mui/icons-material/Try';
+import AutoStoriesIcon from '@mui/icons-material/AutoStories';
+import { removeAuthTokenFromCookies } from '../../utils/cookies';
 
 import {
   getChatsByUserId,
@@ -33,6 +33,25 @@ export default function Chat() {
   const [currentChatId, setCurrentChatId] = useState(null);
   const [isSending, setIsSending] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  const navigate = useNavigate();
+
+  function goToPerfil() {
+    navigate('/perfil');
+  }
+
+  function goToIndex() {
+    removeAuthTokenFromCookies();
+    navigate('/');
+  }
+
+  function goToPalavreco() {
+    navigate('/palavreco');
+  }
+
+  function goToPlanoDeEstudos() {
+    navigate('/teaching-plan');
+  }
 
   useEffect(() => {
     getChatsByUserId()
@@ -112,12 +131,14 @@ export default function Chat() {
         <div>
           <div className={styles.header}>
             <img src="/logo.png" alt="Logo" width={30} />
+            <h3>SpeakUp</h3>
           </div>
 
           <button className={styles.newChat} onClick={() => {
             setCurrentChatId(null);
             setMessages([]);
             setInputMessage('');
+            setSidebarOpen(false);
           }}>
             <Add />
           </button>
@@ -138,9 +159,10 @@ export default function Chat() {
         </div>
 
         <div className={styles.footer}>
-          <button><Settings /> Configurações</button>
-          <button><AccountCircle /> Perfil</button>
-          <button><Apps /> Menu</button>
+          <button onClick={goToPlanoDeEstudos}><AutoStoriesIcon /> Plano de Estudo</button>
+          <button onClick={goToPalavreco}><TryIcon /> Palavreco</button>
+          <button onClick={goToPerfil}><AccountCircle /> Perfil</button>
+          <button onClick={goToIndex}><MeetingRoomIcon /> Sair</button>
         </div>
       </aside>
 
@@ -174,7 +196,6 @@ export default function Chat() {
 
         <footer className={styles.chatFooter}>
           <div className={styles.inputBox}>
-            <button><Mic /></button>
             <input
               type="text"
               placeholder="Digite sua mensagem aqui..."
@@ -182,7 +203,6 @@ export default function Chat() {
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
             />
-            <button><AttachFile /></button>
             <button onClick={handleSend} disabled={isSending}>
               <Send />
             </button>

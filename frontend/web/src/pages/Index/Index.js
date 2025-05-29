@@ -28,7 +28,7 @@ function Index() {
 
   useEffect(() => {
     if (isAuthTokenValid()) {
-      window.location.href = '/home';
+      window.location.href = '/chat';
     }
   }, [isAuthTokenValid]);
 

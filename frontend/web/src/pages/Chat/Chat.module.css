@@ -3,25 +3,39 @@
     height: 100vh;
     background-color: #111;
     color: #f0f0f0;
-    font-family: 'Inter', sans-serif;
     overflow: hidden;
-}
-
-.sidebar {
-    width: 18rem;
-    background-color: #1a1a1a;
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    border-right: 1px solid #333;
 }
 
 .header {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    align-items: end;
     margin-bottom: 2rem;
+    gap: 1rem;
+    justify-content: space-between;
+}
+
+.header h3 {
+    color: #ccc;
+    margin: 0;
+    font-family: 'Karla', sans-serif;
+    background: linear-gradient(270deg,
+            #ffffff, #bfbfbf, #a0a0a0, #8a8a8a, #bfbfbf, #ffffff);
+    background-size: 200% auto;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    animation: chromeShine 6s ease-in-out infinite;
+}
+
+@keyframes chromeShine {
+    0% {
+        background-position: 0% center;
+    }
+
+    100% {
+        background-position: -200% center;
+    }
 }
 
 .logoArea {
@@ -77,6 +91,7 @@
 
 .footer button {
     display: flex;
+    width: 100%;
     align-items: center;
     gap: 0.75rem;
     background: none;
@@ -85,6 +100,7 @@
     padding: 0.75rem 1rem;
     border-radius: 0.5rem;
     cursor: pointer;
+    font-family: 'Karla', sans-serif;
 }
 
 .footer button:hover {
@@ -121,14 +137,14 @@
 
 .chatBody {
     flex: 1;
-    padding: 1.5rem;
+    padding: 1rem;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    
+
     scrollbar-width: none;
-    
+
     &::-webkit-scrollbar {
         display: none;
     }
@@ -160,6 +176,12 @@
 .botMessage div {
     background-color: #1f1f1f;
     color: #e0e0e0;
+    border-radius: 0 20px 20px 20px;
+}
+
+.userMessage div {
+    color: white;
+    border-radius: 20px 0 20px 20px;
 }
 
 .responseExtras {
@@ -219,31 +241,56 @@
 }
 
 .sidebar {
-  width: 250px;
-  background-color: #1a1a1a;
-  padding: 1rem 1.5rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  border-right: 1px solid #333;
-  transition: width 0.1s ease;
-  overflow: hidden;
+    width: 250px;
+    background-color: #1a1a1a;
+    padding: 1rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-right: 1px solid #333;
+    transition: width 0.1s ease;
+    min-width: 250px;
+    overflow-y: scroll;
+
+    scrollbar-width: none;
 }
 
 .sidebarClosed {
-  width: 30px;
+    width: 30px;
+    min-width: 30px !important;
 }
 
-.sidebarClosed .newChat, .sidebarClosed nav, .sidebarClosed .footer {
+.sidebarClosed .newChat,
+.sidebarClosed nav,
+.sidebarClosed .footer,
+.sidebarClosed .header h3 {
     display: none;
 }
 
 .toggleIcon {
     cursor: pointer;
-    transition: transform 0.5s ease;
+    transition: transform 0.2s ease;
     margin: 0.25rem 0;
 }
 
 .rotated {
     transform: rotate(360deg);
+}
+
+@media screen and (max-width: 768px) {
+
+    .sidebarClosed {
+        width: 0;
+        padding: 0;
+        min-width: 0 !important;
+    }
+
+    .sidebarClosed .newChat,
+    .sidebarClosed nav,
+    .sidebarClosed .footer,
+    .sidebarClosed .header {
+        display: none;
+    }
+
+    
 }

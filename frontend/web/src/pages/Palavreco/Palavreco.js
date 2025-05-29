@@ -73,7 +73,7 @@ function Palavreco() {
         <div className={styles.pageContainer}>
             <ArrowBackIcon
                 className={styles.backArrow}
-                onClick={() => navigate('/home')}
+                onClick={() => navigate('/chat')}
             />
             <div className={styles.progressIndicator}>
                 {words.length > 0 && `Palavra ${currentWordIndex + 1} de ${words.length}`}

@@ -41,7 +41,7 @@ function OnBoarding() {
 
         try {
             await updateUser(userId, { language, level });
-            navigate('/home');
+            navigate('/chat');
         } catch (error) {
             alert('Erro ao salvar suas preferências.');
         }
