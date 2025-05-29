@@ -126,17 +126,16 @@ function Index() {
     <>
       <main className={styles.main}>
         <div ref={mountRef} className={styles.particles} />
-
         <section className={styles.hero}>
-          <img src="logo.png" alt="Logo" className={styles.logo} />
+          <img src="logo.png" alt="Logo" width={60}/>
           <h1 className={styles.heroTitle}>SpeakUp</h1>
           <p className={styles.heroSubtitle}>
             Aprendizado personalizado com correções, explicações e evolução contínua.
           </p>
           <a href="/login" className={styles.cta}>Vamos começar!</a>
         </section>
-
         <section className={styles.featureSection}>
+          <h1>Recursos</h1>
           {cardData.map((card, index) => (
             <FeatureCard
               key={index}

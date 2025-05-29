@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './Chat.module.css';
 import {
@@ -74,6 +74,12 @@ export default function Chat() {
         .catch(() => setMessages([]));
     }
   }, [currentChatId]);
+
+  useEffect(() => {
+    if (window.innerWidth <= 768) {
+      setSidebarOpen(false);
+    }
+  }, []);
 
   const handleSend = async () => {
     if (!inputMessage.trim() || isSending) return;
