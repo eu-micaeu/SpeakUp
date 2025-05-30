@@ -1,12 +1,15 @@
 import styles from './Perfil.module.css';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import PersonIcon from '@mui/icons-material/Person';
 import { useState, useEffect } from 'react';
-import { updateUser } from '../../utils/api';
 import { toast, ToastContainer } from 'react-toastify';
+
+// Api functions
+import { updateUser } from '../../utils/api';
+
+// Utils
 import { getDecodedToken, isAuthTokenValid } from '../../utils/cookies';
 
-function Perfil(){
+function Perfil() {
     const [profileData, setProfileData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -22,12 +25,8 @@ function Perfil(){
         const fetchProfileData = async () => {
             try {
 
-                console.log(getDecodedToken);
-
                 const data = getDecodedToken();
 
-                console.log('Dados do token decodificado:', data);
-                
                 setProfileData({
                     name: data.name,
                     email: data.email,
@@ -70,29 +69,23 @@ function Perfil(){
             ...prev,
             [field]: value
         }));
-        
+
         if (field === 'language') {
             if (value === 'english') {
                 setLevels(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']);
-            } else if (value === 'japanese') {
-                setLevels(['N5', 'N4', 'N3', 'N2', 'N1']);
-            } else {
-                setLevels([]);
             }
         }
     };
 
     const handleSave = async () => {
         try {
-            setLoading(true);
-            setError(null);
-            
-            const userId = getDecodedToken().user.id;
+
+            const userId = getDecodedToken().user_id;
 
             await updateUser(userId, editedData);
-            
-            toast.success('Perfil atualizado com sucesso!'); // Adiciona a notificação de toast
-            
+
+            toast.success('Perfil atualizado com sucesso!');
+
             setProfileData(prev => ({
                 ...prev,
                 name: `${editedData.name}`,
@@ -102,9 +95,7 @@ function Perfil(){
             }));
 
         } catch (error) {
-            console.error('Erro ao atualizar perfil:', error);
-            setError('Falha ao atualizar o perfil. Por favor, tente novamente.');
-            toast.error('Falha ao atualizar o perfil.'); // Opcional: Adiciona toast de erro
+            toast.error('Falha ao atualizar o perfil.');
         } finally {
             setLoading(false);
         }
@@ -115,11 +106,6 @@ function Perfil(){
             return <p>Carregando dados do perfil...</p>;
         }
 
-        if (error) {
-            // Mantém a exibição de erro no componente, mas o toast também pode ser usado
-            return <p>Erro: {error}</p>; 
-        }
-
         if (!profileData) {
             return <p>Nenhum dado de perfil encontrado</p>;
         }
@@ -127,9 +113,6 @@ function Perfil(){
         return (
             <div className={styles.profileContainer}>
                 <div className={styles.profileHeader}>
-                    <div className={styles.avatarContainer}>
-                        <PersonIcon style={{ width: '100%', height: '100%', color: '#fff' }} />
-                    </div>
                     <div className={styles.userNames}>
                         <h1 className={styles.userName}>{editedData.name}</h1>
                         <p className={styles.userEmail}>{editedData.email}</p>
@@ -200,8 +183,8 @@ function Perfil(){
                             </select>
                         </div>
                         <div className={styles.infoField}>
-                            <button 
-                                className={styles.saveButton} 
+                            <button
+                                className={styles.saveButton}
                                 onClick={handleSave}
                                 disabled={loading}
                             >
@@ -209,7 +192,7 @@ function Perfil(){
                             </button>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
         );

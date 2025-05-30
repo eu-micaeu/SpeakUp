@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './Sidebar.module.css';
 import {
@@ -7,7 +8,18 @@ import {
     MeetingRoom,
     Try as TryIcon,
     AutoStories as AutoStoriesIcon,
+    Settings
 } from '@mui/icons-material';
+import {
+    Modal,
+    Box,
+    Button,
+    List,
+    ListItem,
+    ListItemIcon,
+    ListItemText,
+    Typography
+} from '@mui/material';
 
 // Api functions
 import {
@@ -27,6 +39,7 @@ export default function Sidebar({
     setSidebarOpen
 }) {
     const navigate = useNavigate();
+    const [openSettings, setOpenSettings] = useState(false);
 
     const handleNewChat = () => {
         setCurrentChatId(null);
@@ -35,13 +48,25 @@ export default function Sidebar({
         setSidebarOpen(false);
     };
 
-    const goToPerfil = () => navigate('/perfil');
+    const goToPerfil = () => {
+        navigate('/perfil');
+        setOpenSettings(false);
+    };
     const goToIndex = () => {
         removeAuthTokenFromCookies();
         navigate('/');
+        setOpenSettings(false);
     };
     const goToPalavreco = () => navigate('/palavreco');
     const goToPlanoDeEstudos = () => navigate('/teaching-plan');
+
+    const handleOpenSettings = () => {
+        setOpenSettings(true);
+    };
+
+    const handleCloseSettings = () => {
+        setOpenSettings(false);
+    };
 
     return (
         <aside className={`${styles.sidebar} ${!sidebarOpen ? styles.sidebarClosed : ''}`}>
@@ -95,15 +120,45 @@ export default function Sidebar({
                     <TryIcon fontSize="small" />
                     <span>Palavreco</span>
                 </button>
-                <button onClick={goToPerfil}>
-                    <AccountCircle fontSize="small" />
-                    <span>Perfil</span>
-                </button>
-                <button onClick={goToIndex}>
-                    <MeetingRoom fontSize="small" />
-                    <span>Sair</span>
+                <button onClick={handleOpenSettings}>
+                    <Settings fontSize="small" />
+                    <span>Configurações</span>
                 </button>
             </div>
+
+            <Modal
+                open={openSettings}
+                onClose={handleCloseSettings}
+                aria-labelledby="settings-modal-title"
+                aria-describedby="settings-modal-description"
+            >
+                <Box sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: 300,
+                    bgcolor: 'black',
+                    boxShadow: 24,
+                    p: 2,
+                    borderRadius: 1
+                }}>
+                    <List>
+                        <ListItem button onClick={goToPerfil} sx={{ borderRadius: "10px", '&:hover': { cursor: 'pointer', backgroundColor: "#2a2a2a" } }}>
+                            <ListItemIcon>
+                                <AccountCircle fontSize="small" sx={{color: "white"}} />
+                            </ListItemIcon>
+                            <ListItemText primary="Perfil" sx={{color: "white"}} />
+                        </ListItem>
+                        <ListItem button onClick={goToIndex} sx={{ borderRadius: "10px", '&:hover': { cursor: 'pointer', backgroundColor: "#2a2a2a" } }}>
+                            <ListItemIcon>
+                                <MeetingRoom fontSize="small" sx={{color: "red"}} />
+                            </ListItemIcon>
+                            <ListItemText primary="Sair" sx={{color: "red"}} />
+                        </ListItem>
+                    </List>
+                </Box>
+            </Modal>
         </aside>
     );
 }
