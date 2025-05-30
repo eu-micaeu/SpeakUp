@@ -31,8 +31,8 @@ function Login() {
         navigate('/');
     };
 
-    const goToHome = () => {
-        navigate('/home');
+    const goToChat = () => {
+        navigate('/chat');
     };
 
     const handleLogin = async (event) => {
@@ -46,7 +46,7 @@ function Login() {
             if (response) {
                 toast.success('Login realizado com sucesso!');
                 setTimeout(() => {
-                    goToHome();
+                    goToChat();
                 }, 2000);
             } else {
                 toast.error('Email ou senha inválidos');
@@ -85,7 +85,7 @@ function Login() {
                 if (isFirstTime) {
                     navigate('/onboarding'); // redireciona para tela de seleção de level/language
                 } else {
-                    goToHome();
+                    goToChat();
                 }
             }, 2000);
 

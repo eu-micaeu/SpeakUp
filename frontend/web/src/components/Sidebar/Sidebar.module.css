@@ -1,97 +1,217 @@
-.sidebar {
-    width: 400px;
-    background-color: #000;
-    color: #fff;
+.header {
     display: flex;
-    flex-direction: column;
+    align-items: end;
+    margin-bottom: 2rem;
+    gap: 1rem;
     justify-content: space-between;
-    transition: width 0.1s ease-in-out;
-    overflow: hidden;
 }
 
-.sidebarHidden {
-    width: 0;
-    overflow: hidden;
-}
-
-.sidebar ul {
-    margin: 70px 0;
-    padding: 0;
-    list-style: none;
+.header h3 {
+    color: #ccc;
+    height: 100%;
     display: flex;
-    flex-direction: column;
     align-items: center;
+    justify-content: center;
+    margin: 0;
+    font-family: 'Karla', sans-serif;
+    background: linear-gradient(270deg,
+            #ffffff, #bfbfbf, #a0a0a0, #8a8a8a, #bfbfbf, #ffffff);
+    background-size: 200% auto;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    animation: chromeShine 6s ease-in-out infinite;
 }
 
-.sidebar ul li {
-    padding: 10px;
-    margin: 5px 0;
-    background-color: #313131;
-    border-radius: 10px;
+@keyframes chromeShine {
+    0% {
+        background-position: 0% center;
+    }
+
+    100% {
+        background-position: -200% center;
+    }
+}
+
+.logoArea {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+}
+
+.logoArea span {
+    font-size: 2rem;
+    color: #ccc;
+}
+
+.logoArea h1 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+}
+
+.newChat {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #333;
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
     cursor: pointer;
-    white-space: nowrap;
-    overflow: hidden;
-    text-align: center;
+    gap: 0.5rem;
+    border: none;
+}
+
+.navItem {
     display: flex;
     justify-content: space-between;
+    background-color: #2a2a2a;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    color: white;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.navItem span {
+    display: flex;
     align-items: center;
-    width: 80%;
+    justify-self: center;
 }
 
-.sidebar ul li:hover {
-    background-color: #424242;
+.navItem:hover {
+    background-color: #1f1f1f;
+    cursor: pointer;
+    user-select: none;
 }
 
-.toggleButton {
+.navItem .deleteButton {
     background-color: transparent;
     border: none;
-    font-size: 24px;
+    color: #ff4d4d;
     cursor: pointer;
-    color: #fff;
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    z-index: 1000;
+    font-size: 0.875rem;
+    padding: 0;
 }
 
-.activeChat {
-    background-color: #505050;
+.navItem .deleteButton:hover {
+    color: #ffffff;
 }
 
-.btCreateChat {
-    background-color: #1f1f1f;
-    color: white;
-    font-size: 24px;
-    border: none;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    margin-top: 10px;
-    cursor: pointer;
-}
-
-.btCreateChat:hover {
-    background-color: #2f2f2f;
-}
-
-.actionsDiv {
+.footer button {
     display: flex;
-    justify-content: space-around;
-    padding: 20px;
-}
-
-.actionsDiv svg:hover {
+    width: 100%;
+    align-items: center;
+    gap: 0.75rem;
+    background: none;
+    border: none;
+    color: #ccc;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
     cursor: pointer;
+    font-family: 'Karla', sans-serif;
 }
 
-.toggleButtonHidden {
+.footer button:hover {
+    background-color: #333;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #1a1a1a;
+    padding: 1rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-right: 1px solid #333;
+    transition: width 0.1s ease;
+    min-width: 250px;
+    overflow-y: scroll;
+
+    scrollbar-width: none;
+}
+
+.sidebarClosed {
+    width: 30px;
+    min-width: 30px !important;
+}
+
+.sidebarClosed .newChat,
+.sidebarClosed nav,
+.sidebarClosed .footer,
+.sidebarClosed .header h3 {
     display: none;
 }
 
-.deleteIcon {
-    color: #ff0000;
+.rotated {
+    transform: rotate(360deg);
 }
 
-.deleteIcon:hover {
-    color: #fff;
+/* Adicione esses estilos ao seu arquivo Sidebar.module.css */
+
+.sidebarContent {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.chatList {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 10px;    
+    scrollbar-width: thin;
+    scrollbar-color: #555 #222;
+}
+
+.chatList::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chatList::-webkit-scrollbar-track {
+    background: #222;
+}
+
+.chatList::-webkit-scrollbar-thumb {
+    background-color: #555;
+    border-radius: 6px;
+}
+
+.selected {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    border-left: 3px solid #4CAF50;
+}
+
+.selectedChatPreview {
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media screen and (max-width: 768px) {
+
+    .sidebarClosed {
+        width: 0;
+        padding: 0;
+        min-width: 0 !important;
+    }
+
+    .sidebarClosed .newChat,
+    .sidebarClosed nav,
+    .sidebarClosed .footer,
+    .sidebarClosed .header {
+        display: none;
+    }
+
+
 }

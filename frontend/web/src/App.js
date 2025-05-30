@@ -1,11 +1,11 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 
 // Pages
 import Index from './pages/Index/Index';
 import Login from './pages/Login/Login';
 import Register from './pages/Register/Register';
 import Chat from './pages/Chat/Chat';
-import Home from './pages/Home/Home';
 import TeachingPlan from './pages/TeachingPlan/TeachingPlan';
 import Perfil from './pages/Perfil/Perfil';
 import OnBoarding from './pages/OnBoarding/OnBoarding';
@@ -39,14 +39,6 @@ function App() {
           }
         />
         <Route
-          path="/home"
-          element={
-            <PrivateRoute>
-              <Home />
-            </PrivateRoute>
-          }
-        />
-        <Route
           path="/perfil"
           element={
             <PrivateRoute>
@@ -62,6 +54,7 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
   );

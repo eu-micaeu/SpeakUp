@@ -29,19 +29,10 @@
     max-width: 800px;
     width: 100%;
     background-color: #1a1a1a;
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 
-                0 1px 3px rgba(0, 0, 0, 0.1),
-                0 0 0 1px rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
     padding: 20px 40px;
     margin: 60px auto 10px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.profileContainer:hover {
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 
-                0 1px 3px rgba(0, 0, 0, 0.1),
-                0 0 0 1px rgba(255, 255, 255, 0.07);
 }
 
 .profileHeader {
@@ -133,10 +124,6 @@
     transition: transform 0.2s ease;
 }
 
-.infoField:hover {
-    transform: translateX(5px);
-}
-
 .infoField label {
     display: block;
     margin-bottom: 10px;
@@ -218,7 +205,6 @@
 }
 
 .saveButton {
-    margin: 10px 0;
     width: 100%;
     background: #404040;
     color: #ffffff;
@@ -229,47 +215,31 @@
     font-weight: 600;
     font-family: 'Karla', sans-serif;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    letter-spacing: 0.5px;
     position: relative;
     overflow: hidden;
 }
 
 .saveButton:hover {
     background: #505050;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
 }
 
-.saveButton:active {
-    transform: translateY(1px);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+.deleteButton{
+    width: 100%;
+    background: #ff4d4d;
+    color: #ffffff;
+    padding: 16px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: 'Karla', sans-serif;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
 }
 
-.saveButton:disabled {
-    background: #333333;
-    cursor: not-allowed;
-    opacity: 0.7;
-    box-shadow: none;
-}
-
-.saveButton::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 5px;
-    height: 5px;
-    background: rgba(255, 255, 255, 0.5);
-    opacity: 0;
-    border-radius: 100%;
-    transform: scale(1, 1) translate(-50%);
-    transform-origin: 50% 50%;
-}
-
-.saveButton:focus:not(:active)::after {
-    animation: ripple 1s ease-out;
+.saveButton:active, .deleteButton:active {
+    transform: scale(0.95);
 }
 
 @keyframes ripple {
