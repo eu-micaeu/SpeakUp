@@ -163,12 +163,12 @@ export default function Sidebar({
                             </ListItemIcon>
                             <ListItemText primary="Sair" sx={{color: "red"}} />
                         </ListItem>
-                        <ListItem button onClick={() => navigate('/about')} sx={{ borderRadius: "10px", '&:hover': { cursor: 'pointer', backgroundColor: "#2a2a2a" } }}>
+                        {/* <ListItem button onClick={() => navigate('/about')} sx={{ borderRadius: "10px", '&:hover': { cursor: 'pointer', backgroundColor: "#2a2a2a" } }}>
                             <ListItemIcon>
                                 <InfoIcon fontSize="small" sx={{color: "white"}} />
                             </ListItemIcon>
                             <ListItemText primary="Sobre" sx={{color: "white"}} />
-                        </ListItem>
+                        </ListItem> */}
                     </List>
                 </Box>
             </Modal>

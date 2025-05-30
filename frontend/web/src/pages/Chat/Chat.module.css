@@ -157,3 +157,25 @@
     padding: 20px;
     border-radius: 0.5rem;
 }
+
+.scrollDownButton {
+  position: fixed;
+  bottom: 100px;
+  right: 20px;
+  background-color: #2a2a2a;
+  color: white;
+  border: none;
+  border-radius: 25%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+}
+
+.scrollDownButton:hover {
+  background-color: #383838;
+}

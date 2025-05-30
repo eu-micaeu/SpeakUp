@@ -4,9 +4,9 @@ import {
   Send,
   Dehaze,
 } from '@mui/icons-material';
-import CircularProgress from '@mui/material/CircularProgress'; // 1. IMPORTAÇÃO ADICIONADA
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import CircularProgress from '@mui/material/CircularProgress';
 
-// Api functions
 import {
   getChatsByUserId,
   createChat,
@@ -18,7 +18,6 @@ import {
   generateAIResponseTopic
 } from '../../utils/api';
 
-// Components
 import Sidebar from '../../components/Sidebar/Sidebar';
 
 export default function Chat() {
@@ -29,8 +28,10 @@ export default function Chat() {
   const [isSending, setIsSending] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedChat, setSelectedChat] = useState(null);
+  const [showScrollDown, setShowScrollDown] = useState(false);
 
   const messagesEndRef = useRef(null);
+  const chatBodyRef = useRef(null);
 
   useEffect(() => {
     getChatsByUserId()
@@ -67,10 +68,23 @@ export default function Chat() {
   }, []);
 
   useEffect(() => {
-
-    messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
-    
+    if (!showScrollDown) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+    }
   }, [messages]);
+
+  useEffect(() => {
+    const chatDiv = chatBodyRef.current;
+    if (!chatDiv) return;
+
+    const handleScroll = () => {
+      const nearBottom = chatDiv.scrollHeight - chatDiv.scrollTop - chatDiv.clientHeight < 100;
+      setShowScrollDown(!nearBottom);
+    };
+
+    chatDiv.addEventListener('scroll', handleScroll);
+    return () => chatDiv.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleSend = async () => {
     if (!inputMessage.trim() || isSending) return;
@@ -147,8 +161,7 @@ export default function Chat() {
           <Dehaze onClick={() => setSidebarOpen(prev => !prev)} className={`${styles.toggleIcon} ${!sidebarOpen ? styles.rotated : ''}`} />
         </header>
 
-        <div className={styles.chatBody}>
-
+        <div className={styles.chatBody} ref={chatBodyRef}>
           {messages.length === 0 && (
             <div className={styles.welcomeBox}>
               <h2>Bem-vindo ao Chat de Prática!</h2>
@@ -168,7 +181,6 @@ export default function Chat() {
               </div>
             </div>
           )}
-
 
           {messages.map(msg => (
             <div
@@ -193,6 +205,14 @@ export default function Chat() {
 
           <div ref={messagesEndRef} />
 
+          {showScrollDown && (
+            <button
+              className={styles.scrollDownButton}
+              onClick={() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })}
+            >
+              <ExpandMoreIcon />
+            </button>
+          )}
         </div>
 
         <footer className={styles.chatFooter}>
@@ -202,11 +222,10 @@ export default function Chat() {
               placeholder="Digite sua mensagem aqui..."
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && !isSending && handleSend()} // 2. MODIFICADO: Adicionado !isSending
-              disabled={isSending} // 3. MODIFICADO: Adicionado disabled
+              onKeyDown={(e) => e.key === 'Enter' && !isSending && handleSend()}
+              disabled={isSending}
             />
             <button onClick={handleSend} disabled={isSending}>
-              {/* 4. MODIFICAÇÃO PRINCIPAL: Renderização condicional do ícone ou spinner */}
               {isSending ? (
                 <CircularProgress size={24} color="inherit" />
               ) : (
