@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import styles from './Chat.module.css';
 import {
   Send,
@@ -27,9 +27,8 @@ export default function Chat() {
   const [currentChatId, setCurrentChatId] = useState(null);
   const [isSending, setIsSending] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [showWelcomePopup, setShowWelcomePopup] = useState(true);
 
-  const closeWelcomePopup = () => setShowWelcomePopup(false);
+  const messagesEndRef = useRef(null);
 
   useEffect(() => {
     getChatsByUserId()
@@ -48,6 +47,8 @@ export default function Chat() {
             type: m.type
           }));
           setMessages(msgs);
+          // Garante que role para o final depois de atualizar
+          setTimeout(scrollToBottom, 100);
         })
         .catch(() => setMessages([]));
     }
@@ -58,6 +59,14 @@ export default function Chat() {
       setSidebarOpen(false);
     }
   }, []);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   const handleSend = async () => {
     if (!inputMessage.trim() || isSending) return;
@@ -174,6 +183,9 @@ export default function Chat() {
               </div>
             </div>
           ))}
+
+          <div ref={messagesEndRef} />
+
         </div>
 
         <footer className={styles.chatFooter}>

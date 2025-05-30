@@ -18,7 +18,6 @@ import {
     ListItem,
     ListItemIcon,
     ListItemText,
-    Typography
 } from '@mui/material';
 
 // Api functions
@@ -87,7 +86,6 @@ export default function Sidebar({
                             className={styles.navItem}
                             onClick={() => {
                                 setCurrentChatId(chat.id);
-                                setSidebarOpen(false);
                             }}
                         >
                             <span>{chat.topic}</span>
