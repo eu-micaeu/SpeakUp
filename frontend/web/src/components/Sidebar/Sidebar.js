@@ -8,12 +8,11 @@ import {
     MeetingRoom,
     Try as TryIcon,
     AutoStories as AutoStoriesIcon,
-    Settings
+    Settings,
 } from '@mui/icons-material';
 import {
     Modal,
     Box,
-    Button,
     List,
     ListItem,
     ListItemIcon,
@@ -35,7 +34,9 @@ export default function Sidebar({
     setMessages,
     setInputMessage,
     sidebarOpen,
-    setSidebarOpen
+    setSidebarOpen,
+    selectedChat,
+    setSelectedChat
 }) {
     const navigate = useNavigate();
     const [openSettings, setOpenSettings] = useState(false);
@@ -44,7 +45,13 @@ export default function Sidebar({
         setCurrentChatId(null);
         setMessages([]);
         setInputMessage('');
+        setSelectedChat(null);
         setSidebarOpen(false);
+    };
+
+    const handleChatClick = (chat) => {
+        setCurrentChatId(chat.id);
+        setSelectedChat(chat);
     };
 
     const goToPerfil = () => {
@@ -69,59 +76,60 @@ export default function Sidebar({
 
     return (
         <aside className={`${styles.sidebar} ${!sidebarOpen ? styles.sidebarClosed : ''}`}>
-            <div>
-                <div className={styles.header}>
-                    <img src="/logo.png" alt="Logo" width={30} />
-                    <h3>SpeakUp</h3>
+            <div className={styles.sidebarContent}>
+                <div>
+                    <div className={styles.header}>
+                        <img src="/logo.png" alt="Logo" width={30} />
+                        <h3>SpeakUp</h3>
+                    </div>
+
+                    <button className={styles.newChat} onClick={handleNewChat}>
+                        <Add />
+                    </button>
+
+                    <nav className={styles.chatList}>
+                        {chats.map(chat => (
+                            <div
+                                key={chat.id}
+                                className={`${styles.navItem} ${selectedChat?.id === chat.id ? styles.selected : ''}`}
+                                onClick={() => handleChatClick(chat)}
+                            >
+                                <span>{chat.topic}</span>
+                                <button
+                                    className={styles.deleteButton}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        deleteChat(chat.id)
+                                            .then(() => {
+                                                setMessages([]);
+                                                setCurrentChatId(null);
+                                                setSelectedChat(null);
+                                                setChats(chats.filter(c => c.id !== chat.id));
+                                            })
+                                            .catch(err => console.error('Error deleting chat:', err));
+                                    }}
+                                >
+                                    <Delete fontSize="small" />
+                                </button>
+                            </div>
+                        ))}
+                    </nav>
                 </div>
 
-                <button className={styles.newChat} onClick={handleNewChat}>
-                    <Add />
-                </button>
-
-                <nav className={styles.chatList}>
-                    {chats.map(chat => (
-                        <div
-                            key={chat.id}
-                            className={styles.navItem}
-                            onClick={() => {
-                                setCurrentChatId(chat.id);
-                            }}
-                        >
-                            <span>{chat.topic}</span>
-                            <button
-                                className={styles.deleteButton}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    deleteChat(chat.id)
-                                        .then(() => {
-                                            setMessages([]);
-                                            setCurrentChatId(null);
-                                            setChats(chats.filter(c => c.id !== chat.id));
-                                        })
-                                        .catch(err => console.error('Error deleting chat:', err));
-                                }}
-                            >
-                                <Delete fontSize="small" />
-                            </button>
-                        </div>
-                    ))}
-                </nav>
-            </div>
-
-            <div className={styles.footer}>
-                <button onClick={goToPlanoDeEstudos}>
-                    <AutoStoriesIcon fontSize="small" />
-                    <span>Plano de Estudo</span>
-                </button>
-                <button onClick={goToPalavreco}>
-                    <TryIcon fontSize="small" />
-                    <span>Palavreco</span>
-                </button>
-                <button onClick={handleOpenSettings}>
-                    <Settings fontSize="small" />
-                    <span>Configurações</span>
-                </button>
+                <div className={styles.footer}>
+                    <button onClick={goToPlanoDeEstudos}>
+                        <AutoStoriesIcon fontSize="small" />
+                        <span>Plano de Estudo</span>
+                    </button>
+                    <button onClick={goToPalavreco}>
+                        <TryIcon fontSize="small" />
+                        <span>Palavreco</span>
+                    </button>
+                    <button onClick={handleOpenSettings}>
+                        <Settings fontSize="small" />
+                        <span>Configurações</span>
+                    </button>
+                </div>
             </div>
 
             <Modal
@@ -135,11 +143,11 @@ export default function Sidebar({
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
-                    width: 300,
+                    width: 200,
                     bgcolor: 'black',
                     boxShadow: 24,
                     p: 2,
-                    borderRadius: 1
+                    borderRadius: 5
                 }}>
                     <List>
                         <ListItem button onClick={goToPerfil} sx={{ borderRadius: "10px", '&:hover': { cursor: 'pointer', backgroundColor: "#2a2a2a" } }}>

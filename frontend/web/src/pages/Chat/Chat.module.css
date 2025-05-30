@@ -126,8 +126,14 @@
 
 .toggleIcon {
     cursor: pointer;
-    transition: transform 0.2s ease;
+    display: inline-block;
     margin: 0.25rem 0;
+    padding: 5px;
+    border-radius: 25%;
+}
+
+.toggleIcon:hover {
+    background-color: #333;
 }
 
 .welcomeBox {

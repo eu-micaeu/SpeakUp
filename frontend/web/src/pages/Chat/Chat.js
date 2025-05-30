@@ -4,6 +4,7 @@ import {
   Send,
   Dehaze,
 } from '@mui/icons-material';
+import CircularProgress from '@mui/material/CircularProgress'; // 1. IMPORTAÇÃO ADICIONADA
 
 // Api functions
 import {
@@ -27,13 +28,20 @@ export default function Chat() {
   const [currentChatId, setCurrentChatId] = useState(null);
   const [isSending, setIsSending] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [selectedChat, setSelectedChat] = useState(null);
 
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
     getChatsByUserId()
-      .then(res => setChats(res.chats || []))
-      .catch(() => setChats([]));
+      .then(res => {
+        setChats(res.chats || []);
+        setSelectedChat(null);
+      })
+      .catch(() => {
+        setChats([]);
+        setSelectedChat(null);
+      });
   }, []);
 
   useEffect(() => {
@@ -47,8 +55,6 @@ export default function Chat() {
             type: m.type
           }));
           setMessages(msgs);
-          // Garante que role para o final depois de atualizar
-          setTimeout(scrollToBottom, 100);
         })
         .catch(() => setMessages([]));
     }
@@ -61,12 +67,10 @@ export default function Chat() {
   }, []);
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+    messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+    
+  }, [messages]);
 
   const handleSend = async () => {
     if (!inputMessage.trim() || isSending) return;
@@ -117,17 +121,25 @@ export default function Chat() {
     }
   };
 
+  const handleChatSelect = (chatId) => {
+    setCurrentChatId(chatId);
+    const chat = chats.find(c => c.id === chatId);
+    setSelectedChat(chat);
+  };
+
   return (
     <div className={styles.Chat}>
 
       <Sidebar
         chats={chats}
         setChats={setChats}
-        setCurrentChatId={setCurrentChatId}
+        setCurrentChatId={handleChatSelect}
         setMessages={setMessages}
         setInputMessage={setInputMessage}
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
+        selectedChat={selectedChat}
+        setSelectedChat={setSelectedChat}
       />
 
       <main className={styles.main}>
@@ -195,10 +207,16 @@ export default function Chat() {
               placeholder="Digite sua mensagem aqui..."
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+              onKeyDown={(e) => e.key === 'Enter' && !isSending && handleSend()} // 2. MODIFICADO: Adicionado !isSending
+              disabled={isSending} // 3. MODIFICADO: Adicionado disabled
             />
             <button onClick={handleSend} disabled={isSending}>
-              <Send />
+              {/* 4. MODIFICAÇÃO PRINCIPAL: Renderização condicional do ícone ou spinner */}
+              {isSending ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                <Send />
+              )}
             </button>
           </div>
         </footer>

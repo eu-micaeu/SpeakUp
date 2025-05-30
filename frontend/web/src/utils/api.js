@@ -237,3 +237,24 @@ export const updateUser = async (userId, userData) => {
         throw error;
     }
 }
+
+// delete user
+export const deleteUser = async (userId) => {
+    try {
+        if (!userId) {
+            throw new Error('ID do usuário é obrigatório');
+        }
+
+        const response = await axios.delete(API_URL + `/user/${userId}`, {
+            headers: {
+                Authorization: `Bearer ${Cookies.get('authToken')}`
+            }
+        });
+        
+        return response.data;
+    }
+    catch (error) {
+        console.error('Erro ao deletar usuário:', error.response || error);
+        throw error;
+    }
+}

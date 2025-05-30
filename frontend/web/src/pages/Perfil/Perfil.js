@@ -2,17 +2,20 @@ import styles from './Perfil.module.css';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useState, useEffect } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 // Api functions
-import { updateUser } from '../../utils/api';
+import {
+    updateUser,
+    deleteUser
+} from '../../utils/api';
 
 // Utils
-import { getDecodedToken, isAuthTokenValid } from '../../utils/cookies';
+import { getDecodedToken, isAuthTokenValid, removeAuthTokenFromCookies } from '../../utils/cookies';
 
 function Perfil() {
     const [profileData, setProfileData] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [levels, setLevels] = useState([]);
     const [editedData, setEditedData] = useState({
         name: '',
@@ -20,6 +23,7 @@ function Perfil() {
         language: '',
         level: ''
     });
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchProfileData = async () => {
@@ -50,10 +54,8 @@ function Perfil() {
                     setLevels(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']);
                 }
 
-                setError(null);
             } catch (error) {
                 console.error('Erro ao buscar dados do perfil:', error);
-                setError("Falha ao carregar dados do perfil");
             } finally {
                 setLoading(false);
             }
@@ -63,6 +65,11 @@ function Perfil() {
             fetchProfileData();
         }
     }, [isAuthTokenValid]);
+
+    const goToIndex = () => {
+        removeAuthTokenFromCookies();
+        navigate('/');
+    };
 
     const handleInputChange = (field, value) => {
         setEditedData(prev => ({
@@ -191,6 +198,25 @@ function Perfil() {
                                 {loading ? 'Salvando...' : 'Salvar'}
                             </button>
                         </div>
+                        <button
+                            className={styles.deleteButton}
+                            onClick={() => {
+                                if (window.confirm('Tem certeza que deseja excluir sua conta?')) {
+                                    const userId = getDecodedToken().user_id;
+                                    deleteUser(userId)
+                                        .then(() => {
+                                            toast.success('Conta excluída com sucesso!');
+                                            goToIndex();
+                                        })
+                                        .catch((error) => {
+                                            console.error('Erro ao excluir conta:', error);
+                                            toast.error('Falha ao excluir conta.');
+                                        });
+                                }
+                            }}
+                        >
+                            Excluir Conta
+                        </button>
                     </div>
 
                 </div>

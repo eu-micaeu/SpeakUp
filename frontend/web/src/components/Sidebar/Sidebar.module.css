@@ -77,6 +77,12 @@
     margin-bottom: 0.5rem;
 }
 
+.navItem span {
+    display: flex;
+    align-items: center;
+    justify-self: center;
+}
+
 .navItem:hover {
     background-color: #1f1f1f;
     cursor: pointer;
@@ -145,6 +151,49 @@
     transform: rotate(360deg);
 }
 
+/* Adicione esses estilos ao seu arquivo Sidebar.module.css */
+
+.sidebarContent {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.chatList {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 10px;    
+    scrollbar-width: thin;
+    scrollbar-color: #555 #222;
+}
+
+.chatList::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chatList::-webkit-scrollbar-track {
+    background: #222;
+}
+
+.chatList::-webkit-scrollbar-thumb {
+    background-color: #555;
+    border-radius: 6px;
+}
+
+.selected {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    border-left: 3px solid #4CAF50;
+}
+
+.selectedChatPreview {
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 @media screen and (max-width: 768px) {
 
     .sidebarClosed {
@@ -160,5 +209,5 @@
         display: none;
     }
 
-    
+
 }

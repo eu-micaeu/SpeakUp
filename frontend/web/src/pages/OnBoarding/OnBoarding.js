@@ -2,8 +2,13 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 
-import { updateUser } from '../../utils/api'; // ajuste o caminho conforme necessário
 import styles from './OnBoarding.module.css';
+
+// Api functions
+import { login, updateUser } from '../../utils/api';
+
+// Utils
+import { getDecodedToken } from '../../utils/cookies'
 
 function OnBoarding() {
     const navigate = useNavigate();
@@ -13,12 +18,11 @@ function OnBoarding() {
     const [userId, setUserId] = useState(null);
 
     useEffect(() => {
-        const storedUserId = Cookies.get('userId');
+        const storedUserId = getDecodedToken().user_id;
         if (storedUserId) {
             setUserId(storedUserId);
         } else {
             console.warn('Usuário não autenticado!');
-            navigate('/login');
         }
     }, [navigate]);
 
@@ -29,11 +33,8 @@ function OnBoarding() {
 
         if (selected === 'english') {
             setLevels(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']);
-        } else if (selected === 'japanese') {
-            setLevels(['N5', 'N4', 'N3', 'N2', 'N1']);
-        } else {
-            setLevels([]);
         }
+
     };
 
     const handleSubmit = async (e) => {
@@ -41,6 +42,7 @@ function OnBoarding() {
 
         try {
             await updateUser(userId, { language, level });
+            // TODO: É NECESSÁRIO ATUALIZAR O TOKEN PARA O PERFIL VISUALIZAR OS DADOS NA PRIMEIRA INSTANCIA, SE SAIR E VOLTAR, FUNCIONARÁ!
             navigate('/chat');
         } catch (error) {
             alert('Erro ao salvar suas preferências.');

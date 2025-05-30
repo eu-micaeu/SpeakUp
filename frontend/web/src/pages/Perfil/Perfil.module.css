@@ -205,7 +205,6 @@
 }
 
 .saveButton {
-    margin: 10px 0;
     width: 100%;
     background: #404040;
     color: #ffffff;
@@ -222,6 +221,25 @@
 
 .saveButton:hover {
     background: #505050;
+}
+
+.deleteButton{
+    width: 100%;
+    background: #ff4d4d;
+    color: #ffffff;
+    padding: 16px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: 'Karla', sans-serif;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.saveButton:active, .deleteButton:active {
+    transform: scale(0.95);
 }
 
 @keyframes ripple {
