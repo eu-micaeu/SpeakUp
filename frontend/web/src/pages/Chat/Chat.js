@@ -155,11 +155,6 @@ export default function Chat() {
               <p>
                 Aqui você pode praticar o idioma conversando com nossa IA.
               </p>
-              <ul>
-                <li>✅ Correção gramatical</li>
-                <li>✅ Tradução para o português</li>
-                <li>✅ Diálogos simulados para praticar</li>
-              </ul>
               <div>
                 <strong>Exemplos:</strong><br /><br />
                 <em>Entrada:</em> "I ned a car"<br />

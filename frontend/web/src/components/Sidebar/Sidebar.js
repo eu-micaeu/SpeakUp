@@ -9,6 +9,7 @@ import {
     Try as TryIcon,
     AutoStories as AutoStoriesIcon,
     Settings,
+    Info as InfoIcon
 } from '@mui/icons-material';
 import {
     Modal,
@@ -161,6 +162,12 @@ export default function Sidebar({
                                 <MeetingRoom fontSize="small" sx={{color: "red"}} />
                             </ListItemIcon>
                             <ListItemText primary="Sair" sx={{color: "red"}} />
+                        </ListItem>
+                        <ListItem button onClick={() => navigate('/about')} sx={{ borderRadius: "10px", '&:hover': { cursor: 'pointer', backgroundColor: "#2a2a2a" } }}>
+                            <ListItemIcon>
+                                <InfoIcon fontSize="small" sx={{color: "white"}} />
+                            </ListItemIcon>
+                            <ListItemText primary="Sobre" sx={{color: "white"}} />
                         </ListItem>
                     </List>
                 </Box>
