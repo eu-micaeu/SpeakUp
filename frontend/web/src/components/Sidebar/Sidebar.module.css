@@ -8,6 +8,10 @@
 
 .header h3 {
     color: #ccc;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin: 0;
     font-family: 'Karla', sans-serif;
     background: linear-gradient(270deg,

@@ -79,7 +79,7 @@ export default function Sidebar({
             <div className={styles.sidebarContent}>
                 <div>
                     <div className={styles.header}>
-                        <img src="/logo.png" alt="Logo" width={30} />
+                        <img src="/logo.png" alt="Logo" width={35} />
                         <h3>SpeakUp</h3>
                     </div>
 
