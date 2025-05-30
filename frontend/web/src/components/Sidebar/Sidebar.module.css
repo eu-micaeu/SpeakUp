@@ -79,6 +79,8 @@
 
 .navItem:hover {
     background-color: #1f1f1f;
+    cursor: pointer;
+    user-select: none;
 }
 
 .navItem .deleteButton {
@@ -88,6 +90,10 @@
     cursor: pointer;
     font-size: 0.875rem;
     padding: 0;
+}
+
+.navItem .deleteButton:hover {
+    color: #ffffff;
 }
 
 .footer button {

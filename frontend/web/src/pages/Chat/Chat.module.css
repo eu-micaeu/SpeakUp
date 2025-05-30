@@ -129,3 +129,29 @@
     transition: transform 0.2s ease;
     margin: 0.25rem 0;
 }
+
+.welcomeBox {
+  color: #ccc;
+  max-width: 600px;
+  margin: auto;
+  padding: 2rem;
+  background-color: #1a1a1a;
+  border-radius: 1rem;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+.welcomeBox h2 {
+  font-size: 1.4rem;
+  margin: 0
+}
+
+.welcomeBox ul{
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.welcomeBox div{
+    background-color: #2a2a2a;
+    padding: 20px;
+    border-radius: 0.5rem;
+}

@@ -27,6 +27,9 @@ export default function Chat() {
   const [currentChatId, setCurrentChatId] = useState(null);
   const [isSending, setIsSending] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [showWelcomePopup, setShowWelcomePopup] = useState(true);
+
+  const closeWelcomePopup = () => setShowWelcomePopup(false);
 
   useEffect(() => {
     getChatsByUserId()
@@ -124,6 +127,33 @@ export default function Chat() {
         </header>
 
         <div className={styles.chatBody}>
+
+          {messages.length === 0 && (
+            <div className={styles.welcomeBox}>
+              <h2>Bem-vindo ao Chat de Prática!</h2>
+              <p>
+                Aqui você pode praticar o idioma conversando com nossa IA.
+              </p>
+              <ul>
+                <li>✅ Correção gramatical</li>
+                <li>✅ Tradução para o português</li>
+                <li>✅ Diálogos simulados para praticar</li>
+              </ul>
+              <div>
+                <strong>Exemplos:</strong><br /><br />
+                <em>Entrada:</em> "I ned a car"<br />
+                <em>Saída:</em> "I need a car"<br /><br />
+                <em>Entrada:</em> "How are you doin?"<br />
+                <em>Saída:</em> "How are you doing?"<br /><br />
+                <em>Entrada:</em> "Let's go beach tomorrow?"<br />
+                <em>Saída:</em> "Let's go to the beach tomorrow?"<br /><br />
+                <em>Entrada:</em> "I don't know how say this."<br />
+                <em>Saída:</em> "I don't know how to say this."
+              </div>
+            </div>
+          )}
+
+
           {messages.map(msg => (
             <div
               key={msg.id}
