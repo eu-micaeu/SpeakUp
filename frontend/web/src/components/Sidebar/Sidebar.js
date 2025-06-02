@@ -122,10 +122,10 @@ export default function Sidebar({
                         <AutoStoriesIcon fontSize="small" />
                         <span>Plano de Estudo</span>
                     </button>
-                    <button onClick={goToPalavreco}>
+                    {/* <button onClick={goToPalavreco}>
                         <TryIcon fontSize="small" />
                         <span>Palavreco</span>
-                    </button>
+                    </button> */}
                     <button onClick={handleOpenSettings}>
                         <Settings fontSize="small" />
                         <span>Configurações</span>
