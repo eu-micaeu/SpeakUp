@@ -8,10 +8,10 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
-	"speakup/config"
+	"speakup/pkg/config"
 	_ "speakup/docs"
-	"speakup/middlewares"
-	"speakup/routes"
+	"speakup/pkg/middlewares"
+	"speakup/pkg/routes"
 )
 
 // @title           SpeakUp API

@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"speakup/config"
-	"speakup/models"
+	"speakup/pkg/config"
+	"speakup/pkg/models"
 	"testing"
 
 	"github.com/gin-gonic/gin"

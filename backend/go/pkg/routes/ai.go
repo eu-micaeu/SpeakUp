@@ -2,8 +2,8 @@ package routes
 
 import (
     "github.com/gin-gonic/gin"
-    "speakup/handlers"
-    "speakup/middlewares"
+    "speakup/pkg/adapters/ai"
+    "speakup/pkg/middlewares"
 )
 
 func AIRoutes(router *gin.Engine) {

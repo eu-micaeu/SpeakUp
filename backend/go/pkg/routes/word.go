@@ -2,8 +2,8 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	"speakup/handlers"
-	"speakup/middlewares"
+	"speakup/pkg/handlers"
+	"speakup/pkg/middlewares"
 )
 
 func WordRoutes(router *gin.Engine) {

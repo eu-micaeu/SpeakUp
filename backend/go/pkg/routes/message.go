@@ -3,9 +3,9 @@ package routes
 import (
 
 	"github.com/gin-gonic/gin"
-	"speakup/handlers"
+	"speakup/pkg/handlers"
 
-	"speakup/middlewares"
+	"speakup/pkg/middlewares"
 
 )
 

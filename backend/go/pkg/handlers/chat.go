@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"time"
 
-	"speakup/config"
-	"speakup/middlewares"
-	"speakup/models"
+	"speakup/pkg/config"
+	"speakup/pkg/middlewares"
+	"speakup/pkg/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"

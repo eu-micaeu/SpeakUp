@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"time"
 
-	"speakup/config"
-	"speakup/models"
+	"speakup/pkg/config"
+	"speakup/pkg/models"
 
 	"go.mongodb.org/mongo-driver/bson"
 
