@@ -132,7 +132,8 @@ function Index() {
           <p className={styles.heroSubtitle}>
             Aprendizado personalizado com correções, explicações e evolução contínua.
           </p>
-          <a href="/login" className={styles.cta}>Vamos começar!</a>
+          <a href="/register" className={styles.cta}>Vamos começar!</a>
+          <a href="/login" className={styles.ctaSecondary}>Já possui uma conta? Faça o login aqui!</a>
         </section>
         <section className={styles.featureSection}>
           <h1>Recursos</h1>

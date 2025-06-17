@@ -66,6 +66,20 @@
     transform: translateY(-2px);
 }
 
+.ctaSecondary {
+    background: transparent;
+    color: #ffffff;
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.ctaSecondary:hover {
+    transform: translateY(-2px);
+}
+
 .particles {
     position: absolute;
     top: 0;
