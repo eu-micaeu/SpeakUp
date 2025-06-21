@@ -40,7 +40,7 @@ var aiConnectorBuilder func() connectors.AIConnector = func() connectors.AIConne
 // @Router /ai/generate-response-dialog [post]
 func GenerateResponseDialog(c *gin.Context) {
 	// ... (prompt loading, request binding)
-    promptPath := filepath.Join("prompts", "promptDialog.txt")
+    promptPath := filepath.Join("pkg/prompts", "promptDialog.txt")
 	promptBytes, err := os.ReadFile(promptPath)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load prompt: " + err.Error()})
@@ -115,7 +115,7 @@ func GenerateResponseDialog(c *gin.Context) {
 // @Router /ai/generate-response-correction [post]
 func GenerateResponseCorrection(c *gin.Context) {
 	// ... (prompt loading, request binding)
-    promptPath := filepath.Join("prompts", "promptCorrection.txt")
+    promptPath := filepath.Join("pkg/prompts", "promptCorrection.txt")
 	promptBytes, err := os.ReadFile(promptPath)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load prompt: " + err.Error()})
@@ -157,7 +157,7 @@ func GenerateResponseCorrection(c *gin.Context) {
 // @Failure 500 {object} map[string]string "Erro interno" example({"error":"Internal server error"})
 // @Router /ai/generate-response-translation [post]
 func GenerateResponseTranslate(c *gin.Context) {
-    promptPath := filepath.Join("prompts", "promptTranslate.txt")
+    promptPath := filepath.Join("pkg/prompts", "promptTranslate.txt")
 	promptBytes, err := os.ReadFile(promptPath)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao carregar o prompt: " + err.Error()})
@@ -233,7 +233,7 @@ func GenerateResponseTopic(c *gin.Context) {
 // @Router /ai/generate-random-word [post]
 func GenerateRandomWord(c *gin.Context) {
 	// ... (prompt loading, user fetching, etc.)
-    promptPath := filepath.Join("prompts", "promptRandomWord.txt")
+    promptPath := filepath.Join("pkg/prompts", "promptRandomWord.txt")
 	promptBytes, err := os.ReadFile(promptPath)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Falha ao carregar o prompt: " + err.Error()})
