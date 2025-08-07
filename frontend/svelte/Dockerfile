@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:24.4.1-alpine
 
 WORKDIR /app
 
@@ -8,4 +8,4 @@ RUN npm ci --legacy-peer-deps
 
 COPY . .
 
-CMD ["npm", "start"]
+CMD ["npm", "run", "dev"]

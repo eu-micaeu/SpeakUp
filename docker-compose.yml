@@ -12,12 +12,12 @@ services:
 
   ui-web:
     build:
-      context: ./frontend/web
+      context: ./frontend/svelte
     volumes:
-      - ./frontend/web:/app
+      - ./frontend/svelte:/app
       - /app/node_modules
     ports:
-      - "3000:3000"
+      - "5173:5173"
     environment:
       - NODE_ENV=development
       - CHOKIDAR_USEPOLLING=true
