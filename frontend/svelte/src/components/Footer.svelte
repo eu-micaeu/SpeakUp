@@ -9,7 +9,7 @@
       <ul>
         <li><a href="/login">Login</a></li>
         <li><a href="#features">Funcionalidades</a></li>
-        <li><a href="#">Sobre</a></li>
+        <li><a href="/about">Sobre</a></li>
       </ul>
     </div>
     <div class="column">

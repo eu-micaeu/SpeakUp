@@ -265,22 +265,159 @@
         <div class="chatBody" bind:this={chatBodyRef}>
             {#if messages.length === 0}
                 <div class="welcomeBox">
-                    <h2>Bem-vindo ao Chat de Prática!</h2>
-                    <p>
-                        Aqui você pode praticar o idioma conversando com nossa
-                        IA.
-                    </p>
-                    <div>
-                        <strong>Exemplos:</strong><br /><br />
-                        <em>Entrada:</em> "I ned a car"<br />
-                        <em>Saída:</em> "I need a car"<br /><br />
-                        <em>Entrada:</em> "How are you doin?"<br />
-                        <em>Saída:</em> "How are you doing?"<br /><br />
-                        <em>Entrada:</em> "Let's go beach tomorrow?"<br />
-                        <em>Saída:</em> "Let's go to the beach tomorrow?"<br
-                        /><br />
-                        <em>Entrada:</em> "I don't know how say this."<br />
-                        <em>Saída:</em> "I don't know how to say this."
+                    <div class="welcomeHeader">
+                        <div class="welcomeIcon">
+                            <svg
+                                width="50"
+                                height="50"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                            >
+                                <path
+                                    d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                />
+                            </svg>
+                        </div>
+                        <h2>Bem-vindo ao SpeakUp!</h2>
+                    </div>
+
+                    <div class="welcomeContent">
+                        <div class="featureSection">
+                            <div class="featureIcon">
+                                <svg
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                >
+                                    <path
+                                        d="M22 11.08V12a10 10 0 1 1-5.93-9.14"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    />
+                                    <path
+                                        d="M22 4L12 14.01l-3-3"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    />
+                                </svg>
+                            </div>
+                            <div class="featureText">
+                                <h3>Como funciona?</h3>
+                                <p>
+                                    Digite suas frases e nossa IA irá corrigir
+                                    erros gramaticais, fornecer traduções e
+                                    continuar a conversa!
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="examplesSection">
+                            <div class="examplesHeader">
+                                <svg
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                >
+                                    <circle
+                                        cx="12"
+                                        cy="12"
+                                        r="10"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    />
+                                    <path
+                                        d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    />
+                                    <path
+                                        d="M12 17h.01"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    />
+                                </svg>
+                                <h3>Exemplos de uso:</h3>
+                            </div>
+
+                            <div class="exampleCard">
+                                <div class="exampleInput">
+                                    <span class="exampleLabel"
+                                        >Você escreve:</span
+                                    >
+                                    <span class="exampleText"
+                                        >"I ned a car"</span
+                                    >
+                                </div>
+                                <div class="exampleArrow">→</div>
+                                <div class="exampleOutput">
+                                    <span class="exampleLabel">IA corrige:</span
+                                    >
+                                    <span class="exampleText"
+                                        >"I need a car"</span
+                                    >
+                                </div>
+                            </div>
+
+                            <div class="exampleCard">
+                                <div class="exampleInput">
+                                    <span class="exampleLabel"
+                                        >Você escreve:</span
+                                    >
+                                    <span class="exampleText"
+                                        >"Let's go beach tomorrow?"</span
+                                    >
+                                </div>
+                                <div class="exampleArrow">→</div>
+                                <div class="exampleOutput">
+                                    <span class="exampleLabel">IA corrige:</span
+                                    >
+                                    <span class="exampleText"
+                                        >"Let's go to the beach tomorrow?"</span
+                                    >
+                                </div>
+                            </div>
+
+                            <!-- <div class="exampleCard">
+                                <div class="exampleInput">
+                                    <span class="exampleLabel"
+                                        >Você escreve:</span
+                                    >
+                                    <span class="exampleText"
+                                        >"I don't know how say this"</span
+                                    >
+                                </div>
+                                <div class="exampleArrow">→</div>
+                                <div class="exampleOutput">
+                                    <span class="exampleLabel">IA corrige:</span
+                                    >
+                                    <span class="exampleText"
+                                        >"I don't know how to say this"</span
+                                    >
+                                </div>
+                            </div> -->
+                        </div>
+
+                        <div class="tipSection">
+                            <div class="tipIcon">💡</div>
+                            <div>
+                                <strong>Dica:</strong> Quanto mais você praticar,
+                                mais natural ficará sua comunicação!
+                            </div>
+                        </div>
                     </div>
                 </div>
             {/if}
@@ -553,25 +690,254 @@
     }
 
     .welcomeBox {
-        color: #ccc;
-        max-width: 600px;
-        margin: auto;
+        max-width: 800px;
+        margin: 2rem auto;
+        background: linear-gradient(145deg, #1e1e1e, #1a1a1a);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        overflow: hidden;
+        animation: fadeInUp 0.6s ease;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .welcomeHeader {
+        text-align: center;
+        padding: 2.5rem 2rem 2rem;
+        background: linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.05),
+            rgba(255, 255, 255, 0.02)
+        );
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .welcomeIcon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1.5rem;
+        background: linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.15),
+            rgba(255, 255, 255, 0.05)
+        );
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    .welcomeIcon svg {
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .welcomeHeader h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0 0 0.5rem 0;
+        background: linear-gradient(135deg, #ffffff, #a0a0a0);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .welcomeContent {
         padding: 2rem;
-        background-color: #1a1a1a;
-        border-radius: 1rem;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
     }
 
-    .welcomeBox h2 {
-        font-size: 1.4rem;
-        margin: 0 0 1rem 0;
+    .featureSection {
+        display: flex;
+        gap: 1.5rem;
+        align-items: flex-start;
+        padding: 1.5rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    .welcomeBox div {
-        background-color: #2a2a2a;
-        padding: 20px;
-        border-radius: 0.5rem;
-        margin-top: 1rem;
+    .featureIcon {
+        flex-shrink: 0;
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(
+            135deg,
+            rgba(76, 175, 80, 0.2),
+            rgba(76, 175, 80, 0.1)
+        );
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(76, 175, 80, 0.3);
+    }
+
+    .featureIcon svg {
+        color: #4caf50;
+    }
+
+    .featureText h3 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.2rem;
+        color: white;
+    }
+
+    .featureText p {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.8);
+        line-height: 1.6;
+    }
+
+    .examplesSection {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .examplesHeader {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 0.5rem;
+    }
+
+    .examplesHeader h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .exampleCard {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 1rem;
+        align-items: center;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        transition: all 0.3s ease;
+    }
+
+    .exampleCard:hover {
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.15);
+        transform: translateX(4px);
+    }
+
+    .exampleInput,
+    .exampleOutput {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .exampleLabel {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.5);
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    .exampleInput .exampleText {
+        color: rgba(255, 107, 107, 0.9);
+        font-family: "Courier New", monospace;
+        font-size: 0.95rem;
+    }
+
+    .exampleOutput .exampleText {
+        color: rgba(76, 175, 80, 0.9);
+        font-family: "Courier New", monospace;
+        font-size: 0.95rem;
+    }
+
+    .exampleArrow {
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+
+    .tipSection {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        padding: 1.25rem;
+        background: linear-gradient(
+            135deg,
+            rgba(255, 193, 7, 0.1),
+            rgba(255, 193, 7, 0.05)
+        );
+        border-radius: 12px;
+        border: 1px solid rgba(255, 193, 7, 0.2);
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .tipIcon {
+        font-size: 2rem;
+        flex-shrink: 0;
+    }
+
+    @media (max-width: 768px) {
+        .welcomeBox {
+            margin: 1rem;
+        }
+
+        .welcomeHeader {
+            padding: 2rem 1.5rem 1.5rem;
+        }
+
+        .welcomeHeader h2 {
+            font-size: 1.5rem;
+        }
+
+        .welcomeContent {
+            padding: 1.5rem;
+        }
+
+        .exampleCard {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+
+        .exampleArrow {
+            transform: rotate(90deg);
+            text-align: center;
+        }
+
+        .featureSection {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .featureIcon {
+            margin: 0 auto;
+        }
     }
 
     .scrollDownButton {

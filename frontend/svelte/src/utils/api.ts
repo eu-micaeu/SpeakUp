@@ -258,13 +258,13 @@ export const getUserById = async (userId: string): Promise<User> => {
             throw new Error('ID do usuário é obrigatório');
         }
 
-        const response = await axios.get<User>(API_URL + `/user/${userId}`, {
+        const response = await axios.get<{ user: User }>(API_URL + `/user/${userId}`, {
             headers: {
                 Authorization: `Bearer ${Cookies.get('authToken')}`
             }
         });
 
-        return response.data;
+        return response.data.user;
     }
     catch (error: unknown) {
         const axiosError = error as AxiosError;

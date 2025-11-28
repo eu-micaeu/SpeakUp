@@ -1,41 +1,51 @@
 <script>
-  import { onMount } from 'svelte';
-  import * as THREE from 'three';
-  import FeatureCard from '../components/FeatureCard.svelte';
-  import Footer from '../components/Footer.svelte';
-  import { isAuthTokenValid } from '../utils/cookies';
-  import { goto } from '$app/navigation';
+  import { onMount } from "svelte";
+  import * as THREE from "three";
+  import FeatureCard from "../components/FeatureCard.svelte";
+  import Footer from "../components/Footer.svelte";
+  import { isAuthTokenValid } from "../utils/cookies";
+  import { goto } from "$app/navigation";
 
   const cardData = [
     {
-      imgSrc: './chat.png',
-      alt: 'Ícone de chat representando conversação',
-      title: 'Plataforma inovadora que utiliza IA para auxiliar no aprendizado de idiomas.',
-      content: 'Analisa textos em tempo real, identificando e corrigindo erros com explicações detalhadas para um aprendizado contínuo.'
+      imgSrc: "./chat.png",
+      alt: "Ícone de chat representando conversação",
+      title:
+        "Plataforma inovadora que utiliza IA para auxiliar no aprendizado de idiomas.",
+      content:
+        "Analisa textos em tempo real, identificando e corrigindo erros com explicações detalhadas para um aprendizado contínuo.",
     },
     {
-      imgSrc: './ia.png',
-      alt: 'Ícone representando Inteligência Artificial',
-      title: 'Oferece experiência personalizada com análise em tempo real de erros gramaticais e de digitação.',
-      content: 'Fornece correções com explicações para melhor compreensão das regras linguísticas.'
+      imgSrc: "./ia.png",
+      alt: "Ícone representando Inteligência Artificial",
+      title:
+        "Oferece experiência personalizada com análise em tempo real de erros gramaticais e de digitação.",
+      content:
+        "Fornece correções com explicações para melhor compreensão das regras linguísticas.",
     },
     {
-      imgSrc: './mic.png',
-      alt: 'Ícone de microfone para reconhecimento de voz',
-      title: 'Em breve: funcionalidade de reconhecimento de voz para análise de pronúncia em tempo real.',
-      content: 'Com feedback detalhado para aprimoramento dinâmico.'
-    }
+      imgSrc: "./mic.png",
+      alt: "Ícone de microfone para reconhecimento de voz",
+      title:
+        "Em breve: funcionalidade de reconhecimento de voz para análise de pronúncia em tempo real.",
+      content: "Com feedback detalhado para aprimoramento dinâmico.",
+    },
   ];
 
   let mountRef;
 
   onMount(() => {
     if (isAuthTokenValid()) {
-      goto('/chat');
+      goto("/chat");
     }
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000,
+    );
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
 
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -44,11 +54,11 @@
 
     if (mountRef) {
       mountRef.appendChild(renderer.domElement);
-      renderer.domElement.style.position = 'absolute';
-      renderer.domElement.style.top = '0';
-      renderer.domElement.style.left = '0';
-      renderer.domElement.style.zIndex = '0';
-      renderer.domElement.style.pointerEvents = 'none';
+      renderer.domElement.style.position = "absolute";
+      renderer.domElement.style.top = "0";
+      renderer.domElement.style.left = "0";
+      renderer.domElement.style.zIndex = "0";
+      renderer.domElement.style.pointerEvents = "none";
     }
 
     camera.position.z = 30;
@@ -71,9 +81,9 @@
       sizes[i] = 0.5 + Math.random() * 1.5;
     }
 
-    particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    particles.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    particles.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+    particles.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    particles.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+    particles.setAttribute("size", new THREE.BufferAttribute(sizes, 1));
 
     const particleMaterial = new THREE.PointsMaterial({
       size: 0.5,
@@ -81,7 +91,7 @@
       transparent: true,
       opacity: 0.8,
       blending: THREE.AdditiveBlending,
-      sizeAttenuation: true
+      sizeAttenuation: true,
     });
 
     const particleSystem = new THREE.Points(particles, particleMaterial);
@@ -102,27 +112,29 @@
       renderer.setSize(window.innerWidth, window.innerHeight);
     };
 
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
 
     return () => {
       if (mountRef && mountRef.contains(renderer.domElement)) {
         mountRef.removeChild(renderer.domElement);
       }
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
     };
   });
 </script>
 
 <main>
-  <div bind:this={mountRef} class="particles" />
+  <div bind:this={mountRef} class="particles"></div>
   <section class="hero">
-    <img src="logo.png" alt="Logo" width={60}/>
+    <img src="logo.png" alt="Logo" width={60} />
     <h1 class="heroTitle">SpeakUp</h1>
     <p class="heroSubtitle">
       Aprendizado personalizado com correções, explicações e evolução contínua.
     </p>
     <a href="/register" class="cta">Vamos começar!</a>
-    <a href="/login" class="ctaSecondary">Já possui uma conta? Faça o login aqui!</a>
+    <a href="/login" class="ctaSecondary"
+      >Já possui uma conta? Faça o login aqui!</a
+    >
   </section>
   <section class="featureSection">
     <h1>Recursos</h1>
@@ -160,8 +172,15 @@
     font-weight: 800;
     margin: 0;
     margin-bottom: 1rem;
-    background: linear-gradient(270deg,
-            #ffffff, #bfbfbf, #a0a0a0, #8a8a8a, #bfbfbf, #ffffff);
+    background: linear-gradient(
+      270deg,
+      #ffffff,
+      #bfbfbf,
+      #a0a0a0,
+      #8a8a8a,
+      #bfbfbf,
+      #ffffff
+    );
     background-size: 200% auto;
     background-clip: text;
     -webkit-background-clip: text;
@@ -227,7 +246,7 @@
     pointer-events: none;
   }
 
-  .featureSection{
+  .featureSection {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -236,7 +255,6 @@
   }
 
   @media screen and (max-width: 768px) {
-
     .particles {
       display: none;
     }
@@ -260,6 +278,5 @@
       font-size: 1rem;
       padding: 0.8rem 1.5rem;
     }
-
   }
 </style>

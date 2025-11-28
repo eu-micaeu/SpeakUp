@@ -1,6 +1,6 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
-    import toast from "svelte-french-toast";
+    import { toast } from "svelte-sonner";
     import { register } from "../../utils/api";
 
     let isLoading = false;
@@ -87,7 +87,7 @@
 </script>
 
 <div class="pageRegister">
-    <!-- Toast container is handled automatically by svelte-french-toast -->
+    <!-- Toast container is handled automatically by svelte-sonner -->
     <form on:submit={handleRegister}>
         <div class="card">
             <div class="textCenter">

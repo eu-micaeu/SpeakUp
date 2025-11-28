@@ -2,7 +2,7 @@
   import { createEventDispatcher } from "svelte";
   import { goto } from "$app/navigation";
   import { deleteChat } from "../utils/api";
-  // import { removeAuthTokenFromCookies } from '../../utils/cookies';
+  import Cookies from "js-cookie";
 
   export let chats: Array<{ id: string; topic: string }>;
   export let sidebarOpen: boolean;
@@ -25,7 +25,7 @@
   }
 
   function goToIndex() {
-    // removeAuthTokenFromCookies();
+    Cookies.remove("authToken");
     goto("/");
     openSettings = false;
   }
@@ -95,7 +95,7 @@
     {/each}
 
     <div class="footer">
-      <button on:click={() => goto("/teaching-plan")}>
+      <!-- <button on:click={() => goto("/teaching-plan")}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
           <rect
             x="4"
@@ -108,9 +108,9 @@
           />
         </svg>
         <span>Plano de Estudo</span>
-      </button>
+      </button> -->
 
-      <button on:click={() => goto("/palavreco")}>
+      <!-- <button on:click={() => goto("/palavreco")}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
           <circle
             cx="12"
@@ -121,7 +121,7 @@
           />
         </svg>
         <span>Palavreco</span>
-      </button>
+      </button> -->
 
       <button on:click={() => (openSettings = true)}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -146,11 +146,71 @@
   </div>
 
   {#if openSettings}
-    <div class="modal">
-      <div class="modal-content">
-        <button on:click={goToPerfil}>Perfil</button>
-        <button on:click={goToIndex}>Sair</button>
-        <button on:click={() => (openSettings = false)}>Fechar</button>
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div class="modal" on:click={() => (openSettings = false)}>
+      <!-- svelte-ignore a11y_click_events_have_key_events -->
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <div class="modal-content" on:click={(e) => e.stopPropagation()}>
+        <div class="modal-header">
+          <h3>Configurações</h3>
+          <button
+            class="close-btn"
+            on:click={() => (openSettings = false)}
+            aria-label="Fechar"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M6 6l12 12M6 18L18 6"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-options">
+          <button class="modal-option" on:click={goToPerfil}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <circle
+                cx="12"
+                cy="8"
+                r="4"
+                stroke="currentColor"
+                stroke-width="2"
+              />
+              <path
+                d="M5 20c0-4 3-7 7-7s7 3 7 7"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
+            <span>Perfil</span>
+          </button>
+
+          <button class="modal-option" on:click={goToIndex}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M16 17l5-5-5-5M21 12H9"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <span>Sair</span>
+          </button>
+        </div>
       </div>
     </div>
   {/if}
@@ -309,35 +369,123 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    animation: fadeIn 0.1s ease;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 
   .modal-content {
-    background: #1a1a1a;
-    padding: 2rem;
-    border-radius: 0.5rem;
+    background: linear-gradient(145deg, #1e1e1e, #1a1a1a);
+    padding: 0;
+    border-radius: 16px;
     color: white;
+    min-width: 320px;
+    max-width: 400px;
+    animation: slideUp 0.2s ease;
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .modal-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #ffffff, #e0e0e0);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .close-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+
+  .close-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    transform: rotate(90deg);
+  }
+
+  .modal-options {
+    padding: 1rem;
     display: flex;
     flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .modal-option {
+    display: flex;
+    align-items: center;
     gap: 1rem;
-  }
-
-  .modal-content button {
-    padding: 0.75rem;
-    background: transparent;
-    color: white;
-    border: 1px solid #333;
-    border-radius: 0.25rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    font-weight: 500;
   }
 
-  .modal-content button:hover {
-    background-color: #2a2a2a;
+  .modal-option:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .modal-option svg {
+    flex-shrink: 0;
+    color: rgba(255, 255, 255, 0.8);
+    transition: all 0.3s ease;
+  }
+
+  .modal-option:hover svg {
+    color: white;
+    transform: scale(1.1);
+  }
+
+  .modal-option span {
+    flex: 1;
   }
 
   @media (max-width: 768px) {

@@ -20,18 +20,33 @@
         level: string;
     };
 
+    // Check if Firebase is properly configured
+    const isFirebaseConfigured =
+        env.PUBLIC_FIREBASE_API_KEY &&
+        env.PUBLIC_FIREBASE_API_KEY !== "your_firebase_api_key_here";
+
     const firebaseConfig = {
-        apiKey: env.PUBLIC_FIREBASE_API_KEY,
-        authDomain: env.PUBLIC_FIREBASE_AUTH_DOMAIN,
-        projectId: env.PUBLIC_FIREBASE_PROJECT_ID,
-        storageBucket: env.PUBLIC_FIREBASE_STORAGE_BUCKET,
-        messagingSenderId: env.PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-        appId: env.PUBLIC_FIREBASE_APP_ID,
-        measurementId: env.PUBLIC_FIREBASE_MEASUREMENT_ID,
+        apiKey: env.PUBLIC_FIREBASE_API_KEY || "",
+        authDomain: env.PUBLIC_FIREBASE_AUTH_DOMAIN || "",
+        projectId: env.PUBLIC_FIREBASE_PROJECT_ID || "",
+        storageBucket: env.PUBLIC_FIREBASE_STORAGE_BUCKET || "",
+        messagingSenderId: env.PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "",
+        appId: env.PUBLIC_FIREBASE_APP_ID || "",
+        measurementId: env.PUBLIC_FIREBASE_MEASUREMENT_ID || "",
     };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+    let app: any = null;
+    let auth: any = null;
+
+    // Only initialize Firebase if configured
+    if (isFirebaseConfigured) {
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+        } catch (error) {
+            console.warn("Firebase initialization failed:", error);
+        }
+    }
 
     let isLoading = false;
     let toastMessage = "";
@@ -73,6 +88,11 @@
     }
 
     async function handleGoogleLogin() {
+        if (!isFirebaseConfigured || !auth) {
+            showToast("Login com Google não está configurado", "error");
+            return;
+        }
+
         const provider = new GoogleAuthProvider();
         try {
             const result = await signInWithPopup(auth, provider);
