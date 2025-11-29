@@ -46,6 +46,6 @@ func main() {
 	// Load Swagger
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	r.Run()
+	r.Run(":8082")
 
 }
