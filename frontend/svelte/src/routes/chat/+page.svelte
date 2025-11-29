@@ -410,14 +410,6 @@
                                 </div>
                             </div> -->
                         </div>
-
-                        <div class="tipSection">
-                            <div class="tipIcon">💡</div>
-                            <div>
-                                <strong>Dica:</strong> Quanto mais você praticar,
-                                mais natural ficará sua comunicação!
-                            </div>
-                        </div>
                     </div>
                 </div>
             {/if}
@@ -881,26 +873,6 @@
         color: rgba(255, 255, 255, 0.4);
         font-size: 1.5rem;
         font-weight: bold;
-    }
-
-    .tipSection {
-        display: flex;
-        gap: 1rem;
-        align-items: center;
-        padding: 1.25rem;
-        background: linear-gradient(
-            135deg,
-            rgba(255, 193, 7, 0.1),
-            rgba(255, 193, 7, 0.05)
-        );
-        border-radius: 12px;
-        border: 1px solid rgba(255, 193, 7, 0.2);
-        color: rgba(255, 255, 255, 0.9);
-    }
-
-    .tipIcon {
-        font-size: 2rem;
-        flex-shrink: 0;
     }
 
     @media (max-width: 768px) {
