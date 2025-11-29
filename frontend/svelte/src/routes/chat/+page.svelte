@@ -2,6 +2,7 @@
     import { onMount, tick } from "svelte";
     import { browser } from "$app/environment";
     import Sidebar from "../../components/Sidebar.svelte";
+    import AudioRecorder from "../../components/AudioRecorder.svelte";
     import {
         getChatsByUserId,
         createChat,
@@ -41,6 +42,8 @@
     let showScrollDown = false;
     let messagesEndRef: HTMLDivElement;
     let chatBodyRef: HTMLDivElement;
+    let isRecording = false;
+    let showTranscriptionNotice = false;
 
     onMount(() => {
         (async () => {
@@ -220,6 +223,27 @@
             messages = [];
             selectedChat = null;
         }
+    }
+
+    function handleAudioRecorded(event: CustomEvent<{ text: string }>) {
+        const { text } = event.detail;
+        console.log("📨 Evento audioRecorded recebido no chat:", { text });
+        if (text && text.trim()) {
+            inputMessage = text.trim();
+            console.log("✅ Enviando mensagem transcrita automaticamente");
+            // Enviar automaticamente após transcrição bem-sucedida
+            handleSend();
+        } else {
+            console.log(
+                "ℹ️ Nenhum texto transcrito. Campo de texto disponível para digitação manual.",
+            );
+            // Mostrar notificação visual temporária
+            showTranscriptionNotice = true;
+            setTimeout(() => {
+                showTranscriptionNotice = false;
+            }, 4000);
+        }
+        // Se não houver transcrição, o campo de texto fica disponível para digitação manual
     }
 </script>
 
@@ -466,6 +490,24 @@
             {/if}
         </div>
 
+        {#if showTranscriptionNotice}
+            <div class="transcriptionNotice">
+                <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                >
+                    <path
+                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"
+                    />
+                </svg>
+                <span
+                    >Transcrição indisponível. Digite sua mensagem abaixo.</span
+                >
+            </div>
+        {/if}
+
         <footer class="chatFooter">
             <div class="inputBox">
                 <input
@@ -473,12 +515,20 @@
                     placeholder="Digite sua mensagem aqui..."
                     bind:value={inputMessage}
                     on:keydown={(e) =>
-                        e.key === "Enter" && !isSending && handleSend()}
+                        e.key === "Enter" &&
+                        !isSending &&
+                        !isRecording &&
+                        handleSend()}
+                    disabled={isSending || isRecording}
+                />
+                <AudioRecorder
+                    bind:isRecording
                     disabled={isSending}
+                    on:audioRecorded={handleAudioRecorded}
                 />
                 <button
                     on:click={handleSend}
-                    disabled={isSending}
+                    disabled={isSending || isRecording}
                     type="button"
                 >
                     {#if isSending}
@@ -933,6 +983,51 @@
 
     .scrollDownButton:hover {
         background-color: #383838;
+    }
+
+    .transcriptionNotice {
+        position: fixed;
+        bottom: 100px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(135deg, #ff9800, #ff6f00);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
+        z-index: 100;
+        animation:
+            slideInUp 0.3s ease-out,
+            fadeOut 0.5s ease-in 3.5s forwards;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .transcriptionNotice svg {
+        flex-shrink: 0;
+    }
+
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateX(-50%) translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    }
+
+    @keyframes fadeOut {
+        from {
+            opacity: 1;
+        }
+        to {
+            opacity: 0;
+        }
     }
 
     .spinner {

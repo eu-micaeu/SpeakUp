@@ -316,3 +316,24 @@ export const deleteUser = async (userId: string): Promise<void> => {
         throw error;
     }
 }
+
+// Transcribe audio using Whisper API
+export const transcribeAudio = async (audioBlob: Blob): Promise<string> => {
+    try {
+        const formData = new FormData();
+        formData.append('audio', audioBlob, 'audio.webm');
+
+        const response = await axios.post<{ text: string }>(API_URL + '/ai/transcribe-audio', formData, {
+            headers: {
+                Authorization: `Bearer ${Cookies.get('authToken')}`,
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+
+        return response.data.text;
+    }
+    catch (error: unknown) {
+        console.error('Erro ao transcrever áudio:', error);
+        throw error;
+    }
+}
