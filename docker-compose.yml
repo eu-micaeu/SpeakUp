@@ -5,7 +5,7 @@ services:
     volumes:
       - ./backend/go:/app
     ports:
-      - "8080:8080"
+      - "8082:8082"
     environment:
       - JWT_KEY=secret
     command: [ "/go/bin/air" ]
@@ -17,7 +17,7 @@ services:
       - ./frontend/svelte:/app
       - /app/node_modules
     ports:
-      - "5173:5173"
+      - "5175:5175"
     environment:
       - NODE_ENV=development
       - CHOKIDAR_USEPOLLING=true
