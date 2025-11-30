@@ -1,0 +1,31 @@
+{
+  "build": {
+    "production": {
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://api.speak-up.click"
+      },
+      "android": {
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease"
+      }
+    },
+    "preview": {
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://api.speak-up.click"
+      },
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "development": {
+      "env": {
+        "EXPO_PUBLIC_API_URL": "http://172.31.31.64:8082"
+      },
+      "developmentClient": true,
+      "distribution": "internal"
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

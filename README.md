@@ -6,7 +6,7 @@
 
 <div align="center">
    
-  [![Go](https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white)](https://golang.org/) [![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/) [![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/) [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/) [![Figma](https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white)](https://www.figma.com/) [![Cloudflare](https://img.shields.io/badge/Cloudflare-F38020?style=for-the-badge&logo=Cloudflare&logoColor=white)](https://www.cloudflare.com/)
+  [![Go](https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white)](https://golang.org/) [![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/) [![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/) [![React Native](https://img.shields.io/badge/React_Native-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactnative.dev/) [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/) [![Expo](https://img.shields.io/badge/Expo-000020?style=for-the-badge&logo=expo&logoColor=white)](https://expo.dev/)
   
 </div>
 
@@ -19,6 +19,8 @@ A cada erro encontrado, a ferramenta destaca as correções necessárias, oferec
 Dessa forma, você não apenas corrige suas falhas, mas também aprende com cada interação, desenvolvendo suas habilidades linguísticas de maneira prática e envolvente.
 </p>
 
+> **📱 NOVIDADE: App Mobile disponível!** → [Ver documentação mobile](./mobile/START_HERE.md)
+
 ---
 
 ## 🚀 Tecnologias utilizadas
@@ -28,9 +30,9 @@ Dessa forma, você não apenas corrige suas falhas, mas também aprende com cada
 GoLang, ou Go, é uma linguagem de programação desenvolvida pela Google, projetada para ser eficiente, com ótimo desempenho em ambientes de alta concorrência. Suas principais vantagens incluem sintaxe simples, gerenciamento de memória automático e alta velocidade de compilação, tornando-a ideal para a criação de sistemas distribuídos, servidores web e soluções de grande escala.
 </p>
 
-### ⚛️ ReactJS
+### ⚛️ React & React Native
 <p align="justify">
-ReactJS é uma biblioteca JavaScript desenvolvida pelo Facebook para a criação de interfaces de usuário dinâmicas e eficientes. Ela facilita o desenvolvimento de componentes reutilizáveis, permitindo a construção de aplicações modernas e rápidas. Além disso, sua estrutura baseada em componentes facilita a manutenção e a escalabilidade de grandes aplicações web.
+React é uma biblioteca JavaScript desenvolvida pelo Facebook para a criação de interfaces de usuário dinâmicas e eficientes. React Native estende essa tecnologia para o desenvolvimento mobile, permitindo criar aplicativos nativos para iOS e Android com JavaScript. Ambos compartilham a mesma filosofia de componentes reutilizáveis, facilitando a manutenção e escalabilidade tanto de aplicações web quanto mobile.
 </p>
 
 ### 🐳 Docker
@@ -56,13 +58,15 @@ MongoDB é um banco de dados NoSQL orientado a documentos que armazena dados em 
 
 ## 🛠️ Como rodar?
 
+### 🌐 Web (Frontend + Backend)
+
 <p align="justify">
-Para rodar o projeto, certifique-se de ter o Docker e o Docker Compose instalados em sua máquina. Siga os passos abaixo:
+Para rodar o projeto web, certifique-se de ter o Docker e o Docker Compose instalados em sua máquina. Siga os passos abaixo:
 </p>
 
 ```bash
 # 1. Clone o repositório do projeto
-git clone https://github.com/seu-usuario/speakup.git
+git clone https://github.com/eu-micaeu/speakup.git
 
 # 2. Navegue até o diretório raiz do projeto
 cd speakup
@@ -72,6 +76,32 @@ docker-compose up
 ```
 
 <p align="justify"> Após a inicialização, você poderá acessar a aplicação no navegador em: <strong>http://localhost:3000</strong> </p>
+
+### 📱 Mobile (React Native + Expo)
+
+<p align="justify">
+Para rodar o aplicativo mobile, siga os passos detalhados no guia completo:
+</p>
+
+**[📖 Ver guia completo de instalação mobile →](./mobile/SETUP.md)**
+
+```bash
+# 1. Entre na pasta mobile
+cd mobile
+
+# 2. Instale as dependências
+npm install
+
+# 3. Configure o .env com o IP do backend
+cp .env.example .env
+
+# 4. Inicie o app
+npm start
+```
+
+<p align="justify">
+Escaneie o QR Code com o app <strong>Expo Go</strong> no seu celular para testar o app!
+</p>
 
 ---
 
