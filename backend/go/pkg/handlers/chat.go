@@ -64,7 +64,7 @@ func GetChatById(c *gin.Context) {
 	db := config.GetMongoClient()
 	collection := db.Database("speakup").Collection("chats")
 	var chat models.Chat
-	err := collection.FindOne(c, map[string]string{"id": id}).Decode(&chat)
+	err := collection.FindOne(c, map[string]string{"_id": id}).Decode(&chat)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Chat not found"})
 		return
@@ -124,7 +124,7 @@ func UpdateChat(c *gin.Context) {
 
 	db := config.GetMongoClient()
 	collection := db.Database("speakup").Collection("chats")
-	_, err := collection.UpdateOne(c, map[string]string{"id": id}, chat)
+	_, err := collection.UpdateOne(c, map[string]string{"_id": id}, chat)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update chat"})
 		return
@@ -148,7 +148,7 @@ func DeleteChat(c *gin.Context) {
 	id := c.Param("id")
 	db := config.GetMongoClient()
 	collection := db.Database("speakup").Collection("chats")
-	_, err := collection.DeleteOne(c, map[string]string{"id": id})
+	_, err := collection.DeleteOne(c, map[string]string{"_id": id})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete chat"})
 		return

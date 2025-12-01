@@ -120,7 +120,10 @@
                 };
                 chatId = newChat.id;
                 currentChatId = chatId;
-                chats = [...chats, newChat];
+                // Only add if not already in the list
+                if (!chats.some((c) => c.id === newChat.id)) {
+                    chats = [...chats, newChat];
+                }
             }
 
             const correction: ApiResponse | undefined =
@@ -245,14 +248,22 @@
         }
         // Se não houver transcrição, o campo de texto fica disponível para digitação manual
     }
+
+    $: sidebarChats = chats
+        .filter((chat) => chat.id != null)
+        .filter(
+            (chat, index, self) =>
+                index === self.findIndex((c) => c.id === chat.id),
+        )
+        .map((chat) => ({
+            id: chat.id,
+            topic: chat.title || chat.topic || "Untitled Chat",
+        }));
 </script>
 
 <div class="Chat">
     <Sidebar
-        chats={chats.map((chat) => ({
-            id: chat.id,
-            topic: chat.title || chat.topic || "Untitled Chat",
-        }))}
+        chats={sidebarChats}
         on:selectChat={handleChatSelect}
         on:chatDeleted={handleChatDeleted}
         bind:sidebarOpen
