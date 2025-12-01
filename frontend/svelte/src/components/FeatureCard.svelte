@@ -1,10 +1,17 @@
 <script>
-  export let imgSrc, alt, title, content;
+  export let imgSrc,
+    alt,
+    title,
+    content,
+    index = 0;
 </script>
 
-<div class="feature">
-  <img src={imgSrc} alt={alt} />
-  <div>
+<div class="feature" style="animation-delay: {index * 0.2}s">
+  <div class="iconWrapper">
+    <img src={imgSrc} {alt} />
+    <div class="iconGlow"></div>
+  </div>
+  <div class="content">
     <h2>{title}</h2>
     <p>{content}</p>
   </div>
@@ -15,53 +22,180 @@
     display: flex;
     gap: 2rem;
     align-items: center;
-    width: 800px;
-    margin: 20px auto;
-    padding: 20px;
-    justify-content: space-between;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto 2rem;
+    padding: 2.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    animation: fadeInUp 0.8s ease-out forwards;
   }
 
-  .feature img {
-    width: 100px;
-    height: auto;
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
-  .feature h2 {
-    margin-bottom: 0.5rem;
-    text-align: justify;
+  .feature::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.05),
+      transparent
+    );
+    transition: left 0.5s;
   }
 
-  .feature p {
-    font-size: 1rem;
-    max-width: 600px;
-    margin-bottom: 0.5rem;
-    text-align: justify;
+  .feature:hover::before {
+    left: 100%;
   }
 
-  .feature div {
-    width: 600px;
-    opacity: 0.8;
+  .feature:hover {
+    transform: translateY(-8px);
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 20px 60px rgba(255, 255, 255, 0.1);
+  }
+
+  .iconWrapper {
+    position: relative;
+    flex-shrink: 0;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.1),
+      rgba(255, 255, 255, 0.05)
+    );
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    transition: all 0.4s ease;
+  }
+
+  .feature:hover .iconWrapper {
+    transform: scale(1.1) rotate(5deg);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+
+  .iconGlow {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 24px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.3), transparent);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+
+  .feature:hover .iconGlow {
+    opacity: 1;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 0.5;
+    }
+    50% {
+      transform: scale(1.2);
+      opacity: 0.8;
+    }
+  }
+
+  .iconWrapper img {
+    width: 70px;
+    height: 70px;
+    object-fit: contain;
+    filter: brightness(1.2);
+    transition: all 0.4s ease;
+    position: relative;
+    z-index: 1;
+  }
+
+  .feature:hover .iconWrapper img {
+    filter: brightness(1.5) drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
+  }
+
+  .content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .content h2 {
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+    font-weight: 700;
+    line-height: 1.4;
+    color: #ffffff;
+    transition: color 0.3s;
+  }
+
+  .feature:hover .content h2 {
+    background: linear-gradient(90deg, #ffffff, #e0e0e0);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .content p {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    opacity: 0.85;
+    color: #e0e0e0;
+    transition: opacity 0.3s;
+  }
+
+  .feature:hover .content p {
+    opacity: 1;
   }
 
   @media screen and (max-width: 768px) {
     .feature {
       flex-direction: column;
-      width: 70%;
       text-align: center;
-      margin: 0 auto;
+      padding: 2rem 1.5rem;
+      margin-bottom: 1.5rem;
     }
 
-    .feature img {
-      width: 80px;
+    .iconWrapper {
+      width: 100px;
+      height: 100px;
     }
 
-    .feature h2 {
-      font-size: 1rem;
+    .iconWrapper img {
+      width: 60px;
+      height: 60px;
     }
 
-    .feature div {
-      font-size: 0.8rem;
-      width: 100%;
+    .content h2 {
+      font-size: 1.1rem;
+    }
+
+    .content p {
+      font-size: 0.95rem;
     }
   }
 </style>
