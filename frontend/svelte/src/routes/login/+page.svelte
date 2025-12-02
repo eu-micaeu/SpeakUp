@@ -317,7 +317,6 @@
         border-radius: 0.5rem;
         color: white;
         z-index: 1000;
-        animation: slideIn 0.3s ease-in;
     }
 
     .toast.success {
@@ -326,17 +325,6 @@
 
     .toast.error {
         background-color: rgb(239, 68, 68);
-    }
-
-    @keyframes slideIn {
-        from {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
     }
 
     .styledLink {

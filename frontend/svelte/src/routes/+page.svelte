@@ -937,12 +937,10 @@
     justify-content: center;
     cursor: pointer;
     color: white;
-    transition: all 0.3s;
   }
 
   .closeButton:hover {
     background: rgba(255, 255, 255, 0.2);
-    transform: rotate(90deg);
   }
 
   .modalHeader {
