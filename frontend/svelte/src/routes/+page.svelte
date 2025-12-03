@@ -96,14 +96,23 @@
     }, 3000);
   }
 
+  const levelDescriptions: Record<string, Record<string, string>> = {
+    english: {
+      A1: "A1 - Básico",
+      A2: "A2 - Elementar",
+      B1: "B1 - Intermediário",
+      B2: "B2 - Intermediário Superior",
+      C1: "C1 - Avançado",
+      C2: "C2 - Proficiente",
+    },
+  };
+
   function handleLanguageChange(e: Event) {
     const language = (e.target as HTMLSelectElement).value;
     selectedLanguage = language;
 
     if (language === "english") {
       levels = ["A1", "A2", "B1", "B2", "C1", "C2"];
-    } else if (language === "japanese") {
-      levels = ["N5", "N4", "N3", "N2", "N1"];
     } else {
       levels = [];
     }
@@ -572,7 +581,6 @@
                 >
                   <option value="" disabled selected>Escolha um idioma</option>
                   <option value="english">🇺🇸 Inglês</option>
-                  <option value="japanese">🇯🇵 Japonês</option>
                 </select>
               </div>
 
@@ -591,7 +599,9 @@
                       : "Selecione um idioma primeiro"}
                   </option>
                   {#each levels as level}
-                    <option value={level}>{level}</option>
+                    <option value={level}>
+                      {levelDescriptions[selectedLanguage]?.[level] || level}
+                    </option>
                   {/each}
                 </select>
               </div>
