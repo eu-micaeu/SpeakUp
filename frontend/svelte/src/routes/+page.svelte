@@ -45,6 +45,42 @@
   let error = "";
   let selectedLanguage = "";
   let levels: string[] = [];
+  let showLevelTest = false;
+  let currentQuestion = 0;
+  let testAnswers: number[] = [];
+
+  const levelingQuestions = [
+    {
+      question: "What ___ you doing right now?",
+      options: ["is", "are", "am", "be"],
+      correct: 1,
+      level: "A1",
+    },
+    {
+      question: "I ___ to the store yesterday.",
+      options: ["go", "went", "gone", "going"],
+      correct: 1,
+      level: "A2",
+    },
+    {
+      question: "If I ___ rich, I would travel the world.",
+      options: ["am", "was", "were", "be"],
+      correct: 2,
+      level: "B1",
+    },
+    {
+      question: "By the time you arrive, I ___ the project.",
+      options: ["finish", "finished", "will finish", "will have finished"],
+      correct: 3,
+      level: "B2",
+    },
+    {
+      question: "Had I known about the meeting, I ___ attended it.",
+      options: ["would have", "will have", "would", "will"],
+      correct: 0,
+      level: "C1",
+    },
+  ];
 
   // Firebase config
   const isFirebaseConfigured =
@@ -115,6 +151,60 @@
     } else {
       levels = [];
     }
+  }
+
+  function startLevelTest() {
+    if (!selectedLanguage) {
+      toast.error("Selecione um idioma primeiro");
+      return;
+    }
+    showLevelTest = true;
+    currentQuestion = 0;
+    testAnswers = [];
+  }
+
+  function answerQuestion(answerIndex: number) {
+    testAnswers[currentQuestion] = answerIndex;
+
+    if (currentQuestion < levelingQuestions.length - 1) {
+      currentQuestion++;
+    } else {
+      calculateLevel();
+    }
+  }
+
+  function calculateLevel() {
+    let correctAnswers = 0;
+    testAnswers.forEach((answer, index) => {
+      if (answer === levelingQuestions[index].correct) {
+        correctAnswers++;
+      }
+    });
+
+    let detectedLevel = "A1";
+    if (correctAnswers >= 4) detectedLevel = "C1";
+    else if (correctAnswers >= 3) detectedLevel = "B2";
+    else if (correctAnswers >= 2) detectedLevel = "B1";
+    else if (correctAnswers >= 1) detectedLevel = "A2";
+
+    // Definir o nível no select
+    const levelSelect = document.getElementById(
+      "register-level",
+    ) as HTMLSelectElement;
+    if (levelSelect) {
+      levelSelect.value = detectedLevel;
+    }
+
+    showLevelTest = false;
+    toast.success(
+      `Nível detectado: ${levelDescriptions[selectedLanguage]?.[detectedLevel]}`,
+    );
+  }
+
+  function closeLevelTest() {
+    showLevelTest = false;
+    currentQuestion = 0;
+    testAnswers = [];
   }
 
   function isValidPassword(password: string): boolean {
@@ -264,7 +354,7 @@
     <img src="logo.png" alt="Logo" width={60} />
     <h1 class="heroTitle">SpeakUp</h1>
     <p class="heroSubtitle">
-      Aprendizado personalizado com correções, explicações e evolução contínua.
+      Aprenda qualquer idioma conversando com uma inteligência artificial!
     </p>
     <button on:click={() => openAuthModal("register")} class="cta"
       >Vamos começar!</button
@@ -342,7 +432,6 @@
         </button>
 
         <div class="modalHeader">
-          <img src="./logo.png" alt="SpeakUp Logo" class="modalLogo" />
           <h2>
             {authMode === "login" ? "Bem-vindo de volta!" : "Crie sua conta"}
           </h2>
@@ -475,6 +564,17 @@
             </div>
 
             <div class="inputGroup">
+              <button
+                type="button"
+                class="levelTestButton"
+                on:click={startLevelTest}
+                disabled={!selectedLanguage}
+              >
+                Não sabe o seu nível? - Fazer teste rápido
+              </button>
+            </div>
+
+            <div class="inputGroup">
               <label for="register-email">Email</label>
               <input
                 id="register-email"
@@ -514,6 +614,59 @@
             </button>
           </form>
         {/if}
+      </div>
+    </div>
+  {/if}
+
+  <!-- Level Test Modal -->
+  {#if showLevelTest}
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <div class="modalOverlay testOverlay" on:click={closeLevelTest}>
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
+      <div class="modalContent testModal" on:click|stopPropagation>
+        <button
+          class="closeButton"
+          on:click={closeLevelTest}
+          aria-label="Fechar teste"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+          >
+            <path
+              d="M18 6L6 18M6 6l12 12"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+        </button>
+
+        <div class="testHeader">
+          <h2>Teste de Nivelamento</h2>
+          <p class="testProgress">
+            Questão {currentQuestion + 1} de {levelingQuestions.length}
+          </p>
+        </div>
+
+        <div class="questionContainer">
+          <p class="question">{levelingQuestions[currentQuestion].question}</p>
+          <div class="optionsGrid">
+            {#each levelingQuestions[currentQuestion].options as option, index}
+              <button
+                type="button"
+                class="optionButton"
+                on:click={() => answerQuestion(index)}
+              >
+                {option}
+              </button>
+            {/each}
+          </div>
+        </div>
       </div>
     </div>
   {/if}
@@ -607,6 +760,7 @@
     font-weight: bold;
     transition: 0.3s;
     cursor: pointer;
+    margin: 15px 0;
   }
 
   .ctaSecondary:hover {
@@ -786,10 +940,9 @@
   .modalContent {
     background: linear-gradient(135deg, #1f1f1f 0%, #2a2a2a 100%);
     border-radius: 24px;
-    padding: 2.5rem;
+    padding: 2rem;
     max-width: 550px;
     width: 90%;
-    height: 80vh;
     overflow-y: auto;
     position: relative;
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -998,6 +1151,93 @@
     cursor: not-allowed;
   }
 
+  .levelTestButton {
+    width: 100%;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .levelTestButton:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+  }
+
+  .levelTestButton:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .testOverlay {
+    z-index: 1100;
+  }
+
+  .testModal {
+    max-width: 600px;
+    min-height: 400px;
+  }
+
+  .testHeader {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .testHeader h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: white;
+  }
+
+  .testProgress {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+  }
+
+  .questionContainer {
+    margin-top: 2rem;
+  }
+
+  .question {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+    text-align: center;
+  }
+
+  .optionsGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .optionButton {
+    padding: 1.25rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .optionButton:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+  }
+
   .errorMessage {
     background: rgba(239, 68, 68, 0.15);
     border: 1px solid rgba(239, 68, 68, 0.3);
@@ -1122,6 +1362,18 @@
     .authTab {
       font-size: 0.9rem;
       padding: 0.6rem;
+    }
+
+    .optionsGrid {
+      grid-template-columns: 1fr;
+    }
+
+    .question {
+      font-size: 1.1rem;
+    }
+
+    .testModal {
+      min-height: 350px;
     }
   }
 </style>
