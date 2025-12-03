@@ -566,12 +566,13 @@
                 <select
                   id="register-language"
                   name="language"
+                  bind:value={selectedLanguage}
                   on:change={handleLanguageChange}
                   required
                 >
-                  <option value="" disabled selected>Selecione</option>
-                  <option value="english">Inglês</option>
-                  <option value="japanese">Japonês</option>
+                  <option value="" disabled selected>Escolha um idioma</option>
+                  <option value="english">🇺🇸 Inglês</option>
+                  <option value="japanese">🇯🇵 Japonês</option>
                 </select>
               </div>
 
@@ -582,8 +583,13 @@
                   name="level"
                   required
                   disabled={!selectedLanguage}
+                  class:disabled={!selectedLanguage}
                 >
-                  <option value="" disabled selected>Selecione</option>
+                  <option value="" disabled selected>
+                    {selectedLanguage
+                      ? "Escolha seu nível"
+                      : "Selecione um idioma primeiro"}
+                  </option>
                   {#each levels as level}
                     <option value={level}>{level}</option>
                   {/each}
@@ -1031,6 +1037,31 @@
 
   .inputGroup input::placeholder {
     color: rgba(255, 255, 255, 0.4);
+  }
+
+  .inputGroup select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.875rem center;
+    background-size: 12px;
+    padding-right: 2.5rem;
+    cursor: pointer;
+  }
+
+  .inputGroup select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .inputGroup select option {
+    background: #1a1a1a;
+    color: white;
+    padding: 0.5rem;
+  }
+
+  .inputGroup select option:disabled {
+    color: rgba(255, 255, 255, 0.5);
   }
 
   .inputRow {
