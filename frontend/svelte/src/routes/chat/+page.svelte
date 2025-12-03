@@ -301,23 +301,7 @@
             {#if messages.length === 0}
                 <div class="welcomeBox">
                     <div class="welcomeHeader">
-                        <div class="welcomeIcon">
-                            <svg
-                                width="50"
-                                height="50"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                            >
-                                <path
-                                    d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                />
-                            </svg>
-                        </div>
-                        <h2>Bem-vindo ao SpeakUp!</h2>
+                        <h2>Vamos iniciar uma conversa?</h2>
                     </div>
 
                     <div class="welcomeContent">
@@ -744,7 +728,7 @@
 
     .welcomeBox {
         max-width: 800px;
-        margin: 2rem auto;
+        margin: auto;
         background: linear-gradient(145deg, #1e1e1e, #1a1a1a);
         border-radius: 20px;
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -773,37 +757,6 @@
             rgba(255, 255, 255, 0.02)
         );
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .welcomeIcon {
-        width: 80px;
-        height: 80px;
-        margin: 0 auto 1.5rem;
-        background: linear-gradient(
-            135deg,
-            rgba(255, 255, 255, 0.15),
-            rgba(255, 255, 255, 0.05)
-        );
-        border-radius: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: 2px solid rgba(255, 255, 255, 0.2);
-        animation: float 3s ease-in-out infinite;
-    }
-
-    @keyframes float {
-        0%,
-        100% {
-            transform: translateY(0);
-        }
-        50% {
-            transform: translateY(-10px);
-        }
-    }
-
-    .welcomeIcon svg {
-        color: rgba(255, 255, 255, 0.9);
     }
 
     .welcomeHeader h2 {

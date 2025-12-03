@@ -29,7 +29,6 @@
     background: rgba(255, 255, 255, 0.03);
     border-radius: 20px;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(10px);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
@@ -72,7 +71,6 @@
     transform: translateY(-8px);
     border-color: rgba(255, 255, 255, 0.2);
     background: rgba(255, 255, 255, 0.06);
-    box-shadow: 0 20px 60px rgba(255, 255, 255, 0.1);
   }
 
   .iconWrapper {
@@ -95,7 +93,6 @@
 
   .feature:hover .iconWrapper {
     transform: scale(1.1) rotate(5deg);
-    border-color: rgba(255, 255, 255, 0.3);
   }
 
   .iconGlow {
@@ -103,40 +100,20 @@
     width: 100%;
     height: 100%;
     border-radius: 24px;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.3), transparent);
     opacity: 0;
-    transition: opacity 0.4s;
   }
 
   .feature:hover .iconGlow {
     opacity: 1;
-    animation: pulse 2s infinite;
-  }
-
-  @keyframes pulse {
-    0%,
-    100% {
-      transform: scale(1);
-      opacity: 0.5;
-    }
-    50% {
-      transform: scale(1.2);
-      opacity: 0.8;
-    }
   }
 
   .iconWrapper img {
     width: 70px;
     height: 70px;
     object-fit: contain;
-    filter: brightness(1.2);
     transition: all 0.4s ease;
     position: relative;
     z-index: 1;
-  }
-
-  .feature:hover .iconWrapper img {
-    filter: brightness(1.5) drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
   }
 
   .content {

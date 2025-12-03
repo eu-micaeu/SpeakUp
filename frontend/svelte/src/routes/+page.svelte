@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import * as THREE from "three";
   import FeatureCard from "../components/FeatureCard.svelte";
   import Footer from "../components/Footer.svelte";
   import { isAuthTokenValid } from "../utils/cookies";
@@ -246,147 +245,15 @@
     }
   }
 
-  let mountRef: HTMLDivElement;
-
   onMount(() => {
     if (isAuthTokenValid()) {
       goto("/chat");
       return;
     }
-
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(
-      75,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000,
-    );
-    const renderer = new THREE.WebGLRenderer({
-      alpha: true,
-      antialias: true,
-      powerPreference: "high-performance",
-    });
-
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limita pixel ratio
-    renderer.setClearColor(0x000000, 0);
-
-    if (mountRef) {
-      mountRef.appendChild(renderer.domElement);
-      renderer.domElement.style.position = "absolute";
-      renderer.domElement.style.top = "0";
-      renderer.domElement.style.left = "0";
-      renderer.domElement.style.zIndex = "0";
-      renderer.domElement.style.pointerEvents = "none";
-    }
-
-    camera.position.z = 30;
-
-    const particleCount = 200; // Reduzido de 400 para 200
-    const particles = new THREE.BufferGeometry();
-    const positions = new Float32Array(particleCount * 3);
-    const colors = new Float32Array(particleCount * 3);
-    const sizes = new Float32Array(particleCount);
-
-    for (let i = 0; i < particleCount; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 200;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 200;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 200;
-
-      colors[i * 3] = 1.0;
-      colors[i * 3 + 1] = 1.0;
-      colors[i * 3 + 2] = 1.0;
-
-      sizes[i] = 0.5 + Math.random() * 1.5;
-    }
-
-    particles.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-    particles.setAttribute("color", new THREE.BufferAttribute(colors, 3));
-    particles.setAttribute("size", new THREE.BufferAttribute(sizes, 1));
-
-    const particleMaterial = new THREE.PointsMaterial({
-      size: 0.5,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.8,
-      blending: THREE.AdditiveBlending,
-      sizeAttenuation: true,
-    });
-
-    const particleSystem = new THREE.Points(particles, particleMaterial);
-    scene.add(particleSystem);
-
-    let animationId: number;
-    let isVisible = true;
-
-    // Detectar visibilidade da página
-    const handleVisibilityChange = () => {
-      isVisible = !document.hidden;
-      if (isVisible && !animationId) {
-        animate();
-      }
-    };
-
-    // Detectar scroll para pausar quando fora da hero section
-    const handleScroll = () => {
-      const heroSection = document.querySelector(".hero");
-      if (heroSection) {
-        const rect = heroSection.getBoundingClientRect();
-        isVisible = rect.bottom > 0 && rect.top < window.innerHeight;
-      }
-    };
-
-    const animate = () => {
-      if (!isVisible) {
-        animationId = 0;
-        return;
-      }
-
-      animationId = requestAnimationFrame(animate);
-      particleSystem.rotation.x += 0.0005;
-      particleSystem.rotation.y += 0.001;
-      renderer.render(scene, camera);
-    };
-
-    animate();
-
-    const handleResize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    };
-
-    window.addEventListener("resize", handleResize);
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-
-    return () => {
-      // Limpeza adequada
-      if (animationId) {
-        cancelAnimationFrame(animationId);
-      }
-
-      window.removeEventListener("resize", handleResize);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.removeEventListener("scroll", handleScroll);
-
-      if (mountRef && mountRef.contains(renderer.domElement)) {
-        mountRef.removeChild(renderer.domElement);
-      }
-
-      // Liberar recursos do Three.js
-      particles.dispose();
-      particleMaterial.dispose();
-      renderer.dispose();
-      scene.clear();
-    };
   });
 </script>
 
 <main>
-  <div bind:this={mountRef} class="particles"></div>
-
   {#if toastMessage}
     <div class="toast {toastType}">
       {toastMessage}
@@ -420,7 +287,7 @@
 
   <section class="apiSection">
     <div class="apiContainer">
-      <h1>Potencializado pelas melhores IAs do mercado</h1>
+      <h1>Potencializado pelas melhores IAs.</h1>
       <div class="apiLogos">
         <div class="apiCard">
           <img src="./openai-logo.png" alt="OpenAI Logo" />
@@ -746,16 +613,6 @@
     transform: translateY(-2px);
   }
 
-  .particles {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-    pointer-events: none;
-  }
-
   .featureSection {
     padding: 6rem 2rem;
     background: linear-gradient(180deg, #0a0a0a 0%, #121212 50%, #0a0a0a 100%);
@@ -932,7 +789,7 @@
     padding: 2.5rem;
     max-width: 550px;
     width: 90%;
-    max-height: 90vh;
+    height: 80vh;
     overflow-y: auto;
     position: relative;
     border: 1px solid rgba(255, 255, 255, 0.1);
