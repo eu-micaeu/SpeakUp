@@ -729,10 +729,8 @@
     .welcomeBox {
         max-width: 800px;
         margin: auto;
-        background: linear-gradient(145deg, #1e1e1e, #1a1a1a);
         border-radius: 20px;
         border: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
         overflow: hidden;
         animation: fadeInUp 0.6s ease;
     }
