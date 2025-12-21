@@ -23,7 +23,8 @@ import (
 )
 
 var aiConnectorBuilder func() connectors.AIConnector = func() connectors.AIConnector {
-	return connectors.NewOpenAIConnector()
+	// Usa sempre o Ollama (local)
+	return connectors.NewOllamaConnector()
 }
 
 // @Summary Gera uma resposta de diálogo usando IA

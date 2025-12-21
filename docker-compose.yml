@@ -8,6 +8,14 @@ services:
       - "8082:8082"
     environment:
       - JWT_KEY=secret
+      - AI_PROVIDER=${AI_PROVIDER:-ollama}
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-llama3.2}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - MONGO_CONNECTION_STRING=${MONGO_CONNECTION_STRING}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     command: [ "/go/bin/air" ]
 
   ui-web:
