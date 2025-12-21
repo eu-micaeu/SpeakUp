@@ -218,7 +218,7 @@
 
 <style>
   .sidebar {
-    width: 280px;
+    width: 360px;
     background-color: #1a1a1a;
     border-right: 1px solid #333;
     display: flex;
@@ -227,7 +227,7 @@
   }
 
   .sidebarClosed {
-    margin-left: -280px;
+    margin-left: -360px;
   }
 
   .sidebarContent {

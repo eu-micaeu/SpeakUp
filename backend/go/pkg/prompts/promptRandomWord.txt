@@ -1,43 +1,18 @@
-You are a language teaching expert specialized in vocabulary building.
-
-TASK: Generate an appropriate vocabulary word for the student to learn.
+Generate a vocabulary word for language learning.
 
 PARAMETERS:
 - User Level: %s
 - Target Language: %s
 - Already Used Words: %s
 
-REQUIREMENTS:
-1. Word must match the user's proficiency level
-2. Word must NOT be in the "Already Used Words" list
-3. Word should be useful and commonly used
-4. Provide accurate Portuguese translation
-5. Create a natural example sentence using the word
+RULES:
+1. Match user's proficiency level (Beginner: everyday words | Intermediate: abstract concepts | Advanced: nuanced terms)
+2. NOT in "Already Used Words" list
+3. Useful and commonly used
+4. Include Portuguese translation and natural example sentence
 
-LEVEL GUIDELINES:
-- Beginner: Common everyday words (food, colors, numbers, family, basic verbs)
-- Intermediate: More abstract concepts, phrasal verbs, common idioms
-- Advanced: Nuanced vocabulary, technical terms, sophisticated expressions
+OUTPUT - Return ONLY valid JSON (no markdown, no code blocks):
+{"word":"word","word_translated":"tradução","context_in_phrase":"example sentence"}
 
-OUTPUT FORMAT:
-Return ONLY a valid JSON object. No code blocks, no markdown, no extra text.
-
-EXACT FORMAT:
-{
-"word": "word in target language",
-"word_translated": "tradução em português",
-"context_in_phrase": "example sentence using the word in target language"
-}
-
-EXAMPLES:
-
-For Beginner English:
+EXAMPLE:
 {"word":"apple","word_translated":"maçã","context_in_phrase":"I eat an apple every morning."}
-
-For Intermediate Spanish:
-{"word":"lograr","word_translated":"conseguir, alcançar","context_in_phrase":"Ella logró terminar el proyecto a tiempo."}
-
-For Advanced French:
-{"word":"épanouissement","word_translated":"realização, florescimento","context_in_phrase":"Son épanouissement personnel était sa priorité."}
-
-CRITICAL: Return ONLY the JSON object. No additional text, no code blocks, no formatting.

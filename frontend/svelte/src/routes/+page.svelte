@@ -377,28 +377,23 @@
 
   <section class="apiSection">
     <div class="apiContainer">
-      <h1>Potencializado pelas melhores IAs.</h1>
+      <h1>Potencializado por IA local e privada.</h1>
       <div class="apiLogos">
         <div class="apiCard">
-          <img src="./openai-logo.png" alt="OpenAI Logo" />
-          <h3>OpenAI GPT</h3>
+          <img src="./ollama-logo.png" alt="Ollama Logo" />
+          <h3>Ollama</h3>
           <p>
-            Tecnologia de ponta para compreensão e geração de linguagem natural
-          </p>
-        </div>
-        <div class="apiCard">
-          <img src="./gemini-logo.png" alt="Google Gemini Logo" />
-          <h3>Google Gemini</h3>
-          <p>
-            IA multimodal avançada do Google para análise contextual profunda
+            Modelos de IA open-source executados localmente para total
+            privacidade e controle dos seus dados
           </p>
         </div>
       </div>
       <p class="apiDescription">
-        Combinamos as APIs mais avançadas de inteligência artificial disponíveis
-        para oferecer correções precisas e contextualizadas detalhadas que se
-        adaptam ao seu nível de conhecimento. Cada interação é otimizada para
-        maximizar seu aprendizado.
+        Utilizamos o Ollama para executar modelos de inteligência artificial
+        avançados diretamente no seu dispositivo, garantindo privacidade total e
+        oferecendo correções precisas e contextualizadas que se adaptam ao seu
+        nível de conhecimento. Aprenda idiomas com tecnologia de ponta sem
+        comprometer seus dados.
       </p>
     </div>
   </section>
@@ -899,8 +894,6 @@
   .apiCard img {
     width: 80px;
     height: 80px;
-    margin-bottom: 1.5rem;
-    filter: brightness(0) invert(1);
   }
 
   .apiCard h3 {
