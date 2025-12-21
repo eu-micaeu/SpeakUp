@@ -136,7 +136,10 @@ func GenerateResponseCorrection(c *gin.Context) {
 	// Use the builder to get a connector instance
 	connector := aiConnectorBuilder() // MODIFIED LINE
 
-	correctionResp, err := connector.GenerateResponse(context.Background(), "Answer me in this language: " + middlewares.GetLanguageFromContext(c) + prompt + request.Message)
+	// Concatenate prompt with user message for correction
+	fullPrompt := prompt + "\n\nText to correct: " + request.Message
+	
+	correctionResp, err := connector.GenerateResponse(context.Background(), fullPrompt)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -178,7 +181,10 @@ func GenerateResponseTranslate(c *gin.Context) {
 	// Use the builder to get a connector instance
 	connector := aiConnectorBuilder() // MODIFIED LINE
 
-	response, err := connector.GenerateResponse(context.Background(), prompt+req.Message)
+	// Concatenate prompt with user message for translation
+	fullPrompt := prompt + "\n\nText: " + req.Message + "\nTranslation:"
+
+	response, err := connector.GenerateResponse(context.Background(), fullPrompt)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao gerar tradução: " + err.Error()})
 		return
