@@ -6,9 +6,9 @@ import (
 	"speakup/pkg/middlewares"
 )
 
-func WordRoutes(router *gin.Engine) {
+func WordRoutes(router *gin.Engine, wordHandler *handlers.WordHandler) {
 	wordRoutes := router.Group("api/word")
 	{
-		wordRoutes.GET("/user", middlewares.AuthMiddleware(), handlers.ListUserWords)
+		wordRoutes.GET("/user", middlewares.AuthMiddleware(), wordHandler.ListUserWords)
 	}
 }

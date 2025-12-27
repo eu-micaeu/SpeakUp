@@ -3,14 +3,20 @@ package handlers
 import (
 	"net/http"
 
-	"speakup/pkg/config"
 	"speakup/pkg/middlewares"
-	"speakup/pkg/models"
+	"speakup/pkg/repositories"
+	"speakup/pkg/utils"
 
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
+
+type WordHandler struct {
+	Repo repositories.WordRepository
+}
+
+func NewWordHandler(repo repositories.WordRepository) *WordHandler {
+	return &WordHandler{Repo: repo}
+}
 
 // @Summary Lista todas as palavras de um usuário
 // @Description Retorna todas as palavras geradas para um usuário específico
@@ -23,32 +29,19 @@ import (
 // @Failure 401 {object} map[string]string "Erro de autenticação" example({"error":"Usuário não autenticado"})
 // @Failure 500 {object} map[string]string "Erro interno do servidor" example({"error":"Falha ao buscar palavras"})
 // @Router /word/user [get]
-func ListUserWords(c *gin.Context) {
+func (h *WordHandler) ListUserWords(c *gin.Context) {
 	// Obter ID do usuário do contexto
 	userID := middlewares.GetUserIDFromContext(c)
 	if userID == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Usuário não autenticado"})
+		utils.RespondWithError(c, http.StatusUnauthorized, "Usuário não autenticado")
 		return
 	}
 
-	// Buscar palavras do usuário
-	db := config.GetMongoClient()
-	collection := db.Database("speakup").Collection("words")
-
-	cursor, err := collection.Find(c, bson.M{
-		"user_id": userID,
-	}, options.Find().SetSort(bson.M{"created_at": -1}))
-
+	words, err := h.Repo.FindAllByUserID(c, userID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Falha ao buscar palavras"})
+		utils.RespondWithError(c, http.StatusInternalServerError, "Falha ao buscar palavras")
 		return
 	}
 
-	var words []models.Word
-	if err = cursor.All(c, &words); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Falha ao processar palavras"})
-		return
-	}
-
-	c.JSON(http.StatusOK, words)
+	utils.RespondWithJSON(c, http.StatusOK, words)
 }

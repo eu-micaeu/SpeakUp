@@ -9,20 +9,20 @@ import (
 
 )
 
-func MessageRoutes(router *gin.Engine) {
+func MessageRoutes(router *gin.Engine, messageHandler *handlers.MessageHandler) {
 
 	messageRoutes := router.Group("api/message")
 
 	{
 		// CRUD operations for messages
-		messageRoutes.POST("", middlewares.AuthMiddleware(), handlers.CreateMessage)
-		messageRoutes.GET("/:id", middlewares.AuthMiddleware(), handlers.GetMessageById)
-		messageRoutes.GET("", middlewares.AuthMiddleware(), handlers.GetMessages)
-		messageRoutes.PUT("/:id", middlewares.AuthMiddleware(), handlers.UpdateMessage)
-		messageRoutes.DELETE("/:id", middlewares.AuthMiddleware(), handlers.DeleteMessage)
+		messageRoutes.POST("", middlewares.AuthMiddleware(), messageHandler.CreateMessage)
+		messageRoutes.GET("/:id", middlewares.AuthMiddleware(), messageHandler.GetMessageById)
+		messageRoutes.GET("", middlewares.AuthMiddleware(), messageHandler.GetMessages)
+		messageRoutes.PUT("/:id", middlewares.AuthMiddleware(), messageHandler.UpdateMessage)
+		messageRoutes.DELETE("/:id", middlewares.AuthMiddleware(), messageHandler.DeleteMessage)
 
 		// Get messages by chat ID
-		messageRoutes.GET("/chat/:id", middlewares.AuthMiddleware(), handlers.GetMessagesByChatId)
+		messageRoutes.GET("/chat/:id", middlewares.AuthMiddleware(), messageHandler.GetMessagesByChatId)
 	}
 
 }

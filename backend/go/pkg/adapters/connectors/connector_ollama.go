@@ -37,7 +37,7 @@ func NewOllamaConnector() *OllamaConnector {
 
 	model := os.Getenv("OLLAMA_MODEL")
 	if model == "" {
-		model = "llama3.2"
+		model = "mistral"
 	}
 
 	return &OllamaConnector{

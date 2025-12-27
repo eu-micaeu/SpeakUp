@@ -4,14 +4,23 @@ import (
 	"net/http"
 	"time"
 
-	"speakup/pkg/config"
 	"speakup/pkg/models"
+	"speakup/pkg/repositories"
+	"speakup/pkg/utils"
 
 	"go.mongodb.org/mongo-driver/bson"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
+
+type MessageHandler struct {
+	Repo repositories.MessageRepository
+}
+
+func NewMessageHandler(repo repositories.MessageRepository) *MessageHandler {
+	return &MessageHandler{Repo: repo}
+}
 
 // CreateMessage creates a new message
 // @Summary Create a new message
@@ -27,28 +36,22 @@ import (
 // @Failure 401 "Não autorizado"
 // @Failure 500 "Erro ao criar mensagem"
 // @Router /message [post]
-
-// CreateMessage is a handler function that creates a new message
-func CreateMessage(c *gin.Context) {
+func (h *MessageHandler) CreateMessage(c *gin.Context) {
 	var message models.Message
 	if err := c.ShouldBindJSON(&message); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		utils.RespondWithError(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	message.ID = uuid.New().String()
 	message.CreatedAt = time.Now().Format(time.RFC3339)
 
-	db := config.GetMongoClient()
-	collection := db.Database("speakup").Collection("messages")
-	_, err := collection.InsertOne(c, message)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create message"})
+	if err := h.Repo.Create(c, message); err != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to create message")
 		return
 	}
 
-	c.JSON(http.StatusCreated, message)
-
+	utils.RespondWithJSON(c, http.StatusCreated, message)
 }
 
 // GetMessageById gets a message by ID
@@ -64,18 +67,15 @@ func CreateMessage(c *gin.Context) {
 // @Failure 401 "Não autorizado"
 // @Failure 404 "Mensagem não encontrada"
 // @Router /message/{id} [get]
-func GetMessageById(c *gin.Context) {
+func (h *MessageHandler) GetMessageById(c *gin.Context) {
 	id := c.Param("id")
-	db := config.GetMongoClient()
-	collection := db.Database("speakup").Collection("messages")
-	var message models.Message
-	err := collection.FindOne(c, map[string]string{"id": id}).Decode(&message)
+	message, err := h.Repo.FindByID(c, id)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Message not found"})
+		utils.RespondWithError(c, http.StatusNotFound, "Message not found")
 		return
 	}
 
-	c.JSON(http.StatusOK, message)
+	utils.RespondWithJSON(c, http.StatusOK, message)
 }
 
 // GetMessages gets all messages
@@ -90,22 +90,14 @@ func GetMessageById(c *gin.Context) {
 // @Failure 401 "Não autorizado"
 // @Failure 500 "Erro ao buscar mensagens"
 // @Router /message [get]
-func GetMessages(c *gin.Context) {
-	db := config.GetMongoClient()
-	collection := db.Database("speakup").Collection("messages")
-	cursor, err := collection.Find(c, map[string]string{})
+func (h *MessageHandler) GetMessages(c *gin.Context) {
+	messages, err := h.Repo.FindAll(c)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get messages"})
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to get messages")
 		return
 	}
 
-	var messages []models.Message
-	if err := cursor.All(c, &messages); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get messages"})
-		return
-	}
-
-	c.JSON(http.StatusOK, messages)
+	utils.RespondWithJSON(c, http.StatusOK, messages)
 }
 
 // UpdateMessage updates a message by ID
@@ -123,22 +115,28 @@ func GetMessages(c *gin.Context) {
 // @Failure 401 "Não autorizado"
 // @Failure 500 "Erro ao atualizar mensagem"
 // @Router /message/{id} [put]
-func UpdateMessage(c *gin.Context) {
+func (h *MessageHandler) UpdateMessage(c *gin.Context) {
 	id := c.Param("id")
 	var message models.Message
 	if err := c.ShouldBindJSON(&message); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		utils.RespondWithError(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	db := config.GetMongoClient()
-	collection := db.Database("speakup").Collection("messages")
-	_, err := collection.UpdateOne(c, map[string]string{"id": id}, bson.M{"$set": message})
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update message"})
+	
+	updateDoc := bson.M{}
+	if message.Content != "" {
+		updateDoc["content"] = message.Content
+	}
+	if message.Type != "" {
+		updateDoc["type"] = message.Type
+	}
+	
+	if err := h.Repo.Update(c, id, updateDoc); err != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to update message")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Message updated successfully"})
+	utils.RespondWithJSON(c, http.StatusOK, gin.H{"message": "Message updated successfully"})
 }
 
 // DeleteMessage deletes a message by ID
@@ -154,20 +152,15 @@ func UpdateMessage(c *gin.Context) {
 // @Failure 401 "Não autorizado"
 // @Failure 500 "Erro ao deletar mensagem"
 // @Router /message/{id} [delete]
-func DeleteMessage(c *gin.Context) {
+func (h *MessageHandler) DeleteMessage(c *gin.Context) {
 	id := c.Param("id")
-	db := config.GetMongoClient()
-	collection := db.Database("speakup").Collection("messages")
-	_, err := collection.DeleteOne(c, map[string]string{"id": id})
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete message"})
+	if err := h.Repo.Delete(c, id); err != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to delete message")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Message deleted successfully"})
+	utils.RespondWithJSON(c, http.StatusOK, gin.H{"message": "Message deleted successfully"})
 }
-
-// Special handler functions
 
 // GetMessagesByChatId gets all messages from a specific chat
 // @Summary Get messages by chat ID
@@ -182,21 +175,13 @@ func DeleteMessage(c *gin.Context) {
 // @Failure 401 "Não autorizado"
 // @Failure 500 "Erro ao buscar mensagens"
 // @Router /message/chat/{id} [get]
-func GetMessagesByChatId(c *gin.Context) {
+func (h *MessageHandler) GetMessagesByChatId(c *gin.Context) {
 	chatId := c.Param("id")
-	db := config.GetMongoClient()
-	collection := db.Database("speakup").Collection("messages")
-	cursor, err := collection.Find(c, map[string]string{"chat_id": chatId})
+	messages, err := h.Repo.FindAllByChatID(c, chatId)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get messages"})
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to get messages")
 		return
 	}
 
-	var messages []models.Message
-	if err := cursor.All(c, &messages); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get messages"})
-		return
-	}
-
-	c.JSON(http.StatusOK, messages)
+	utils.RespondWithJSON(c, http.StatusOK, messages)
 }

@@ -2,9 +2,11 @@ package handlers
 
 import (
 	"net/http"
-	"speakup/pkg/config"
+
 	"speakup/pkg/middlewares"
 	"speakup/pkg/models"
+	"speakup/pkg/repositories"
+	"speakup/pkg/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -12,6 +14,14 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
 )
+
+type UserHandler struct {
+	Repo repositories.UserRepository
+}
+
+func NewUserHandler(repo repositories.UserRepository) *UserHandler {
+	return &UserHandler{Repo: repo}
+}
 
 // Login handles the login of a user
 // Login godoc
@@ -24,35 +34,34 @@ import (
 // @Example      {object} credentials {"email":"user@example.com","password":"123456"}
 // @Success      200         {object}  object{token=string}
 // @Router       /user/login [post]
-func Login(c *gin.Context) {
-	client := config.GetMongoClient()
+func (h *UserHandler) Login(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		utils.RespondWithError(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	collection := client.Database("speakup").Collection("users")
-	var result models.User
-	err := collection.FindOne(c, bson.M{"email": user.Email}).Decode(&result)
+
+	result, err := h.Repo.FindByEmail(c, user.Email)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email"})
+		utils.RespondWithError(c, http.StatusUnauthorized, "Invalid email")
 		return
 	}
+
 	err = bcrypt.CompareHashAndPassword([]byte(result.Password), []byte(user.Password))
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid password"})
+		utils.RespondWithError(c, http.StatusUnauthorized, "Invalid password")
 		return
 	}
+
 	token, err := middlewares.GenerateJWT(result.ID, result.Name, result.Email, result.Language, result.Level)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to generate token")
 		return
 	}
-	c.Set("authToken", token)
-	c.JSON(http.StatusOK, gin.H{"message": "Login successful", "token": token})
-}
 
-// CRUD operations for user
+	c.Set("authToken", token)
+	utils.RespondWithJSON(c, http.StatusOK, gin.H{"message": "Login successful", "token": token})
+}
 
 // CreateUser handles the creation of a new user
 // CreateUser godoc
@@ -66,25 +75,21 @@ func Login(c *gin.Context) {
 // @Failure      400  {object}  object{error=string}
 // @Failure      500  {object}  object{error=string}
 // @Router       /user [post]
-func CreateUser(c *gin.Context) {
-	client := config.GetMongoClient()
+func (h *UserHandler) CreateUser(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		utils.RespondWithError(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	collection := client.Database("speakup").Collection("users")
-
 	// Check if a user with the same email already exists
-	var existingUser models.User
-	err := collection.FindOne(c, bson.M{"email": user.Email}).Decode(&existingUser)
+	_, err := h.Repo.FindByEmail(c, user.Email)
 	if err == nil {
-		c.JSON(http.StatusConflict, gin.H{"error": "User with this email already exists"})
+		utils.RespondWithError(c, http.StatusConflict, "User with this email already exists")
 		return
 	}
 	if err != mongo.ErrNoDocuments {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+		utils.RespondWithError(c, http.StatusInternalServerError, "Database error")
 		return
 	}
 
@@ -94,19 +99,19 @@ func CreateUser(c *gin.Context) {
 	// Hash the user's password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to hash password")
 		return
 	}
 	user.Password = string(hashedPassword)
 
 	// Insert the user into the database
-	_, err = collection.InsertOne(c, user)
+	err = h.Repo.Create(c, user)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to create user")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "User created successfully"})
+	utils.RespondWithJSON(c, http.StatusOK, gin.H{"message": "User created successfully"})
 }
 
 // GetUsers handles the retrieval of a user
@@ -119,17 +124,14 @@ func CreateUser(c *gin.Context) {
 // @Success      200  {object}  models.User
 // @Failure      500  {object}  object{error=string}
 // @Router       /user/{id} [get]
-func GetUsers(c *gin.Context) {
-	client := config.GetMongoClient()
+func (h *UserHandler) GetUsers(c *gin.Context) {
 	id := c.Param("id")
-	collection := client.Database("speakup").Collection("users")
-	var user models.User
-	err := collection.FindOne(c, bson.M{"id": id}).Decode(&user)
+	user, err := h.Repo.FindByID(c, id)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user"})
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to get user")
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"user": user})
+	utils.RespondWithJSON(c, http.StatusOK, gin.H{"user": user})
 }
 
 // UpdateUser handles the update of a user
@@ -145,12 +147,11 @@ func GetUsers(c *gin.Context) {
 // @Failure      400  {object}  object{error=string}
 // @Failure      500  {object}  object{error=string}
 // @Router       /user/{id} [put]
-func UpdateUser(c *gin.Context) {
-	client := config.GetMongoClient()
+func (h *UserHandler) UpdateUser(c *gin.Context) {
 	id := c.Param("id")
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		utils.RespondWithError(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -173,7 +174,7 @@ func UpdateUser(c *gin.Context) {
 		// Hash do novo password
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
+			utils.RespondWithError(c, http.StatusInternalServerError, "Failed to hash password")
 			return
 		}
 		updateDoc["password"] = string(hashedPassword)
@@ -181,18 +182,17 @@ func UpdateUser(c *gin.Context) {
 
 	// Se não houver campos para atualizar, retorna sucesso
 	if len(updateDoc) == 0 {
-		c.JSON(http.StatusOK, gin.H{"message": "No fields to update"})
+		utils.RespondWithJSON(c, http.StatusOK, gin.H{"message": "No fields to update"})
 		return
 	}
 
-	collection := client.Database("speakup").Collection("users")
-	_, err := collection.UpdateOne(c, bson.M{"id": id}, bson.M{"$set": updateDoc})
+	err := h.Repo.Update(c, id, updateDoc)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to update user")
 		return
 	}
-	
-	c.JSON(http.StatusOK, gin.H{"message": "User updated successfully"})
+
+	utils.RespondWithJSON(c, http.StatusOK, gin.H{"message": "User updated successfully"})
 }
 
 // DeleteUser handles the deletion of a user
@@ -205,14 +205,12 @@ func UpdateUser(c *gin.Context) {
 // @Success      200  {object}  object{message=string}
 // @Failure      500  {object}  object{error=string}
 // @Router       /user/{id} [delete]
-func DeleteUser(c *gin.Context) {
-	client := config.GetMongoClient()
+func (h *UserHandler) DeleteUser(c *gin.Context) {
 	id := c.Param("id")
-	collection := client.Database("speakup").Collection("users")
-	_, err := collection.DeleteOne(c, bson.M{"id": id})
+	err := h.Repo.Delete(c, id)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user"})
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to delete user")
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
+	utils.RespondWithJSON(c, http.StatusOK, gin.H{"message": "User deleted successfully"})
 }

@@ -4,15 +4,22 @@ import (
 	"net/http"
 	"time"
 
-	"speakup/pkg/config"
 	"speakup/pkg/middlewares"
 	"speakup/pkg/models"
+	"speakup/pkg/repositories"
+	"speakup/pkg/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
-// @Summary CRUD operations for chat
+type ChatHandler struct {
+	Repo repositories.ChatRepository
+}
+
+func NewChatHandler(repo repositories.ChatRepository) *ChatHandler {
+	return &ChatHandler{Repo: repo}
+}
 
 // CreateChat godoc
 // @Summary Create a new chat
@@ -26,10 +33,10 @@ import (
 // @Failure 400 {object} object "Bad request"
 // @Failure 500 {object} object "Internal server error"
 // @Router /chat [post]
-func CreateChat(c *gin.Context) {
+func (h *ChatHandler) CreateChat(c *gin.Context) {
 	var chat models.Chat
 	if err := c.ShouldBindJSON(&chat); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		utils.RespondWithError(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -37,15 +44,12 @@ func CreateChat(c *gin.Context) {
 	chat.UserID = middlewares.GetUserIDFromContext(c)
 	chat.StartTime = time.Now().Format(time.RFC3339)
 
-	db := config.GetMongoClient()
-	collection := db.Database("speakup").Collection("chats")
-	_, err := collection.InsertOne(c, chat)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create chat"})
+	if err := h.Repo.Create(c, chat); err != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to create chat")
 		return
 	}
 
-	c.JSON(http.StatusCreated, chat)
+	utils.RespondWithJSON(c, http.StatusCreated, chat)
 }
 
 // GetChatById godoc
@@ -59,18 +63,15 @@ func CreateChat(c *gin.Context) {
 // @Success 200 {object} models.Chat "Chat found"
 // @Failure 404 {object} object "Chat not found"
 // @Router /chat/{id} [get]
-func GetChatById(c *gin.Context) {
+func (h *ChatHandler) GetChatById(c *gin.Context) {
 	id := c.Param("id")
-	db := config.GetMongoClient()
-	collection := db.Database("speakup").Collection("chats")
-	var chat models.Chat
-	err := collection.FindOne(c, map[string]string{"_id": id}).Decode(&chat)
+	chat, err := h.Repo.FindByID(c, id)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Chat not found"})
+		utils.RespondWithError(c, http.StatusNotFound, "Chat not found")
 		return
 	}
 
-	c.JSON(http.StatusOK, chat)
+	utils.RespondWithJSON(c, http.StatusOK, chat)
 }
 
 // GetChats godoc
@@ -83,22 +84,14 @@ func GetChatById(c *gin.Context) {
 // @Success 200 {array} models.Chat "List of chats"
 // @Failure 500 {object} object "Internal server error"
 // @Router /chat [get]
-func GetChats(c *gin.Context) {
-	db := config.GetMongoClient()
-	collection := db.Database("speakup").Collection("chats")
-	cursor, err := collection.Find(c, map[string]string{})
+func (h *ChatHandler) GetChats(c *gin.Context) {
+	chats, err := h.Repo.FindAll(c)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get chats"})
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to get chats")
 		return
 	}
 
-	var chats []models.Chat
-	if err := cursor.All(c, &chats); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get chats"})
-		return
-	}
-
-	c.JSON(http.StatusOK, chats)
+	utils.RespondWithJSON(c, http.StatusOK, chats)
 }
 
 // UpdateChat godoc
@@ -114,23 +107,20 @@ func GetChats(c *gin.Context) {
 // @Failure 400 {object} object "Bad request"
 // @Failure 500 {object} object "Internal server error"
 // @Router /chat/{id} [put]
-func UpdateChat(c *gin.Context) {
+func (h *ChatHandler) UpdateChat(c *gin.Context) {
 	id := c.Param("id")
 	var chat models.Chat
 	if err := c.ShouldBindJSON(&chat); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		utils.RespondWithError(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	db := config.GetMongoClient()
-	collection := db.Database("speakup").Collection("chats")
-	_, err := collection.UpdateOne(c, map[string]string{"_id": id}, chat)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update chat"})
+	if err := h.Repo.Update(c, id, chat); err != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to update chat")
 		return
 	}
 
-	c.JSON(http.StatusOK, chat)
+	utils.RespondWithJSON(c, http.StatusOK, chat)
 }
 
 // DeleteChat godoc
@@ -144,20 +134,15 @@ func UpdateChat(c *gin.Context) {
 // @Success 200 {object} object "Chat deleted successfully"
 // @Failure 500 {object} object "Internal server error"
 // @Router /chat/{id} [delete]
-func DeleteChat(c *gin.Context) {
+func (h *ChatHandler) DeleteChat(c *gin.Context) {
 	id := c.Param("id")
-	db := config.GetMongoClient()
-	collection := db.Database("speakup").Collection("chats")
-	_, err := collection.DeleteOne(c, map[string]string{"_id": id})
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete chat"})
+	if err := h.Repo.Delete(c, id); err != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to delete chat")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Chat deleted successfully"})
+	utils.RespondWithJSON(c, http.StatusOK, gin.H{"message": "Chat deleted successfully"})
 }
-
-// Special operations for chat
 
 // GetChatsByUserId godoc
 // @Summary Get user's chats
@@ -169,21 +154,13 @@ func DeleteChat(c *gin.Context) {
 // @Success 200 {object} object{chats=[]models.Chat} "List of user's chats"
 // @Failure 500 {object} object "Internal server error"
 // @Router /chat/user [get]
-func GetChatsByUserId(c *gin.Context) {
+func (h *ChatHandler) GetChatsByUserId(c *gin.Context) {
 	id := middlewares.GetUserIDFromContext(c)
-	db := config.GetMongoClient()
-	collection := db.Database("speakup").Collection("chats")
-	cursor, err := collection.Find(c, map[string]string{"user_id": id})
+	chats, err := h.Repo.FindAllByUserID(c, id)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get chats"})
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to get chats")
 		return
 	}
 
-	var chats []models.Chat
-	if err := cursor.All(c, &chats); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get chats"})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"chats": chats})
+	utils.RespondWithJSON(c, http.StatusOK, gin.H{"chats": chats})
 }

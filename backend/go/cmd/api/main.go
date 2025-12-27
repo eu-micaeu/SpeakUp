@@ -10,7 +10,9 @@ import (
 
 	"speakup/pkg/config"
 	_ "speakup/docs"
+	"speakup/pkg/handlers"
 	"speakup/pkg/middlewares"
+	"speakup/pkg/repositories"
 	"speakup/pkg/routes"
 )
 
@@ -36,12 +38,29 @@ func main() {
 	// Connect to MongoDB
 	config.ConnectMongoDB()
 
+	// Initialize Dependencies
+	dbClient := config.GetMongoClient()
+	dbName := config.GetDBName()
+	db := dbClient.Database(dbName)
+
+	// Repositories
+	chatRepo := repositories.NewMongoChatRepository(db)
+	userRepo := repositories.NewMongoUserRepository(db)
+	messageRepo := repositories.NewMongoMessageRepository(db)
+	wordRepo := repositories.NewMongoWordRepository(db)
+
+	// Handlers
+	chatHandler := handlers.NewChatHandler(chatRepo)
+	userHandler := handlers.NewUserHandler(userRepo)
+	messageHandler := handlers.NewMessageHandler(messageRepo)
+	wordHandler := handlers.NewWordHandler(wordRepo)
+
 	// Load routes
-	routes.UserRoutes(r)
-	routes.ChatRoutes(r)
-	routes.MessageRoutes(r)
+	routes.UserRoutes(r, userHandler)
+	routes.ChatRoutes(r, chatHandler)
+	routes.MessageRoutes(r, messageHandler)
 	routes.AIRoutes(r)
-	routes.WordRoutes(r)
+	routes.WordRoutes(r, wordHandler)
 
 	// Load Swagger
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

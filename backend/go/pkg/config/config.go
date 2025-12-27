@@ -44,3 +44,11 @@ func GetMongoClient() *mongo.Client {
 func SetMongoClient(c *mongo.Client) {
 	client = c
 }
+
+func GetDBName() string {
+	dbName := os.Getenv("DB_NAME")
+	if dbName == "" {
+		return "speakup"
+	}
+	return dbName
+}

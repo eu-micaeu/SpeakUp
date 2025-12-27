@@ -8,16 +8,16 @@ import (
 )
 
 // UserRoutes sets up the routes for the user
-func UserRoutes(router *gin.Engine) {
+func UserRoutes(router *gin.Engine, userHandler *handlers.UserHandler) {
 	userRoutes := router.Group("api/user")
 	{
 		// RESTful routes
-		userRoutes.POST("/", handlers.CreateUser)
-		userRoutes.GET("/:id", handlers.GetUsers)
-		userRoutes.PUT("/:id", handlers.UpdateUser)
-		userRoutes.DELETE("/:id", handlers.DeleteUser)
+		userRoutes.POST("/", userHandler.CreateUser)
+		userRoutes.GET("/:id", userHandler.GetUsers)
+		userRoutes.PUT("/:id", userHandler.UpdateUser)
+		userRoutes.DELETE("/:id", userHandler.DeleteUser)
 
 		// Custom routes
-		userRoutes.POST("/login", handlers.Login)
+		userRoutes.POST("/login", userHandler.Login)
 	}
 }
