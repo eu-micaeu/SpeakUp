@@ -6,7 +6,7 @@
 
 <div align="center">
    
-  [![Go](https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white)](https://golang.org/) [![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/) [![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/) [![React Native](https://img.shields.io/badge/React_Native-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactnative.dev/) [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/) [![Expo](https://img.shields.io/badge/Expo-000020?style=for-the-badge&logo=expo&logoColor=white)](https://expo.dev/)
+  [![Go](https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white)](https://golang.org/) [![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/) [![Svelte](https://img.shields.io/badge/Svelte-FF3E00?style=for-the-badge&logo=svelte&logoColor=white)](https://svelte.dev/) [![React Native](https://img.shields.io/badge/React_Native-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactnative.dev/) [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/) [![Expo](https://img.shields.io/badge/Expo-000020?style=for-the-badge&logo=expo&logoColor=white)](https://expo.dev/)
   
 </div>
 
@@ -30,9 +30,9 @@ Dessa forma, você não apenas corrige suas falhas, mas também aprende com cada
 GoLang, ou Go, é uma linguagem de programação desenvolvida pela Google, projetada para ser eficiente, com ótimo desempenho em ambientes de alta concorrência. Suas principais vantagens incluem sintaxe simples, gerenciamento de memória automático e alta velocidade de compilação, tornando-a ideal para a criação de sistemas distribuídos, servidores web e soluções de grande escala.
 </p>
 
-### ⚛️ React & React Native
+### 🧡 SvelteKit & ⚛️ React Native
 <p align="justify">
-React é uma biblioteca JavaScript desenvolvida pelo Facebook para a criação de interfaces de usuário dinâmicas e eficientes. React Native estende essa tecnologia para o desenvolvimento mobile, permitindo criar aplicativos nativos para iOS e Android com JavaScript. Ambos compartilham a mesma filosofia de componentes reutilizáveis, facilitando a manutenção e escalabilidade tanto de aplicações web quanto mobile.
+SvelteKit é um framework web moderno construído sobre o Svelte, oferecendo alta performance e gerando menos código boilerplate. Para o desenvolvimento mobile, utilizamos React Native, permitindo criar aplicativos nativos para iOS e Android com a flexibilidade do ecossistema JavaScript.
 </p>
 
 ### 🐳 Docker
