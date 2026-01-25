@@ -1,7 +1,13 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { goto } from "$app/navigation";
-    import { getUserById, deleteUser, updateUser } from "../../utils/api";
+    import {
+        getUserById,
+        deleteUser,
+        updateUser,
+        getBillingStatus,
+        createPortalSession,
+    } from "../../utils/api";
     import { toast } from "svelte-sonner";
     import Cookies from "js-cookie";
 
@@ -13,11 +19,23 @@
         level: string;
     }
 
+    interface BillingStatus {
+        stripe_customer_id: string;
+        stripe_subscription_id: string;
+        stripe_price_id: string;
+        stripe_status: string;
+        stripe_current_period_end: number;
+    }
+
     let user: User | null = null;
     let loading = true;
     let editing = false;
     let showDeleteModal = false;
     let deleteConfirmation = "";
+
+    let billingStatus: BillingStatus | null = null;
+    let billingLoading = false;
+    let billingActionLoading = false;
 
     let editForm = {
         name: "",
@@ -74,11 +92,24 @@
             };
 
             updateLevels(user.language);
+
+            await loadBillingStatus();
         } catch (error) {
             console.error("Erro ao carregar dados do usuário:", error);
             toast.error("Erro ao carregar perfil");
         } finally {
             loading = false;
+        }
+    }
+
+    async function loadBillingStatus() {
+        try {
+            billingLoading = true;
+            billingStatus = await getBillingStatus();
+        } catch (error) {
+            console.error("Erro ao carregar billing:", error);
+        } finally {
+            billingLoading = false;
         }
     }
 
@@ -130,6 +161,31 @@
             console.error("Erro ao deletar conta:", error);
             toast.error("Erro ao deletar conta");
         }
+    }
+
+    async function handleCancelPlan() {
+        try {
+            billingActionLoading = true;
+            const { url } = await createPortalSession();
+            if (url) {
+                window.location.href = url;
+            }
+        } catch (error) {
+            console.error("Erro ao abrir portal:", error);
+            toast.error("Erro ao abrir portal");
+        } finally {
+            billingActionLoading = false;
+        }
+    }
+
+    function formatPeriodEnd(timestamp: number) {
+        if (!timestamp) return "-";
+        const date = new Date(timestamp * 1000);
+        return date.toLocaleDateString("pt-BR");
+    }
+
+    function isActive(status?: string) {
+        return status === "active" || status === "trialing";
     }
 
     onMount(() => {
@@ -231,6 +287,53 @@
                             Nível
                         </span>
                         <span class="value">{user.level}</span>
+                    </div>
+                </div>
+
+                <div class="billing-card">
+                    <div class="billing-header">
+                        <h3>Assinatura</h3>
+                        {#if billingLoading}
+                            <span class="billing-status">Carregando...</span>
+                        {:else if billingStatus}
+                            <span
+                                class="billing-status {isActive(
+                                    billingStatus.stripe_status,
+                                )
+                                    ? 'active'
+                                    : 'inactive'}"
+                                >{billingStatus.stripe_status
+                                    ? billingStatus.stripe_status
+                                    : "Sem assinatura"}</span
+                            >
+                        {:else}
+                            <span class="billing-status inactive"
+                                >Sem assinatura</span
+                            >
+                        {/if}
+                    </div>
+
+                    <div class="billing-info">
+                        <div class="info-item">
+                            <span class="label">Renovação</span>
+                            <span class="value">
+                                {formatPeriodEnd(
+                                    billingStatus?.stripe_current_period_end ||
+                                        0,
+                                )}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="billing-actions">
+                        <button
+                            class="btn btn-secondary"
+                            on:click={handleCancelPlan}
+                            disabled={billingActionLoading ||
+                                !isActive(billingStatus?.stripe_status)}
+                        >
+                            Cancelar plano
+                        </button>
                     </div>
                 </div>
 
@@ -495,6 +598,61 @@
         flex-direction: column;
         gap: 1rem;
         margin-bottom: 2rem;
+    }
+
+    .billing-card {
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .billing-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .billing-header h3 {
+        margin: 0;
+        font-size: 1.2rem;
+    }
+
+    .billing-status {
+        padding: 0.35rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: capitalize;
+        background: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .billing-status.active {
+        background: rgba(76, 175, 80, 0.2);
+        color: #4caf50;
+        border: 1px solid rgba(76, 175, 80, 0.4);
+    }
+
+    .billing-status.inactive {
+        background: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .billing-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .billing-actions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
     }
 
     .info-item {

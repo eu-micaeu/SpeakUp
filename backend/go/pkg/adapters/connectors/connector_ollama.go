@@ -17,9 +17,11 @@ type OllamaConnector struct {
 }
 
 type OllamaRequest struct {
-	Model  string `json:"model"`
-	Prompt string `json:"prompt"`
-	Stream bool   `json:"stream"`
+	Model   string         `json:"model"`
+	Prompt  string         `json:"prompt"`
+	Stream  bool           `json:"stream"`
+	System  string         `json:"system,omitempty"`
+	Options map[string]any `json:"options,omitempty"`
 }
 
 type OllamaResponse struct {
@@ -48,10 +50,20 @@ func NewOllamaConnector() *OllamaConnector {
 }
 
 func (o *OllamaConnector) GenerateResponse(ctx context.Context, message string) (string, error) {
+	return o.generate(ctx, message, "", nil)
+}
+
+func (o *OllamaConnector) GenerateResponseWithOptions(ctx context.Context, message string, system string, options map[string]any) (string, error) {
+	return o.generate(ctx, message, system, options)
+}
+
+func (o *OllamaConnector) generate(ctx context.Context, message string, system string, options map[string]any) (string, error) {
 	reqBody := OllamaRequest{
-		Model:  o.model,
-		Prompt: message,
-		Stream: false,
+		Model:   o.model,
+		Prompt:  message,
+		Stream:  false,
+		System:  system,
+		Options: options,
 	}
 
 	jsonData, err := json.Marshal(reqBody)

@@ -48,6 +48,21 @@ interface User {
     level: string;
 }
 
+export interface BillingStatus {
+    stripe_customer_id: string;
+    stripe_subscription_id: string;
+    stripe_price_id: string;
+    stripe_status: string;
+    stripe_current_period_end: number;
+}
+
+export interface AIUsageStatus {
+    is_pro: boolean;
+    daily_limit: number;
+    used_today: number;
+    remaining: number;
+}
+
 interface Word {
     id: string;
     word: string;
@@ -336,4 +351,46 @@ export const transcribeAudio = async (audioBlob: Blob): Promise<string> => {
         console.error('Erro ao transcrever áudio:', error);
         throw error;
     }
+}
+
+// Billing status
+export const getBillingStatus = async (): Promise<BillingStatus> => {
+    const response = await axios.get<BillingStatus>(API_URL + '/billing/status', {
+        headers: {
+            Authorization: `Bearer ${Cookies.get('authToken')}`
+        }
+    });
+    return response.data;
+}
+
+// Create Stripe checkout session
+export const createCheckoutSession = async (plan: 'monthly' | 'annual'): Promise<{ url: string }> => {
+    const response = await axios.post<{ url: string }>(API_URL + '/billing/checkout', {
+        plan
+    }, {
+        headers: {
+            Authorization: `Bearer ${Cookies.get('authToken')}`
+        }
+    });
+    return response.data;
+}
+
+// Create Stripe customer portal session
+export const createPortalSession = async (): Promise<{ url: string }> => {
+    const response = await axios.post<{ url: string }>(API_URL + '/billing/portal', {}, {
+        headers: {
+            Authorization: `Bearer ${Cookies.get('authToken')}`
+        }
+    });
+    return response.data;
+}
+
+// AI usage status
+export const getAIUsageStatus = async (): Promise<AIUsageStatus> => {
+    const response = await axios.get<AIUsageStatus>(API_URL + '/ai/usage', {
+        headers: {
+            Authorization: `Bearer ${Cookies.get('authToken')}`
+        }
+    });
+    return response.data;
 }

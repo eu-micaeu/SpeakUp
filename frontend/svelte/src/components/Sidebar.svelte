@@ -24,6 +24,11 @@
     openSettings = false;
   }
 
+  function goToPlans() {
+    goto("/planos");
+    openSettings = false;
+  }
+
   function goToIndex() {
     Cookies.remove("authToken");
     goto("/");
@@ -189,6 +194,26 @@
               />
             </svg>
             <span>Perfil</span>
+          </button>
+
+          <button class="modal-option" on:click={goToPlans}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M3 7h18M5 7v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M8 11h8M8 15h5"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <span>Planos</span>
           </button>
 
           <button class="modal-option" on:click={goToIndex}>

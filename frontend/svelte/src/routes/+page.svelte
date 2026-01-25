@@ -155,7 +155,6 @@
 
   function startLevelTest() {
     if (!selectedLanguage) {
-      toast.error("Selecione um idioma primeiro");
       return;
     }
     showLevelTest = true;
@@ -196,9 +195,6 @@
     }
 
     showLevelTest = false;
-    toast.success(
-      `Nível detectado: ${levelDescriptions[selectedLanguage]?.[detectedLevel]}`,
-    );
   }
 
   function closeLevelTest() {
@@ -372,6 +368,49 @@
       {#each cardData as card, i}
         <FeatureCard {...card} index={i} />
       {/each}
+    </div>
+  </section>
+
+  <section class="plansSection">
+    <div class="sectionHeader">
+      <h1>Planos e preços</h1>
+      <p class="sectionSubtitle">Escolha o plano ideal para sua jornada.</p>
+    </div>
+    <div class="plansGrid">
+      <article class="planCard free">
+        <span class="planBadge neutral">Free</span>
+        <h3>Plano Free</h3>
+        <p class="planPrice">R$ 0 <span>/ sempre</span></p>
+        <p class="planLimit">Até 10 interações de IA/dia</p>
+        <ul>
+          <li>Chat com IA e correções básicas.</li>
+          <li>Traduções e tópicos com limite diário.</li>
+          <li>Histórico recente de conversas.</li>
+        </ul>
+        <a class="planCta" href="/planos">Ver detalhes</a>
+      </article>
+      <article class="planCard">
+        <h3>Plano Mensal</h3>
+        <p class="planPrice">R$ 18 <span>/ mês</span></p>
+        <ul>
+          <li>Chat com IA ilimitado.</li>
+          <li>Correções e traduções ilimitadas.</li>
+          <li>Geração de tópicos sem limite.</li>
+        </ul>
+        <a class="planCta" href="/planos">Ver detalhes</a>
+      </article>
+      <article class="planCard highlighted">
+        <span class="planBadge">Mais vantajoso</span>
+        <h3>Plano Anual</h3>
+        <p class="planPrice">R$ 180 <span>/ ano</span></p>
+        <p class="planDiscount">Economize R$ 36 (2 meses grátis)</p>
+        <ul>
+          <li>Chat com IA ilimitado.</li>
+          <li>Correções e traduções ilimitadas.</li>
+          <li>Geração de tópicos sem limite.</li>
+        </ul>
+        <a class="planCta" href="/planos">Ver detalhes</a>
+      </article>
     </div>
   </section>
 
@@ -833,6 +872,110 @@
     display: flex;
     flex-direction: column;
     gap: 2rem;
+  }
+
+  .plansSection {
+    padding: 6rem 2rem;
+    background: #0f0f0f;
+    border-top: 1px solid #1f1f1f;
+    border-bottom: 1px solid #1f1f1f;
+  }
+
+  .plansGrid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 2rem;
+  }
+
+  .planCard {
+    position: relative;
+    padding: 2.5rem;
+    border-radius: 20px;
+    background: #1b1b1b;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  }
+
+  .planCard h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1.6rem;
+  }
+
+  .planPrice {
+    margin: 0 0 1.5rem;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #f3f4ff;
+  }
+
+  .planPrice span {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #a5a9c8;
+  }
+
+  .planDiscount {
+    margin: -0.75rem 0 1.5rem;
+    font-size: 0.95rem;
+    color: #a9e6c3;
+    font-weight: 600;
+  }
+
+  .planLimit {
+    margin: -0.75rem 0 1.5rem;
+    font-size: 0.95rem;
+    color: #f0c98b;
+    font-weight: 600;
+  }
+
+  .planCard ul {
+    margin: 0 0 2rem;
+    padding-left: 1.2rem;
+    display: grid;
+    gap: 0.6rem;
+    color: #cfcfcf;
+  }
+
+  .planCta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.25rem;
+    border-radius: 12px;
+    background: #5c6dff;
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .planCard.highlighted {
+    background: linear-gradient(150deg, rgba(64, 86, 255, 0.18), #1b1b1b 60%);
+    border-color: rgba(92, 109, 255, 0.4);
+  }
+
+  .planBadge {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 999px;
+    background: #5163ff;
+    color: #fff;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .planBadge.neutral {
+    background: rgba(255, 255, 255, 0.12);
+    color: #e9e9e9;
+  }
+
+  .planCard.free {
+    border-color: rgba(255, 255, 255, 0.15);
+    background: #181818;
   }
 
   .apiSection {
