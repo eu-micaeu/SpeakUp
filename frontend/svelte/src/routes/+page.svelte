@@ -392,6 +392,7 @@
       <article class="planCard">
         <h3>Plano Mensal</h3>
         <p class="planPrice">R$ 18 <span>/ mês</span></p>
+        <p class="planDiscount">Com os seguintes benefícios:</p>
         <ul>
           <li>Chat com IA ilimitado.</li>
           <li>Correções e traduções ilimitadas.</li>
