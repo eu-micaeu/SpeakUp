@@ -896,7 +896,6 @@
     border-radius: 20px;
     background: #1b1b1b;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
   }
 
   .planCard h3 {
@@ -1032,7 +1031,6 @@
   .apiCard:hover {
     transform: translateY(-10px);
     border-color: rgba(255, 255, 255, 0.3);
-    box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
   }
 
   .apiCard img {
@@ -1083,7 +1081,6 @@
     overflow-y: auto;
     position: relative;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   }
 
   .closeButton {
@@ -1247,7 +1244,6 @@
   .submitButton:hover:not(:disabled) {
     background: linear-gradient(135deg, #5a5a5a 0%, #454545 100%);
     transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
   }
 
   .submitButton:disabled {
@@ -1280,7 +1276,6 @@
   .googleButton:hover:not(:disabled) {
     background: #f5f5f5;
     transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   }
 
   .googleButton:disabled {

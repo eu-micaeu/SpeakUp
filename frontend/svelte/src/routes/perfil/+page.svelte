@@ -263,21 +263,6 @@
 </script>
 
 <div class="container">
-    <div class="header">
-        <button class="back-btn" on:click={() => goto("/chat")}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path
-                    d="M19 12H5M5 12l7 7M5 12l7-7"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                />
-            </svg>
-            Voltar
-        </button>
-    </div>
-
     {#if loading}
         <div class="loading">
             <div class="spinner"></div>
@@ -725,7 +710,7 @@
 <style>
     .container {
         min-height: 100vh;
-        background-color:#0a0a0a;
+        background-color: #0a0a0a;
         color: white;
         position: relative;
         overflow: hidden;
@@ -752,32 +737,6 @@
         margin: 2rem auto 2rem;
         display: flex;
         align-items: center;
-    }
-
-    .back-btn {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.75rem 1.25rem;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        border-radius: 12px;
-        color: white;
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        font-size: 0.95rem;
-        font-weight: 500;
-        backdrop-filter: blur(10px);
-    }
-
-    .back-btn:hover {
-        background: rgba(255, 255, 255, 0.08);
-        border-color: rgba(255, 255, 255, 0.3);
-        transform: translateX(-4px);
-    }
-
-    .back-btn:active {
-        transform: translateX(-2px);
     }
 
     h1 {

@@ -607,7 +607,6 @@
         color: white;
         padding: 1rem;
         border-radius: 0.5rem;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .botMessage div {
@@ -883,7 +882,6 @@
         justify-content: center;
         align-items: center;
         cursor: pointer;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
         z-index: 10;
         transition: background-color 0.2s;
     }
@@ -904,7 +902,6 @@
         display: flex;
         align-items: center;
         gap: 0.75rem;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
         border: 1px solid rgba(255, 255, 255, 0.2);
         z-index: 100;
         animation:

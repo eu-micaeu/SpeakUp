@@ -32,15 +32,9 @@ type OllamaResponse struct {
 }
 
 func NewOllamaConnector() *OllamaConnector {
+	
 	baseURL := os.Getenv("OLLAMA_BASE_URL")
-	if baseURL == "" {
-		baseURL = "http://localhost:11434"
-	}
-
 	model := os.Getenv("OLLAMA_MODEL")
-	if model == "" {
-		model = "mistral"
-	}
 
 	return &OllamaConnector{
 		baseURL: baseURL,

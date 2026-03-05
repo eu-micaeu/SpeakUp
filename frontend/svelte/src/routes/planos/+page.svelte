@@ -1,6 +1,5 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { goto } from "$app/navigation";
     import {
         createCheckoutSession,
         createPortalSession,
@@ -27,15 +26,6 @@
         used_today: number;
         remaining: number;
     } | null = null;
-
-    function handleBack() {
-        if (typeof window !== "undefined" && window.history.length > 1) {
-            window.history.back();
-            return;
-        }
-
-        goto("/chat");
-    }
 
     async function loadBillingStatus() {
         try {
@@ -99,30 +89,7 @@
     });
 </script>
 
-<svelte:head>
-    <title>Planos | SpeakUp</title>
-</svelte:head>
-
 <section class="plans">
-    <header class="plans-header">
-        <button class="back-button" on:click={handleBack} aria-label="Voltar">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path
-                    d="M15 18l-6-6 6-6"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                />
-            </svg>
-            <span>Voltar</span>
-        </button>
-        <h1>Planos do SpeakUp</h1>
-        <p>
-            Escolha o plano ideal para continuar evoluindo no idioma com prática
-            diária, correções inteligentes e acompanhamento do progresso.
-        </p>
-    </header>
 
     <div class="plans-grid">
         <article class="plan-card free">
@@ -226,19 +193,11 @@
             {/if}
         {/if}
     </div>
-
-    <div class="helper">
-        <p>
-            Para gerenciar sua assinatura, abra o menu de configurações e siga
-            para a área de cobrança quando estiver disponível.
-        </p>
-    </div>
 </section>
 
 <style>
     .plans {
-        height: calc(100vh - 80px);
-        padding: 2.5rem clamp(1.5rem, 4vw, 4rem) 4rem;
+        height: 100vh;
         color: #e9e9e9;
         background-color: #0a0a0a;
         position: relative;
@@ -592,19 +551,6 @@
         }
     }
 
-    .helper {
-        max-width: 720px;
-        margin-top: 3rem;
-        padding: 1.5rem;
-        color: #9c9c9c;
-        line-height: 1.7;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 14px;
-        font-size: 0.95rem;
-        animation: fadeInUp 0.7s ease-out 0.5s both;
-    }
-
     @media (max-width: 768px) {
         .plans {
             padding: 1.5rem 1rem 2.5rem;
@@ -692,11 +638,6 @@
             padding: 0.7rem 1rem;
             font-size: 0.9rem;
             border-radius: 12px;
-        }
-
-        .helper {
-            padding: 1.25rem;
-            font-size: 0.9rem;
         }
     }
 </style>

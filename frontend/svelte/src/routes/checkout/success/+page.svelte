@@ -34,7 +34,6 @@
         background: #1c1c1c;
         border: 1px solid rgba(255, 255, 255, 0.08);
         text-align: center;
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
     }
 
     .icon {
