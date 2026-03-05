@@ -237,10 +237,12 @@
 
 <style>
     .plans {
-        min-height: calc(100vh - 80px);
+        height: calc(100vh - 80px);
         padding: 2.5rem clamp(1.5rem, 4vw, 4rem) 4rem;
         color: #e9e9e9;
-        background: #141414;
+        background-color: #0a0a0a;
+        position: relative;
+        overflow: hidden;
     }
 
     .plans-header {
@@ -248,46 +250,155 @@
         margin-bottom: 2.5rem;
         display: grid;
         gap: 0.75rem;
+        animation: slideDown 0.6s ease-out;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     .back-button {
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        padding: 0.75rem 1rem;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 8px;
+        padding: 0.75rem 1.25rem;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(92, 109, 255, 0.3);
+        border-radius: 12px;
         color: white;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         font-size: 0.95rem;
+        font-weight: 500;
+        backdrop-filter: blur(10px);
+        width: fit-content;
     }
 
     .back-button:hover {
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.3);
         transform: translateX(-4px);
+    }
+
+    .back-button:active {
+        transform: translateX(-2px);
+    }
+
+    .plans-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin: 0;
+        letter-spacing: -0.5px;
+    }
+
+    .plans-header p {
+        font-size: 1.1rem;
+        color: #b5b5b5;
+        margin: 0;
+        line-height: 1.6;
+    }
+
+    @media (max-width: 768px) {
+        .plans-header h1 {
+            font-size: 1.8rem;
+        }
+
+        .plans-header p {
+            font-size: 1rem;
+        }
     }
 
     .plan-card {
         position: relative;
-        padding: 2rem;
+        padding: 2.5rem;
         border-radius: 20px;
-        background: #1c1c1c;
+        background: linear-gradient(
+            145deg,
+            rgba(28, 28, 28, 0.9),
+            rgba(24, 24, 24, 0.8)
+        );
         border: 1px solid rgba(255, 255, 255, 0.08);
-        margin:60px 0;
+        backdrop-filter: blur(10px);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        animation: fadeInUp 0.6s ease-out both;
+        height: 80%;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .plans-grid > .plan-card:nth-child(1) {
+        animation-delay: 0.1s;
+    }
+
+    .plans-grid > .plan-card:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .plans-grid > .plan-card:nth-child(3) {
+        animation-delay: 0.3s;
+    }
+
+    .plan-card:hover {
+        transform: translateY(-8px);
+    }
+
+    .plan-card.highlight {
+        background: linear-gradient(
+            145deg,
+            rgba(64, 86, 255, 0.15),
+            rgba(24, 24, 24, 0.8)
+        );
+    }
+
+    .plan-card.free {
+        background: linear-gradient(
+            145deg,
+            rgba(24, 24, 24, 0.8),
+            rgba(18, 18, 18, 0.8)
+        );
+        border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .plans-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 2.5rem;
+        margin-bottom: 3rem;
+        align-items: start;
     }
 
     .plan-card h2 {
-        margin: 0;
+        margin: 0 0 1rem 0;
         font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: -0.5px;
     }
 
     .price {
         margin: 0.6rem 0 0.2rem;
-        font-size: 1.9rem;
-        font-weight: 700;
+        font-size: 2rem;
+        font-weight: 800;
         color: #f3f4ff;
+        letter-spacing: -1px;
     }
 
     .price span {
@@ -299,8 +410,8 @@
     .discount {
         margin: -0.4rem 0 1rem;
         font-size: 0.95rem;
-        font-weight: 600;
-        color: #a9e6c3;
+        font-weight: 700;
+        color: #7ee5b3;
     }
 
     .discount.warning {
@@ -310,14 +421,20 @@
     .subtitle {
         margin: 0.35rem 0 1.5rem;
         color: #a4a4a4;
+        font-size: 0.95rem;
     }
 
     .plan-card ul {
         margin: 0;
-        padding-left: 1.2rem;
+        padding-left: 1.5rem;
         display: grid;
-        gap: 0.65rem;
+        gap: 0.8rem;
         color: #d1d1d1;
+        flex-grow: 1;
+    }
+
+    .plan-card ul li {
+        line-height: 1.5;
     }
 
     .plan-footer {
@@ -325,32 +442,52 @@
     }
 
     .plan-actions {
-        margin-top: 1.5rem;
+        margin-top: auto;
+        padding-top: 1.5rem;
     }
 
     .action-button {
         width: 100%;
-        padding: 0.75rem 1rem;
-        border-radius: 12px;
-        border: none;
-        background: #5c6dff;
+        padding: 0.875rem 1.5rem;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.1);
         color: #fff;
         font-weight: 600;
         cursor: pointer;
-        transition:
-            transform 0.2s ease,
-            box-shadow 0.2s ease;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        font-size: 1rem;
+    }
+
+    .action-button::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.2);
+        transition: left 0.3s ease;
+        z-index: 1;
     }
 
     .action-button:hover {
+        transform: translateY(-3px);
+    }
+
+    .action-button:hover::before {
+        left: 100%;
+    }
+
+    .action-button:active {
         transform: translateY(-1px);
-        box-shadow: 0 10px 20px rgba(92, 109, 255, 0.25);
     }
 
     .action-button:disabled {
-        opacity: 0.7;
+        opacity: 0.6;
         cursor: not-allowed;
-        box-shadow: none;
         transform: none;
     }
 
@@ -358,38 +495,38 @@
         width: auto;
         background: rgba(255, 255, 255, 0.08);
         color: #e9e9e9;
-        border: 1px solid rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .action-button.secondary:hover {
+        background: rgba(255, 255, 255, 0.12);
+        border-color: rgba(255, 255, 255, 0.25);
     }
 
     .tag {
         display: inline-flex;
-        padding: 0.35rem 0.8rem;
+        padding: 0.4rem 0.9rem;
         border-radius: 999px;
-        background: rgba(111, 145, 255, 0.15);
-        color: #9fb1ff;
+        background: rgba(255, 255, 255, 0.1);
+        color: #cccccc;
         font-size: 0.8rem;
-    }
-
-    .highlight {
-        border-color: rgba(111, 145, 255, 0.5);
-        background: linear-gradient(
-            150deg,
-            rgba(64, 86, 255, 0.18),
-            #1c1c1c 60%
-        );
+        font-weight: 600;
+        letter-spacing: 0.05em;
     }
 
     .highlight-pill {
         position: absolute;
         top: 1.5rem;
         right: 1.5rem;
-        padding: 0.25rem 0.7rem;
+        padding: 0.35rem 0.9rem;
         border-radius: 999px;
-        background: #5163ff;
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.3);
         color: #fff;
-        font-size: 0.7rem;
-        letter-spacing: 0.08em;
+        font-size: 0.75rem;
+        letter-spacing: 0.1em;
         text-transform: uppercase;
+        font-weight: 700;
     }
 
     .highlight-pill.neutral {
@@ -397,46 +534,48 @@
         color: #e9e9e9;
     }
 
-    .plan-card.free {
-        background: #181818;
-        border-color: rgba(255, 255, 255, 0.12);
-    }
-
     .billing-panel {
-        margin-top: 2.25rem;
+        margin-top: 3rem;
+        padding: 2rem;
         display: flex;
         flex-wrap: wrap;
         align-items: center;
-        gap: 1rem;
+        gap: 1.5rem;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(92, 109, 255, 0.25);
+        border-radius: 18px;
+        backdrop-filter: blur(10px);
+        animation: fadeInUp 0.7s ease-out 0.4s both;
     }
 
     .billing-note {
         margin: 0;
         color: #b5b5b5;
+        font-weight: 500;
     }
 
     .billing-note.active {
-        color: #9de0b2;
-        font-weight: 600;
+        color: #7ee5b3;
+        font-weight: 700;
     }
 
     .billing-note.inactive {
-        color: #f0b7b7;
+        color: #f0a8a8;
     }
 
     .usage-text {
-        margin: 0.25rem 0 0;
+        margin: 0.5rem 0 0;
         color: #f0c98b;
-        font-weight: 600;
+        font-weight: 700;
+        font-size: 0.95rem;
     }
 
     .usage-bar {
         width: 100%;
         max-width: 320px;
-        height: 8px;
+        height: 10px;
         border-radius: 999px;
         background: rgba(255, 255, 255, 0.1);
-        overflow: hidden;
     }
 
     .usage-bar span {
@@ -444,24 +583,120 @@
         height: 100%;
         background: linear-gradient(90deg, #f0c98b, #f39b6d);
         border-radius: inherit;
+        animation: progressFill 1.5s ease-out;
+    }
+
+    @keyframes progressFill {
+        from {
+            width: 0% !important;
+        }
     }
 
     .helper {
         max-width: 720px;
-        margin-top: 2.5rem;
+        margin-top: 3rem;
+        padding: 1.5rem;
         color: #9c9c9c;
-        line-height: 1.6;
+        line-height: 1.7;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        font-size: 0.95rem;
+        animation: fadeInUp 0.7s ease-out 0.5s both;
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 768px) {
+        .plans {
+            padding: 1.5rem 1rem 2.5rem;
+        }
+
         .plan-card {
-            padding: 1.5rem;
+            padding: 2rem;
         }
 
         .highlight-pill {
             position: static;
             margin-bottom: 0.75rem;
             display: inline-flex;
+            width: fit-content;
+        }
+
+        .plan-card h2 {
+            font-size: 1.3rem;
+        }
+
+        .price {
+            font-size: 1.75rem;
+        }
+
+        .billing-panel {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .action-button {
+            padding: 0.75rem 1.25rem;
+        }
+
+        .action-button.secondary {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .plans {
+            padding: 1rem 0.5rem 2rem;
+        }
+
+        .plans-header {
+            margin-bottom: 2rem;
+        }
+
+        .back-button {
+            padding: 0.6rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .plans-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .plans-header p {
+            font-size: 0.9rem;
+        }
+
+        .plan-card {
+            padding: 1.5rem;
+            border-radius: 16px;
+        }
+
+        .plan-card h2 {
+            font-size: 1.1rem;
+        }
+
+        .price {
+            font-size: 1.5rem;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+        }
+
+        .plan-card ul {
+            gap: 0.6rem;
+            padding-left: 1.2rem;
+        }
+
+        .action-button {
+            padding: 0.7rem 1rem;
+            font-size: 0.9rem;
+            border-radius: 12px;
+        }
+
+        .helper {
+            padding: 1.25rem;
+            font-size: 0.9rem;
         }
     }
 </style>

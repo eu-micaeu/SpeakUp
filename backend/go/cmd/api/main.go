@@ -9,7 +9,6 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"speakup/pkg/config"
-	_ "speakup/docs"
 	"speakup/pkg/handlers"
 	"speakup/pkg/middlewares"
 	"speakup/pkg/repositories"
@@ -24,16 +23,16 @@ import (
 
 func main() {
 
-	r := gin.Default()
-
-	// CORS
-	r.Use(middlewares.CorsMiddleware())
-
-	// Carregar variáveis de ambiente do arquivo .env
+	// Carregar variáveis de ambiente do arquivo .env PRIMEIRO
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatalf("Erro ao carregar o arquivo .env: %v", err)
 	}
+
+	r := gin.Default()
+
+	// CORS
+	r.Use(middlewares.CorsMiddleware())
 
 	// Connect to MongoDB
 	config.ConnectMongoDB()

@@ -113,6 +113,26 @@
         }
     }
 
+    function setupVisibilityListener() {
+        const handleVisibilityChange = async () => {
+            if (!document.hidden) {
+                // Página voltou ao foco, recarrega status de billing
+                console.log("Página retornou ao foco, sincronizando dados...");
+                await loadBillingStatus();
+            }
+        };
+
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+
+        // Cleanup function
+        return () => {
+            document.removeEventListener(
+                "visibilitychange",
+                handleVisibilityChange,
+            );
+        };
+    }
+
     function updateLevels(language: string) {
         if (language === "english") {
             levels = ["A1", "A2", "B1", "B2", "C1", "C2"];
@@ -166,13 +186,27 @@
     async function handleCancelPlan() {
         try {
             billingActionLoading = true;
+            toast.loading("Abrindo portal de gerenciamento...");
             const { url } = await createPortalSession();
             if (url) {
-                window.location.href = url;
+                toast.promise(
+                    new Promise((resolve) => {
+                        setTimeout(() => {
+                            window.location.href = url;
+                            resolve(true);
+                        }, 500);
+                    }),
+                    {
+                        loading: "Redirecionando para Stripe...",
+                        success:
+                            "Você será redirecionado para gerenciar sua assinatura.",
+                        error: "Erro ao abrir portal",
+                    },
+                );
             }
         } catch (error) {
             console.error("Erro ao abrir portal:", error);
-            toast.error("Erro ao abrir portal");
+            toast.error("Erro ao abrir portal de pagamento");
         } finally {
             billingActionLoading = false;
         }
@@ -188,8 +222,43 @@
         return status === "active" || status === "trialing";
     }
 
+    function getPlanName(priceId?: string, status?: string) {
+        if (status === "canceled") {
+            return "❌ Assinatura Cancelada";
+        }
+
+        if (!priceId) return "Nenhum plano ativo";
+
+        // Mapeamento dos price IDs para nomes de planos
+        const planMap: { [key: string]: string } = {
+            price_1RW5MgDQYqua1knA06NgjjST: "Plano Mensal",
+            price_1StFqqDQYqua1knAQAXih6ES: "Plano Anual",
+        };
+
+        return planMap[priceId] || "Plano Personalizado";
+    }
+
+    function getStatusText(status?: string) {
+        const statusMap: { [key: string]: string } = {
+            active: "Ativa",
+            trialing: "Período de teste",
+            canceled: "Cancelada",
+            incomplete: "Incompleta",
+            incomplete_expired: "Expirada",
+            past_due: "Pagamento pendente",
+            unpaid: "Não paga",
+        };
+
+        return status ? statusMap[status] || status : "Sem assinatura";
+    }
+
     onMount(() => {
         loadUserData();
+        const unsubscribeVisibility = setupVisibilityListener();
+
+        return () => {
+            unsubscribeVisibility();
+        };
     });
 </script>
 
@@ -207,7 +276,6 @@
             </svg>
             Voltar
         </button>
-        <h1>Meu Perfil</h1>
     </div>
 
     {#if loading}
@@ -218,23 +286,6 @@
     {:else if user}
         <div class="profile-card">
             <div class="profile-header">
-                <div class="avatar">
-                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
-                        <circle
-                            cx="12"
-                            cy="8"
-                            r="4"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        />
-                        <path
-                            d="M5 20c0-4 3-7 7-7s7 3 7 7"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                        />
-                    </svg>
-                </div>
                 <h2>{user.name}</h2>
                 <p class="email">{user.email}</p>
             </div>
@@ -292,19 +343,19 @@
 
                 <div class="billing-card">
                     <div class="billing-header">
-                        <h3>Assinatura</h3>
+                        <h3>💳 Assinatura</h3>
                         {#if billingLoading}
                             <span class="billing-status">Carregando...</span>
-                        {:else if billingStatus}
+                        {:else if billingStatus && billingStatus.stripe_status}
                             <span
                                 class="billing-status {isActive(
                                     billingStatus.stripe_status,
                                 )
                                     ? 'active'
                                     : 'inactive'}"
-                                >{billingStatus.stripe_status
-                                    ? billingStatus.stripe_status
-                                    : "Sem assinatura"}</span
+                                >{getStatusText(
+                                    billingStatus.stripe_status,
+                                )}</span
                             >
                         {:else}
                             <span class="billing-status inactive"
@@ -313,27 +364,220 @@
                         {/if}
                     </div>
 
+                    {#if billingStatus?.stripe_status === "canceled"}
+                        <div class="cancellation-alert">
+                            <svg
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                            >
+                                <circle
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                />
+                                <path
+                                    d="M8 12h8M12 8v8"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                />
+                            </svg>
+                            <p>
+                                Sua assinatura foi cancelada e o acesso será
+                                removido na data de validade acima.
+                            </p>
+                        </div>
+                    {/if}
+
                     <div class="billing-info">
                         <div class="info-item">
-                            <span class="label">Renovação</span>
-                            <span class="value">
-                                {formatPeriodEnd(
-                                    billingStatus?.stripe_current_period_end ||
-                                        0,
+                            <span class="label">
+                                <svg
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                >
+                                    <path
+                                        d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM2 10h20"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    />
+                                </svg>
+                                Plano atual
+                            </span>
+                            <span
+                                class="value plan-name {billingStatus?.stripe_status ===
+                                'canceled'
+                                    ? 'cancelled'
+                                    : ''}"
+                            >
+                                {getPlanName(
+                                    billingStatus?.stripe_price_id,
+                                    billingStatus?.stripe_status,
                                 )}
                             </span>
                         </div>
+
+                        {#if billingStatus?.stripe_current_period_end && billingStatus?.stripe_status !== "canceled"}
+                            <div class="info-item">
+                                <span class="label">
+                                    <svg
+                                        width="18"
+                                        height="18"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                    >
+                                        <circle
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                        />
+                                        <path
+                                            d="M12 6v6l4 2"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                        />
+                                    </svg>
+                                    Próxima renovação
+                                </span>
+                                <span class="value">
+                                    {formatPeriodEnd(
+                                        billingStatus.stripe_current_period_end,
+                                    )}
+                                </span>
+                            </div>
+                        {:else if billingStatus?.stripe_current_period_end && billingStatus?.stripe_status === "canceled"}
+                            <div class="info-item">
+                                <span class="label">
+                                    <svg
+                                        width="18"
+                                        height="18"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                    >
+                                        <circle
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                        />
+                                        <path
+                                            d="M12 6v6l4 2"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                        />
+                                    </svg>
+                                    Acesso até
+                                </span>
+                                <span class="value" style="color: #ff9500;">
+                                    {formatPeriodEnd(
+                                        billingStatus.stripe_current_period_end,
+                                    )}
+                                </span>
+                            </div>
+                        {/if}
+
+                        {#if billingStatus?.stripe_subscription_id && billingStatus?.stripe_status !== "canceled"}
+                            <div class="info-item">
+                                <span class="label">
+                                    <svg
+                                        width="18"
+                                        height="18"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                    >
+                                        <path
+                                            d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        />
+                                        <path
+                                            d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        />
+                                    </svg>
+                                    ID da Assinatura
+                                </span>
+                                <span class="value subscription-id">
+                                    {billingStatus.stripe_subscription_id.substring(
+                                        0,
+                                        20,
+                                    )}...
+                                </span>
+                            </div>
+                        {/if}
                     </div>
 
                     <div class="billing-actions">
-                        <button
-                            class="btn btn-secondary"
-                            on:click={handleCancelPlan}
-                            disabled={billingActionLoading ||
-                                !isActive(billingStatus?.stripe_status)}
-                        >
-                            Cancelar plano
-                        </button>
+                        {#if isActive(billingStatus?.stripe_status)}
+                            <button
+                                class="btn btn-secondary"
+                                on:click={handleCancelPlan}
+                                disabled={billingActionLoading}
+                            >
+                                <svg
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                >
+                                    <path
+                                        d="M9 11l3 3L22 4"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    />
+                                    <path
+                                        d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    />
+                                </svg>
+                                {billingActionLoading
+                                    ? "Carregando..."
+                                    : "Gerenciar assinatura"}
+                            </button>
+                        {:else}
+                            <button
+                                class="btn btn-primary"
+                                on:click={() => goto("/planos")}
+                            >
+                                <svg
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                >
+                                    <path
+                                        d="M12 5v14M5 12h14"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                    />
+                                </svg>
+                                Ver planos disponíveis
+                            </button>
+                        {/if}
                     </div>
                 </div>
 
@@ -481,45 +725,73 @@
 <style>
     .container {
         min-height: 100vh;
-        background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-        padding: 2rem;
+        background-color:#0a0a0a;
         color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .container::before {
+        content: "";
+        position: fixed;
+        top: -50%;
+        right: -50%;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(
+            circle,
+            rgba(255, 255, 255, 0.03) 0%,
+            transparent 70%
+        );
+        pointer-events: none;
+        z-index: -1;
     }
 
     .header {
-        max-width: 800px;
-        margin: 0 auto 2rem;
+        max-width: 1400px;
+        margin: 2rem auto 2rem;
         display: flex;
         align-items: center;
-        gap: 1rem;
     }
 
     .back-btn {
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        padding: 0.75rem 1rem;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 8px;
+        padding: 0.75rem 1.25rem;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 12px;
         color: white;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         font-size: 0.95rem;
+        font-weight: 500;
+        backdrop-filter: blur(10px);
     }
 
     .back-btn:hover {
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.3);
         transform: translateX(-4px);
     }
 
+    .back-btn:active {
+        transform: translateX(-2px);
+    }
+
     h1 {
-        font-size: 2rem;
+        font-size: 2.5rem;
         font-weight: 700;
-        background: linear-gradient(135deg, #ffffff, #a0a0a0);
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: #ffffff;
+        margin: 0;
+        letter-spacing: -0.5px;
+    }
+
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 1.8rem;
+        }
     }
 
     .loading {
@@ -537,22 +809,20 @@
         border: 3px solid rgba(255, 255, 255, 0.1);
         border-top-color: white;
         border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-        to {
-            transform: rotate(360deg);
-        }
     }
 
     .profile-card {
-        max-width: 800px;
+        max-width: 1400px;
         margin: 0 auto;
-        background: linear-gradient(145deg, #1e1e1e, #1a1a1a);
-        border-radius: 20px;
+        background: linear-gradient(
+            145deg,
+            rgba(30, 30, 30, 0.8),
+            rgba(26, 26, 26, 0.9)
+        );
+        border-radius: 24px;
         padding: 2.5rem;
         border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
     }
 
     .profile-header {
@@ -562,50 +832,34 @@
         margin-bottom: 2rem;
     }
 
-    .avatar {
-        width: 100px;
-        height: 100px;
-        margin: 0 auto 1rem;
-        background: linear-gradient(
-            135deg,
-            rgba(255, 255, 255, 0.15),
-            rgba(255, 255, 255, 0.05)
-        );
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: 2px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .avatar svg {
-        color: rgba(255, 255, 255, 0.8);
-    }
-
     h2 {
-        font-size: 1.8rem;
+        font-size: 2rem;
         margin: 0 0 0.5rem 0;
-        font-weight: 600;
+        font-weight: 700;
+        color: #fff;
+        letter-spacing: -0.5px;
     }
 
     .email {
-        color: rgba(255, 255, 255, 0.6);
+        color: rgba(255, 255, 255, 0.65);
         font-size: 1rem;
+        margin: 0;
     }
 
     .profile-info {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
         margin-bottom: 2rem;
     }
 
     .billing-card {
         margin-bottom: 2rem;
-        padding: 1.5rem;
-        border-radius: 16px;
-        background: rgba(255, 255, 255, 0.04);
+        padding: 1.75rem;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.03);
         border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
     }
 
     .billing-header {
@@ -631,9 +885,9 @@
     }
 
     .billing-status.active {
-        background: rgba(76, 175, 80, 0.2);
-        color: #4caf50;
-        border: 1px solid rgba(76, 175, 80, 0.4);
+        background: rgba(255, 255, 255, 0.15);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.3);
     }
 
     .billing-status.inactive {
@@ -642,10 +896,33 @@
         border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
-    .billing-info {
+    .cancellation-alert {
         display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
+        gap: 1rem;
+        padding: 1rem;
+        margin: 0 0 1rem 0;
+        border-radius: 12px;
+        background: rgba(255, 59, 48, 0.1);
+        border: 1px solid rgba(255, 59, 48, 0.3);
+        color: #ff3b30;
+    }
+
+    .cancellation-alert svg {
+        flex-shrink: 0;
+        margin-top: 0.2rem;
+    }
+
+    .cancellation-alert p {
+        margin: 0;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        color: #ff3b30;
+    }
+
+    .billing-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1rem;
         margin-bottom: 1.25rem;
     }
 
@@ -653,16 +930,28 @@
         display: flex;
         gap: 1rem;
         flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+
+    .billing-actions .btn {
+        flex: 0 1 auto;
+        min-width: 200px;
+    }
+
+    .billing-actions .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
     }
 
     .info-item {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 1rem;
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 1.25rem;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        transition: all 0.3s ease;
     }
 
     .label {
@@ -678,74 +967,118 @@
         color: white;
     }
 
+    .plan-name {
+        color: #ffffff;
+        font-weight: 700;
+    }
+
+    .plan-name.cancelled {
+        background: none;
+        -webkit-text-fill-color: unset;
+        color: #ff3b30;
+        font-weight: 600;
+    }
+
+    .subscription-id {
+        font-family: "Courier New", monospace;
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.7);
+    }
+
     .actions {
-        display: flex;
-        gap: 1rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
     }
 
     .btn {
-        flex: 1;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 0.5rem;
-        padding: 1rem;
+        padding: 1rem 1.5rem;
         border: none;
-        border-radius: 12px;
+        border-radius: 14px;
         font-size: 1rem;
         font-weight: 600;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        transition: left 0.3s ease;
+        z-index: -1;
+    }
+
+    .btn:hover::before {
+        left: 100%;
     }
 
     .btn-primary {
-        background: linear-gradient(
-            135deg,
-            rgba(255, 255, 255, 0.15),
-            rgba(255, 255, 255, 0.05)
-        );
+        background: rgba(255, 255, 255, 0.1);
         color: white;
         border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .btn-primary:hover {
-        background: linear-gradient(
-            135deg,
-            rgba(255, 255, 255, 0.25),
-            rgba(255, 255, 255, 0.15)
-        );
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        background: rgba(255, 255, 255, 0.15);
+        border-color: rgba(255, 255, 255, 0.3);
+        transform: translateY(-3px);
+    }
+
+    .btn-primary:active {
+        transform: translateY(-1px);
     }
 
     .btn-danger {
         background: linear-gradient(
             135deg,
-            rgba(255, 59, 48, 0.2),
-            rgba(255, 59, 48, 0.1)
+            rgba(255, 59, 48, 0.15),
+            rgba(255, 59, 48, 0.08)
         );
-        color: #ff3b30;
+        color: #ff6b5b;
         border: 1px solid rgba(255, 59, 48, 0.3);
     }
 
     .btn-danger:hover {
         background: linear-gradient(
             135deg,
-            rgba(255, 59, 48, 0.3),
-            rgba(255, 59, 48, 0.2)
+            rgba(255, 59, 48, 0.25),
+            rgba(255, 59, 48, 0.15)
         );
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(255, 59, 48, 0.2);
+        border-color: rgba(255, 59, 48, 0.5);
+        color: #ff3b30;
+        transform: translateY(-3px);
+    }
+
+    .btn-danger:active {
+        transform: translateY(-1px);
     }
 
     .btn-secondary {
         background: rgba(255, 255, 255, 0.05);
-        color: rgba(255, 255, 255, 0.8);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.15);
     }
 
     .btn-secondary:hover {
         background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.25);
+        transform: translateY(-3px);
+    }
+
+    .btn-secondary:active {
+        transform: translateY(-1px);
     }
 
     .edit-form {
@@ -805,7 +1138,9 @@
     }
 
     .form-actions {
-        display: flex;
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 1rem;
         margin-top: 1rem;
     }
@@ -822,7 +1157,6 @@
         align-items: center;
         justify-content: center;
         z-index: 1000;
-        animation: fadeIn 0.2s ease;
     }
 
     .modal {
@@ -831,28 +1165,6 @@
         max-width: 500px;
         width: 90%;
         border: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-        animation: slideUp 0.3s ease;
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-        }
-        to {
-            opacity: 1;
-        }
-    }
-
-    @keyframes slideUp {
-        from {
-            transform: translateY(20px);
-            opacity: 0;
-        }
-        to {
-            transform: translateY(0);
-            opacity: 1;
-        }
     }
 
     .modal-header {

@@ -2,22 +2,17 @@ services:
   backend:
     build:
       context: ./backend/go
+    env_file:
+      - ./backend/go/.env
     volumes:
       - ./backend/go:/app
     ports:
       - "8082:8082"
-    environment:
-      - JWT_KEY=secret
-      - AI_PROVIDER=${AI_PROVIDER:-ollama}
-      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
-      - OLLAMA_MODEL=${OLLAMA_MODEL:-llama3.2}
-      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
-      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     command: [ "/go/bin/air" ]
 
-  ui-web:
+  frontend:
     build:
       context: ./frontend/svelte
     volumes:
@@ -25,15 +20,5 @@ services:
       - /app/node_modules
     ports:
       - "5175:5175"
-    environment:
-      - NODE_ENV=development
-      - CHOKIDAR_USEPOLLING=true
-      - PUBLIC_FIREBASE_API_KEY=${PUBLIC_FIREBASE_API_KEY:-}
-      - PUBLIC_FIREBASE_AUTH_DOMAIN=${PUBLIC_FIREBASE_AUTH_DOMAIN:-}
-      - PUBLIC_FIREBASE_PROJECT_ID=${PUBLIC_FIREBASE_PROJECT_ID:-}
-      - PUBLIC_FIREBASE_STORAGE_BUCKET=${PUBLIC_FIREBASE_STORAGE_BUCKET:-}
-      - PUBLIC_FIREBASE_MESSAGING_SENDER_ID=${PUBLIC_FIREBASE_MESSAGING_SENDER_ID:-}
-      - PUBLIC_FIREBASE_APP_ID=${PUBLIC_FIREBASE_APP_ID:-}
-      - PUBLIC_FIREBASE_MEASUREMENT_ID=${PUBLIC_FIREBASE_MEASUREMENT_ID:-}
     depends_on:
       - backend

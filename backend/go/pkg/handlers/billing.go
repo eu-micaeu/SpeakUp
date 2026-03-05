@@ -183,7 +183,8 @@ func (h *BillingHandler) GetBillingStatus(c *gin.Context) {
 		return
 	}
 
-	if user.StripeCustomerID != "" && (user.StripeSubscriptionID == "" || user.StripePriceID == "" || user.StripeStatus == "") {
+	// Sempre sincroniza com o Stripe se houver um customer ID para garantir dados atualizados
+	if user.StripeCustomerID != "" {
 		subscriptionData, priceID, err := fetchLatestSubscription(user.StripeCustomerID)
 		if err == nil && subscriptionData != nil {
 			user.StripeSubscriptionID = subscriptionData.ID

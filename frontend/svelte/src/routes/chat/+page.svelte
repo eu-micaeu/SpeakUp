@@ -206,10 +206,6 @@
         }
     }
 
-    function toggleSidebar() {
-        sidebarOpen = !sidebarOpen;
-    }
-
     function scrollToBottomSmooth() {
         if (messagesEndRef) {
             messagesEndRef.scrollIntoView({ behavior: "smooth" });
@@ -277,26 +273,7 @@
         }}
     />
 
-    <main class="main">
-        <header class="chatHeader">
-            <button
-                class="toggleIcon"
-                class:rotated={!sidebarOpen}
-                on:click={toggleSidebar}
-                type="button"
-                aria-label="Toggle sidebar"
-            >
-                <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                >
-                    <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
-                </svg>
-            </button>
-        </header>
-
+    <main class="main" class:sidebarClosed={!sidebarOpen}>
         <div class="chatBody" bind:this={chatBodyRef}>
             {#if messages.length === 0}
                 <div class="welcomeBox">
@@ -588,15 +565,12 @@
         display: flex;
         flex-direction: column;
         background-color: #111;
+        margin-left: 360px;
+        transition: margin-left 0.3s ease;
     }
 
-    .chatHeader {
-        background-color: #1a1a1a;
-        padding: 1rem;
-        border-bottom: 1px solid #333;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+    .main.sidebarClosed {
+        margin-left: 60px;
     }
 
     .chatBody {
@@ -704,28 +678,6 @@
         cursor: not-allowed;
     }
 
-    .toggleIcon {
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0.25rem 0;
-        padding: 0.5rem;
-        border-radius: 0.25rem;
-        background: none;
-        border: none;
-        color: currentColor;
-        transition: background-color 0.2s;
-    }
-
-    .toggleIcon:hover {
-        background-color: #333;
-    }
-
-    .toggleIcon.rotated {
-        transform: rotate(90deg);
-    }
-
     .welcomeBox {
         max-width: 800px;
         margin: auto;
@@ -761,10 +713,7 @@
         font-size: 2rem;
         font-weight: 700;
         margin: 0 0 0.5rem 0;
-        background: linear-gradient(135deg, #ffffff, #a0a0a0);
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: #ffffff;
     }
 
     .welcomeContent {
@@ -788,20 +737,16 @@
         flex-shrink: 0;
         width: 50px;
         height: 50px;
-        background: linear-gradient(
-            135deg,
-            rgba(76, 175, 80, 0.2),
-            rgba(76, 175, 80, 0.1)
-        );
+        background: rgba(255, 255, 255, 0.1);
         border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        border: 1px solid rgba(76, 175, 80, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .featureIcon svg {
-        color: #4caf50;
+        color: #ffffff;
     }
 
     .featureText h3 {
@@ -870,13 +815,13 @@
     }
 
     .exampleInput .exampleText {
-        color: rgba(255, 107, 107, 0.9);
+        color: rgba(255, 255, 255, 0.7);
         font-family: "Courier New", monospace;
         font-size: 0.95rem;
     }
 
     .exampleOutput .exampleText {
-        color: rgba(76, 175, 80, 0.9);
+        color: rgba(255, 255, 255, 0.9);
         font-family: "Courier New", monospace;
         font-size: 0.95rem;
     }
@@ -952,14 +897,15 @@
         bottom: 100px;
         left: 50%;
         transform: translateX(-50%);
-        background: linear-gradient(135deg, #ff9800, #ff6f00);
+        background: #1a1a1a;
         color: white;
         padding: 0.75rem 1.5rem;
         border-radius: 12px;
         display: flex;
         align-items: center;
         gap: 0.75rem;
-        box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.2);
         z-index: 100;
         animation:
             slideInUp 0.3s ease-out,

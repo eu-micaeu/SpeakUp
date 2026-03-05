@@ -10,4 +10,6 @@ RUN go mod download
 
 COPY . .
 
+COPY .env .env
+
 CMD ["air"]
