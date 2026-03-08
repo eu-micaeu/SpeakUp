@@ -429,19 +429,13 @@
         Utilizamos o Ollama para executar modelos de inteligência artificial
         avançados diretamente no seu dispositivo, garantindo privacidade total e
         oferecendo correções precisas e contextualizadas que se adaptam ao seu
-        nível de conhecimento. Aprenda idiomas com tecnologia de ponta sem
-        comprometer seus dados.
+        nível de conhecimento.
       </p>
     </div>
   </section>
 
-  <!-- Auth Modal -->
   {#if showAuthModal}
-    <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div class="modalOverlay" on:click={closeAuthModal}>
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <!-- svelte-ignore a11y-no-static-element-interactions -->
       <div class="modalContent" on:click|stopPropagation>
         <button
           class="closeButton"
