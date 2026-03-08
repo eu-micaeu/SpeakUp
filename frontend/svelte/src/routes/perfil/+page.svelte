@@ -758,7 +758,6 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        min-height: 400px;
         gap: 1rem;
     }
 
@@ -772,21 +771,23 @@
 
     .profile-card {
         max-width: 1400px;
+        min-height: 100vh;
         margin: 0 auto;
         background: linear-gradient(
             145deg,
             rgba(30, 30, 30, 0.8),
             rgba(26, 26, 26, 0.9)
         );
-        border-radius: 24px;
-        padding: 2.5rem;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 0 2.5rem;
         backdrop-filter: blur(20px);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
 
     .profile-header {
         text-align: center;
-        padding-bottom: 2rem;
+        padding: 2rem 0;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         margin-bottom: 2rem;
     }

@@ -387,7 +387,6 @@
           <li>Traduções e tópicos com limite diário.</li>
           <li>Histórico recente de conversas.</li>
         </ul>
-        <a class="planCta" href="/planos">Ver detalhes</a>
       </article>
       <article class="planCard">
         <h3>Plano Mensal</h3>
@@ -398,7 +397,6 @@
           <li>Correções e traduções ilimitadas.</li>
           <li>Geração de tópicos sem limite.</li>
         </ul>
-        <a class="planCta" href="/planos">Ver detalhes</a>
       </article>
       <article class="planCard highlighted">
         <span class="planBadge">Mais vantajoso</span>
@@ -410,7 +408,6 @@
           <li>Correções e traduções ilimitadas.</li>
           <li>Geração de tópicos sem limite.</li>
         </ul>
-        <a class="planCta" href="/planos">Ver detalhes</a>
       </article>
     </div>
   </section>
@@ -936,23 +933,6 @@
     display: grid;
     gap: 0.6rem;
     color: #cfcfcf;
-  }
-
-  .planCta {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.75rem 1.25rem;
-    border-radius: 12px;
-    background: #5c6dff;
-    color: #fff;
-    font-weight: 600;
-    text-decoration: none;
-  }
-
-  .planCard.highlighted {
-    background: linear-gradient(150deg, rgba(64, 86, 255, 0.18), #1b1b1b 60%);
-    border-color: rgba(92, 109, 255, 0.4);
   }
 
   .planBadge {

@@ -197,11 +197,15 @@
 
 <style>
     .plans {
-        height: 100vh;
+        min-height: 100vh;
         color: #e9e9e9;
         background-color: #0a0a0a;
         position: relative;
         overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 2rem;
     }
 
     .plans-header {
