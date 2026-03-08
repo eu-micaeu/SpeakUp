@@ -1,25 +1,14 @@
-<div align="center">
-  <img src="./frontend/web/public/logo.png" width="75" alt="SpeakUp Logo">
-</div>
+<img src="./frontend/svelte/static/logo.png" width="75" alt="SpeakUp Logo">
 
 <br>
-
-<div align="center">
-   
-  [![Go](https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white)](https://golang.org/) [![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/) [![Svelte](https://img.shields.io/badge/Svelte-FF3E00?style=for-the-badge&logo=svelte&logoColor=white)](https://svelte.dev/) [![React Native](https://img.shields.io/badge/React_Native-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactnative.dev/) [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/) [![Expo](https://img.shields.io/badge/Expo-000020?style=for-the-badge&logo=expo&logoColor=white)](https://expo.dev/)
-  
-</div>
-
 <br>
 
 <p align="justify">
-Uma plataforma inovadora que utiliza inteligência artificial para auxiliar no aprendizado de novos idiomas de maneira eficiente e personalizada. 
+Uma plataforma que utiliza inteligência artificial para auxiliar no aprendizado de novos idiomas de maneira eficiente e personalizada. 
 Com foco na melhoria contínua, a IA analisa seus textos em tempo real, identificando erros de digitação e gramaticais.
 A cada erro encontrado, a ferramenta destaca as correções necessárias, oferecendo explicações detalhadas sobre o que foi corrigido e o motivo.
 Dessa forma, você não apenas corrige suas falhas, mas também aprende com cada interação, desenvolvendo suas habilidades linguísticas de maneira prática e envolvente.
 </p>
-
-> **📱 NOVIDADE: App Mobile disponível!** → [Ver documentação mobile](./mobile/START_HERE.md)
 
 ---
 

@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 	"strings"
@@ -38,6 +39,8 @@ func GenerateJWT(id, name, email, language, level string) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	fmt.Println(jwtKey)
 
 	tokenString, err := token.SignedString(jwtKey)
 	if err != nil {

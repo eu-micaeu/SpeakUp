@@ -9,7 +9,6 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"speakup/pkg/config"
-	_ "speakup/docs"
 	"speakup/pkg/handlers"
 	"speakup/pkg/middlewares"
 	"speakup/pkg/repositories"
@@ -24,16 +23,16 @@ import (
 
 func main() {
 
-	r := gin.Default()
-
-	// CORS
-	r.Use(middlewares.CorsMiddleware())
-
-	// Carregar variáveis de ambiente do arquivo .env
+	// Carregar variáveis de ambiente do arquivo .env PRIMEIRO
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatalf("Erro ao carregar o arquivo .env: %v", err)
 	}
+
+	r := gin.Default()
+
+	// CORS
+	r.Use(middlewares.CorsMiddleware())
 
 	// Connect to MongoDB
 	config.ConnectMongoDB()
@@ -47,20 +46,19 @@ func main() {
 	chatRepo := repositories.NewMongoChatRepository(db)
 	userRepo := repositories.NewMongoUserRepository(db)
 	messageRepo := repositories.NewMongoMessageRepository(db)
-	wordRepo := repositories.NewMongoWordRepository(db)
 
 	// Handlers
 	chatHandler := handlers.NewChatHandler(chatRepo)
 	userHandler := handlers.NewUserHandler(userRepo)
 	messageHandler := handlers.NewMessageHandler(messageRepo)
-	wordHandler := handlers.NewWordHandler(wordRepo)
+	billingHandler := handlers.NewBillingHandler(userRepo)
 
 	// Load routes
 	routes.UserRoutes(r, userHandler)
 	routes.ChatRoutes(r, chatHandler)
 	routes.MessageRoutes(r, messageHandler)
 	routes.AIRoutes(r)
-	routes.WordRoutes(r, wordHandler)
+	routes.BillingRoutes(r, billingHandler)
 
 	// Load Swagger
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

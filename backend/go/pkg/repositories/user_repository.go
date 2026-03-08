@@ -12,6 +12,7 @@ type UserRepository interface {
 	Create(ctx context.Context, user models.User) error
 	FindByID(ctx context.Context, id string) (models.User, error)
 	FindByEmail(ctx context.Context, email string) (models.User, error)
+	FindByStripeCustomerID(ctx context.Context, customerID string) (models.User, error)
 	Update(ctx context.Context, id string, updateDoc bson.M) error
 	Delete(ctx context.Context, id string) error
 }
@@ -40,6 +41,12 @@ func (r *MongoUserRepository) FindByID(ctx context.Context, id string) (models.U
 func (r *MongoUserRepository) FindByEmail(ctx context.Context, email string) (models.User, error) {
 	var user models.User
 	err := r.Collection.FindOne(ctx, bson.M{"email": email}).Decode(&user)
+	return user, err
+}
+
+func (r *MongoUserRepository) FindByStripeCustomerID(ctx context.Context, customerID string) (models.User, error) {
+	var user models.User
+	err := r.Collection.FindOne(ctx, bson.M{"stripe_customer_id": customerID}).Decode(&user)
 	return user, err
 }
 

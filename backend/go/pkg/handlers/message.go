@@ -2,9 +2,12 @@ package handlers
 
 import (
 	"net/http"
+	"strings"
 	"time"
 
+	"speakup/pkg/middlewares"
 	"speakup/pkg/models"
+	"speakup/pkg/planlimits"
 	"speakup/pkg/repositories"
 	"speakup/pkg/utils"
 
@@ -41,6 +44,33 @@ func (h *MessageHandler) CreateMessage(c *gin.Context) {
 	if err := c.ShouldBindJSON(&message); err != nil {
 		utils.RespondWithError(c, http.StatusBadRequest, err.Error())
 		return
+	}
+
+	if strings.ToLower(message.Sender) == "user" {
+		userID := middlewares.GetUserIDFromContext(c)
+		if userID == "" {
+			utils.RespondWithError(c, http.StatusUnauthorized, "Unauthorized")
+			return
+		}
+
+		pro, err := planlimits.IsProUser(c, userID)
+		if err != nil {
+			utils.RespondWithError(c, http.StatusInternalServerError, "Failed to load subscription status")
+			return
+		}
+
+		if !pro {
+			limit := planlimits.GetFreeDailyLimit()
+			allowed, err := planlimits.CheckAndIncrementUsage(c, userID, limit)
+			if err != nil {
+				utils.RespondWithError(c, http.StatusInternalServerError, "Failed to enforce plan limits")
+				return
+			}
+			if !allowed {
+				utils.RespondWithError(c, http.StatusTooManyRequests, "Limite diário do plano Free atingido. Faça upgrade para continuar.")
+				return
+			}
+		}
 	}
 
 	message.ID = uuid.New().String()
@@ -122,7 +152,7 @@ func (h *MessageHandler) UpdateMessage(c *gin.Context) {
 		utils.RespondWithError(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	
+
 	updateDoc := bson.M{}
 	if message.Content != "" {
 		updateDoc["content"] = message.Content
@@ -130,7 +160,7 @@ func (h *MessageHandler) UpdateMessage(c *gin.Context) {
 	if message.Type != "" {
 		updateDoc["type"] = message.Type
 	}
-	
+
 	if err := h.Repo.Update(c, id, updateDoc); err != nil {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to update message")
 		return

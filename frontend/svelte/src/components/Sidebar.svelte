@@ -11,6 +11,10 @@
   const dispatch = createEventDispatcher();
   let openSettings = false;
 
+  function toggleSidebar() {
+    sidebarOpen = !sidebarOpen;
+  }
+
   function handleNewChat() {
     dispatch("newChat");
   }
@@ -21,6 +25,11 @@
 
   function goToPerfil() {
     goto("/perfil");
+    openSettings = false;
+  }
+
+  function goToPlans() {
+    goto("/planos");
     openSettings = false;
   }
 
@@ -41,6 +50,19 @@
 </script>
 
 <aside class:sidebar={true} class:sidebarClosed={!sidebarOpen}>
+  <div class="divToggleButton">
+    <button
+      class="toggleButton"
+      class:rotated={sidebarOpen}
+      on:click={toggleSidebar}
+      aria-label="Toggle sidebar"
+    >
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
+      </svg>
+    </button>
+  </div>
+
   <div class="sidebarContent">
     <div class="header">
       <img src="/logo.png" alt="Logo" width={35} />
@@ -191,6 +213,26 @@
             <span>Perfil</span>
           </button>
 
+          <button class="modal-option" on:click={goToPlans}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M3 7h18M5 7v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M8 11h8M8 15h5"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <span>Planos</span>
+          </button>
+
           <button class="modal-option" on:click={goToIndex}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
               <path
@@ -223,11 +265,39 @@
     border-right: 1px solid #333;
     display: flex;
     flex-direction: column;
-    transition: margin-left 0.3s ease;
+    transition: width 0.1s ease;
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    z-index: 100;
   }
 
   .sidebarClosed {
-    margin-left: -360px;
+    width: 60px;
+  }
+
+  .divToggleButton{
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .toggleButton {
+    background: none;
+    border: none;
+    color: #ccc;
+    cursor: pointer;
+    padding: 1rem;
+    align-items: right;
+    justify-content: center;
+    border-radius: 0.5rem;
+    min-height: 60px;
+    margin: 0 auto;
+  }
+
+  .toggleButton.rotated {
+    transform: rotate(90deg);
+    margin: 0;
   }
 
   .sidebarContent {
@@ -235,6 +305,12 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+  }
+
+  .sidebarClosed .sidebarContent {
+    opacity: 0;
+    pointer-events: none;
   }
 
   .header {
@@ -470,7 +546,6 @@
     background: rgba(255, 255, 255, 0.1);
     border-color: rgba(255, 255, 255, 0.3);
     transform: translateX(4px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   }
 
   .modal-option svg {

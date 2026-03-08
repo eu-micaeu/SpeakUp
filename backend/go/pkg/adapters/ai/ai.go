@@ -2,29 +2,103 @@ package handlers
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
-	"speakup/pkg/config"
 	"speakup/pkg/adapters/connectors"
+	"speakup/pkg/config"
 	"speakup/pkg/middlewares"
 	"speakup/pkg/models"
+	"speakup/pkg/planlimits"
 
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var aiConnectorBuilder func() connectors.AIConnector = func() connectors.AIConnector {
 	// Usa sempre o Ollama (local)
 	return connectors.NewOllamaConnector()
+}
+
+// @Summary Retorna uso diário de IA
+// @Description Retorna o consumo diário de créditos do usuário no plano Free
+// @Tags AI
+// @Produce json
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Token de autenticação"
+// @Success 200 {object} map[string]interface{}
+// @Failure 401 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /ai/usage [get]
+func GetAIUsage(c *gin.Context) {
+	userID := middlewares.GetUserIDFromContext(c)
+	if userID == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	pro, err := planlimits.IsProUser(c, userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load subscription status"})
+		return
+	}
+
+	limit := planlimits.GetFreeDailyLimit()
+	used := int64(0)
+	remaining := int64(0)
+	if !pro {
+		used, err = planlimits.GetUsageCount(c, userID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load usage"})
+			return
+		}
+		remaining = limit - used
+		if remaining < 0 {
+			remaining = 0
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"is_pro":      pro,
+		"daily_limit": limit,
+		"used_today":  used,
+		"remaining":   remaining,
+	})
+}
+
+func enforcePlanLimits(c *gin.Context) bool {
+	userID := middlewares.GetUserIDFromContext(c)
+	if userID == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return false
+	}
+
+	pro, err := planlimits.IsProUser(c, userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load subscription status"})
+		return false
+	}
+
+	if pro {
+		return true
+	}
+
+	limit := planlimits.GetFreeDailyLimit()
+	used, err := planlimits.GetUsageCount(c, userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to enforce plan limits"})
+		return false
+	}
+	if used >= limit {
+		c.JSON(http.StatusTooManyRequests, gin.H{
+			"error": "Limite diário do plano Free atingido. Faça upgrade para continuar.",
+		})
+		return false
+	}
+
+	return true
 }
 
 // @Summary Gera uma resposta de diálogo usando IA
@@ -40,8 +114,12 @@ var aiConnectorBuilder func() connectors.AIConnector = func() connectors.AIConne
 // @Failure 500 {object} map[string]string "Erro interno do servidor" example({"error":"Internal server error"})
 // @Router /ai/generate-response-dialog [post]
 func GenerateResponseDialog(c *gin.Context) {
+	if !enforcePlanLimits(c) {
+		return
+	}
+
 	// ... (prompt loading, request binding)
-    promptPath := filepath.Join("pkg/prompts", "promptDialog.txt")
+	promptPath := filepath.Join("pkg/prompts", "promptDialog.txt")
 	promptBytes, err := os.ReadFile(promptPath)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load prompt: " + err.Error()})
@@ -115,8 +193,12 @@ func GenerateResponseDialog(c *gin.Context) {
 // @Failure 500 {object} map[string]string "Erro interno do servidor" example({"error":"Internal server error"})
 // @Router /ai/generate-response-correction [post]
 func GenerateResponseCorrection(c *gin.Context) {
+	if !enforcePlanLimits(c) {
+		return
+	}
+
 	// ... (prompt loading, request binding)
-    promptPath := filepath.Join("pkg/prompts", "promptCorrection.txt")
+	promptPath := filepath.Join("pkg/prompts", "promptCorrection.txt")
 	promptBytes, err := os.ReadFile(promptPath)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load prompt: " + err.Error()})
@@ -137,12 +219,28 @@ func GenerateResponseCorrection(c *gin.Context) {
 	connector := aiConnectorBuilder() // MODIFIED LINE
 
 	// Concatenate prompt with user message for correction
-	fullPrompt := prompt + "\n\nText to correct: " + request.Message
-	
-	correctionResp, err := connector.GenerateResponse(context.Background(), fullPrompt)
+	fullPrompt := fmt.Sprintf("%s\n\nINPUT:\n%s\n\nOUTPUT:", prompt, request.Message)
+
+	var correctionResp string
+	if ollamaConnector, ok := connector.(*connectors.OllamaConnector); ok {
+		systemPrompt := "You are a strict text correction tool. Return ONLY the corrected text. Do not answer the question. Do not add explanations."
+		options := map[string]any{
+			"temperature": 0.1,
+			"top_p":       0.9,
+			"num_predict": 128,
+		}
+		correctionResp, err = ollamaConnector.GenerateResponseWithOptions(context.Background(), fullPrompt, systemPrompt, options)
+	} else {
+		correctionResp, err = connector.GenerateResponse(context.Background(), fullPrompt)
+	}
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
+	}
+
+	correctionResp = strings.TrimSpace(correctionResp)
+	if correctionResp == "" {
+		correctionResp = request.Message
 	}
 
 	c.JSON(http.StatusOK, gin.H{"response": correctionResp})
@@ -161,7 +259,11 @@ func GenerateResponseCorrection(c *gin.Context) {
 // @Failure 500 {object} map[string]string "Erro interno" example({"error":"Internal server error"})
 // @Router /ai/generate-response-translation [post]
 func GenerateResponseTranslate(c *gin.Context) {
-    promptPath := filepath.Join("pkg/prompts", "promptTranslate.txt")
+	if !enforcePlanLimits(c) {
+		return
+	}
+
+	promptPath := filepath.Join("pkg/prompts", "promptTranslate.txt")
 	promptBytes, err := os.ReadFile(promptPath)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao carregar o prompt: " + err.Error()})
@@ -206,6 +308,10 @@ func GenerateResponseTranslate(c *gin.Context) {
 // @Failure 500 {object} map[string]string "Erro interno do servidor" example({"error":"Internal server error"})
 // @Router /ai/generate-response-topic [post]
 func GenerateResponseTopic(c *gin.Context) {
+	if !enforcePlanLimits(c) {
+		return
+	}
+
 	var request struct {
 		Message string `json:"message"`
 	}
@@ -218,119 +324,33 @@ func GenerateResponseTopic(c *gin.Context) {
 	// Use the builder to get a connector instance
 	connector := aiConnectorBuilder() // MODIFIED LINE
 
-	topicResp, err := connector.GenerateResponse(context.Background(), "Please generate a topic for the following text, return only words ,generate with 2 words only: "+request.Message)
+	strictPrompt := fmt.Sprintf(
+		"You are a topic generator. Return ONLY a topic with exactly 2 words. No punctuation, no quotes, no extra text.\n\nExamples:\nInput: I want to learn English for travel.\nOutput: Travel English\nInput: We discussed ordering food in restaurants.\nOutput: Food Ordering\n\nInput: %s\nOutput:",
+		request.Message,
+	)
+
+	var topicResp string
+	var err error
+	if ollamaConnector, ok := connector.(*connectors.OllamaConnector); ok {
+		systemPrompt := "Return ONLY a two-word topic. No explanations."
+		options := map[string]any{
+			"temperature": 0.1,
+			"top_p":       0.9,
+			"num_predict": 12,
+		}
+		topicResp, err = ollamaConnector.GenerateResponseWithOptions(context.Background(), strictPrompt, systemPrompt, options)
+	} else {
+		topicResp, err = connector.GenerateResponse(context.Background(), strictPrompt)
+	}
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
+	topicResp = strings.TrimSpace(topicResp)
+	if topicResp == "" {
+		topicResp = "New Topic"
+	}
+
 	c.JSON(http.StatusOK, gin.H{"response": topicResp})
-}
-
-// @Summary Gera uma palavra aleatória usando IA
-// @Description Gera uma palavra aleatória baseada no nível e idioma do usuário
-// @Tags AI
-// @Accept json
-// @Produce json
-// @Security ApiKeyAuth
-// @Param Authorization header string true "Token de autenticação"
-// @Success 200 {object} models.Word "Palavra gerada com sucesso"
-// @Failure 400 {object} map[string]string "Erro na requisição" example({"error":"Invalid request"})
-// @Failure 500 {object} map[string]string "Erro interno do servidor" example({"error":"Internal server error"})
-// @Router /ai/generate-random-word [post]
-func GenerateRandomWord(c *gin.Context) {
-	// ... (prompt loading, user fetching, etc.)
-    promptPath := filepath.Join("pkg/prompts", "promptRandomWord.txt")
-	promptBytes, err := os.ReadFile(promptPath)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Falha ao carregar o prompt: " + err.Error()})
-		return
-	}
-	prompt := string(promptBytes)
-
-	userID := middlewares.GetUserIDFromContext(c)
-	if userID == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Usuário não autenticado"})
-		return
-	}
-
-	db := config.GetMongoClient()
-	collectionUsers := db.Database("speakup").Collection("users")
-
-	var user models.User
-	err = collectionUsers.FindOne(c, bson.M{"id": userID}).Decode(&user)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Falha ao buscar dados do usuário"})
-		return
-	}
-
-	wordsCollection := db.Database("speakup").Collection("words")
-	cursor, err := wordsCollection.Find(c, bson.M{
-		"user_id": userID,
-	}, options.Find().SetSort(bson.M{"created_at": -1}).SetLimit(50))
-
-	if err != nil && err != mongo.ErrNoDocuments {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Falha ao buscar histórico de palavras"})
-		return
-	}
-
-	var previousWords []models.Word
-	if err != mongo.ErrNoDocuments {
-		if err = cursor.All(c, &previousWords); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Falha ao processar histórico de palavras"})
-			return
-		}
-	}
-
-	previousWordsStr := "nenhuma palavra anterior"
-	if len(previousWords) > 0 {
-		wordsList := make([]string, len(previousWords))
-		for i, w := range previousWords {
-			wordsList[i] = w.Word
-		}
-		previousWordsStr = strings.Join(wordsList, ", ")
-	}
-
-	fullPrompt := fmt.Sprintf(prompt, user.Level, user.Language, previousWordsStr)
-
-	// Use the builder to get a connector instance
-	connector := aiConnectorBuilder() // MODIFIED LINE
-
-	response, err := connector.GenerateResponse(context.Background(), fullPrompt)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao gerar palavra: " + err.Error()})
-		return
-	}
-
-	// ... (response cleaning, JSON unmarshal, DB saving)
-    response = strings.TrimSpace(response)
-	if strings.HasPrefix(response, "```json") {
-		response = strings.TrimPrefix(response, "```json")
-	}
-	if strings.HasSuffix(response, "```") {
-		response = strings.TrimSuffix(response, "```")
-	}
-	response = strings.TrimSpace(response)
-
-	var word models.Word
-	err = json.Unmarshal([]byte(response), &word)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao processar resposta: " + err.Error()})
-		return
-	}
-
-	word.ID = primitive.NewObjectID().Hex()
-	word.UserID = userID
-	word.Language = user.Language
-	word.Level = user.Level
-	word.CreatedAt = time.Now().UTC().Format(time.RFC3339)
-
-	collectionWords := db.Database("speakup").Collection("words") // Re-get collection or pass db
-	_, err = collectionWords.InsertOne(c, word)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao salvar palavra: " + err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, word)
 }
