@@ -18,20 +18,9 @@ import (
 )
 
 var aiConnectorBuilder func() connectors.AIConnector = func() connectors.AIConnector {
-	// Usa sempre o Ollama (local)
 	return connectors.NewOllamaConnector()
 }
 
-// @Summary Retorna uso diário de IA
-// @Description Retorna o consumo diário de créditos do usuário no plano Free
-// @Tags AI
-// @Produce json
-// @Security ApiKeyAuth
-// @Param Authorization header string true "Token de autenticação"
-// @Success 200 {object} map[string]interface{}
-// @Failure 401 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Router /ai/usage [get]
 func GetAIUsage(c *gin.Context) {
 	userID := middlewares.GetUserIDFromContext(c)
 	if userID == "" {
@@ -101,18 +90,6 @@ func enforcePlanLimits(c *gin.Context) bool {
 	return true
 }
 
-// @Summary Gera uma resposta de diálogo usando IA
-// @Description Gera uma resposta de diálogo contextual baseada na mensagem fornecida
-// @Tags AI
-// @Accept json
-// @Produce json
-// @Security ApiKeyAuth
-// @Param Authorization header string true "Token de autenticação"
-// @Param request body object{message=string,chat_id=string} true "Chat object"
-// @Success 200 {object} map[string]string "Resposta gerada com sucesso" example({"response":"Hi! I'm doing great, thank you for asking. How are you?"})
-// @Failure 400 {object} map[string]string "Erro na requisição" example({"error":"Invalid request"})
-// @Failure 500 {object} map[string]string "Erro interno do servidor" example({"error":"Internal server error"})
-// @Router /ai/generate-response-dialog [post]
 func GenerateResponseDialog(c *gin.Context) {
 	if !enforcePlanLimits(c) {
 		return
@@ -180,18 +157,6 @@ func GenerateResponseDialog(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"response": dialogueResp})
 }
 
-// @Summary Gera uma correção de texto usando IA
-// @Description Analisa e corrige erros gramaticais no texto fornecido
-// @Tags AI
-// @Accept json
-// @Produce json
-// @Security ApiKeyAuth
-// @Param Authorization header string true "Token de autenticação"
-// @Param message body object{message=string} true "Chat object"
-// @Success 200 {object} map[string]string "Correção gerada com sucesso" example({"response":"I went to school yesterday"})
-// @Failure 400 {object} map[string]string "Erro na requisição" example({"error":"Invalid request"})
-// @Failure 500 {object} map[string]string "Erro interno do servidor" example({"error":"Internal server error"})
-// @Router /ai/generate-response-correction [post]
 func GenerateResponseCorrection(c *gin.Context) {
 	if !enforcePlanLimits(c) {
 		return
@@ -246,18 +211,6 @@ func GenerateResponseCorrection(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"response": correctionResp})
 }
 
-// @Summary Traduz um texto usando IA
-// @Description Recebe um texto e retorna sua tradução para o idioma especificado
-// @Tags AI
-// @Accept json
-// @Produce json
-// @Security ApiKeyAuth
-// @Param Authorization header string true "Token de autenticação"
-// @Param message body object{message=string,target_language=string} true "Texto e idioma de destino"
-// @Success 200 {object} map[string]string "Tradução gerada com sucesso" example({"response":"Olá, como vai você?"})
-// @Failure 400 {object} map[string]string "Requisição inválida" example({"error":"Invalid request"})
-// @Failure 500 {object} map[string]string "Erro interno" example({"error":"Internal server error"})
-// @Router /ai/generate-response-translation [post]
 func GenerateResponseTranslate(c *gin.Context) {
 	if !enforcePlanLimits(c) {
 		return
@@ -295,18 +248,6 @@ func GenerateResponseTranslate(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"response": response})
 }
 
-// @Summary Gera um tópico para uma conversa usando IA
-// @Description Analisa o texto fornecido e gera um tópico relevante de duas palavras
-// @Tags AI
-// @Accept json
-// @Produce json
-// @Security ApiKeyAuth
-// @Param Authorization header string true "Token de autenticação"
-// @Param message body object{topic=string} true "Chat object"
-// @Success 200 {object} map[string]string "Tópico gerado com sucesso" example({"response":"World Travel"})
-// @Failure 400 {object} map[string]string "Erro na requisição" example({"error":"Invalid request"})
-// @Failure 500 {object} map[string]string "Erro interno do servidor" example({"error":"Internal server error"})
-// @Router /ai/generate-response-topic [post]
 func GenerateResponseTopic(c *gin.Context) {
 	if !enforcePlanLimits(c) {
 		return
@@ -321,18 +262,21 @@ func GenerateResponseTopic(c *gin.Context) {
 		return
 	}
 
-	// Use the builder to get a connector instance
-	connector := aiConnectorBuilder() // MODIFIED LINE
+	connector := aiConnectorBuilder()
 
-	strictPrompt := fmt.Sprintf(
-		"You are a topic generator. Return ONLY a topic with exactly 2 words. No punctuation, no quotes, no extra text.\n\nExamples:\nInput: I want to learn English for travel.\nOutput: Travel English\nInput: We discussed ordering food in restaurants.\nOutput: Food Ordering\n\nInput: %s\nOutput:",
-		request.Message,
-	)
+	promptPath := filepath.Join("pkg/prompts", "promptTopic.txt")
+	promptBytes, err := os.ReadFile(promptPath)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load prompt: " + err.Error()})
+		return
+	}
+	prompt := string(promptBytes)
+
+	strictPrompt := fmt.Sprintf("%s\n\nInput: %s\nOutput:", prompt, request.Message)
 
 	var topicResp string
-	var err error
 	if ollamaConnector, ok := connector.(*connectors.OllamaConnector); ok {
-		systemPrompt := "Return ONLY a two-word topic. No explanations."
+		systemPrompt := "You are a strict topic labeler. Return exactly two words in Title Case with only letters and one space."
 		options := map[string]any{
 			"temperature": 0.1,
 			"top_p":       0.9,
