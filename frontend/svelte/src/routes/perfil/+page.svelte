@@ -45,6 +45,13 @@
 
     let levels: string[] = [];
 
+    const monthly =
+        (import.meta.env.VITE_STRIPE_PRICE_MONTHLY as string | undefined)
+            ?.trim() || "";
+    const annual =
+        (import.meta.env.VITE_STRIPE_PRICE_ANNUAL as string | undefined)
+            ?.trim() || "";
+
     function parseJwt(token: string) {
         try {
             const base64Url = token.split(".")[1];
@@ -229,11 +236,14 @@
 
         if (!priceId) return "Nenhum plano ativo";
 
-        // Mapeamento dos price IDs para nomes de planos
-        const planMap: { [key: string]: string } = {
-            price_1RW5MgDQYqua1knA06NgjjST: "Plano Mensal",
-            price_1StFqqDQYqua1knAQAXih6ES: "Plano Anual",
-        };
+        // Mapeamento dinâmico via variáveis VITE_* do frontend
+        const planMap: { [key: string]: string } = {};
+        if (monthly) {
+            planMap[monthly] = "Plano Mensal";
+        }
+        if (annual) {
+            planMap[annual] = "Plano Anual";
+        }
 
         return planMap[priceId] || "Plano Personalizado";
     }

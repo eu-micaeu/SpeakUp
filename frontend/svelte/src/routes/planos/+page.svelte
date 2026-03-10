@@ -56,9 +56,13 @@
             if (url) {
                 window.location.href = url;
             }
-        } catch (error) {
+        } catch (error: unknown) {
             console.error("Erro ao iniciar assinatura:", error);
-            toast.error("Erro ao iniciar assinatura");
+            const message =
+                error instanceof Error
+                    ? error.message
+                    : "Erro ao iniciar assinatura";
+            toast.error(message);
         } finally {
             billingActionLoading = false;
         }
@@ -134,7 +138,7 @@
         <article class="plan-card highlight">
             <div class="highlight-pill">Mais vantajoso</div>
             <h2>Plano Anual</h2>
-            <p class="price">R$ 7 <span>/ ano</span></p>
+            <p class="price">R$ 70 <span>/ ano</span></p>
             <p class="discount">Economize R$ 14 no ano</p>
             <p class="subtitle">Economia e consistência</p>
             <ul>

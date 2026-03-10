@@ -365,14 +365,21 @@ export const getBillingStatus = async (): Promise<BillingStatus> => {
 
 // Create Stripe checkout session
 export const createCheckoutSession = async (plan: 'monthly' | 'annual'): Promise<{ url: string }> => {
-    const response = await axios.post<{ url: string }>(API_URL + '/billing/checkout', {
-        plan
-    }, {
-        headers: {
-            Authorization: `Bearer ${Cookies.get('authToken')}`
-        }
-    });
-    return response.data;
+    try {
+        const response = await axios.post<{ url: string }>(API_URL + '/billing/checkout', {
+            plan
+        }, {
+            headers: {
+                Authorization: `Bearer ${Cookies.get('authToken')}`
+            }
+        });
+        return response.data;
+    }
+    catch (error: unknown) {
+        const axiosError = error as AxiosError<{ error?: string; message?: string }>;
+        const apiMessage = axiosError.response?.data?.error || axiosError.response?.data?.message;
+        throw new Error(apiMessage || 'Erro ao criar sessão de checkout');
+    }
 }
 
 // Create Stripe customer portal session

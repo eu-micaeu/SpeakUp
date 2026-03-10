@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 	"strings"
@@ -16,6 +17,8 @@ import (
 	billingportal "github.com/stripe/stripe-go/v79/billingportal/session"
 	checkout "github.com/stripe/stripe-go/v79/checkout/session"
 	"github.com/stripe/stripe-go/v79/customer"
+	priceapi "github.com/stripe/stripe-go/v79/price"
+	productapi "github.com/stripe/stripe-go/v79/product"
 	"github.com/stripe/stripe-go/v79/subscription"
 	"github.com/stripe/stripe-go/v79/webhook"
 	"go.mongodb.org/mongo-driver/bson"
@@ -120,6 +123,10 @@ func (h *BillingHandler) CreateCheckoutSession(c *gin.Context) {
 
 	sess, err := checkout.New(params)
 	if err != nil {
+		if stripeErr, ok := err.(*stripe.Error); ok && strings.TrimSpace(stripeErr.Msg) != "" {
+			utils.RespondWithError(c, http.StatusBadRequest, stripeErr.Msg)
+			return
+		}
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to create checkout session")
 		return
 	}
@@ -213,7 +220,7 @@ func fetchLatestSubscription(customerID string) (*stripe.Subscription, string, e
 	params.AddExpand("data.items.data.price")
 
 	iter := subscription.List(params)
-	for iter.Next() {
+	if iter.Next() {
 		sub := iter.Subscription()
 		priceID := ""
 		if sub.Items != nil && len(sub.Items.Data) > 0 && sub.Items.Data[0].Price != nil {
@@ -346,22 +353,62 @@ func mapStripeFields(customerID, subscriptionID, priceID, status string, current
 }
 
 func resolvePriceID(plan string) (string, error) {
+	var priceID string
+
 	switch plan {
 	case "monthly":
-		priceID := os.Getenv("STRIPE_PRICE_MONTHLY")
+		priceID = strings.TrimSpace(os.Getenv("STRIPE_PRICE_MONTHLY"))
 		if priceID == "" {
 			return "", errEnv("STRIPE_PRICE_MONTHLY")
 		}
-		return priceID, nil
 	case "annual":
-		priceID := os.Getenv("STRIPE_PRICE_ANNUAL")
+		priceID = strings.TrimSpace(os.Getenv("STRIPE_PRICE_ANNUAL"))
 		if priceID == "" {
 			return "", errEnv("STRIPE_PRICE_ANNUAL")
 		}
-		return priceID, nil
 	default:
 		return "", errBadPlan()
 	}
+
+	if err := validateStripePrice(priceID); err != nil {
+		return "", err
+	}
+
+	return priceID, nil
+}
+
+func validateStripePrice(priceID string) error {
+	priceObj, err := priceapi.Get(priceID, nil)
+	if err != nil {
+		if stripeErr, ok := err.(*stripe.Error); ok && strings.TrimSpace(stripeErr.Msg) != "" {
+			return errors.New(stripeErr.Msg)
+		}
+		return fmt.Errorf("failed to validate Stripe price '%s'", priceID)
+	}
+
+	if priceObj == nil || !priceObj.Active {
+		return fmt.Errorf("Price '%s' is not active", priceID)
+	}
+
+	if priceObj.Recurring == nil {
+		return fmt.Errorf("Price '%s' must be recurring for subscriptions", priceID)
+	}
+
+	if priceObj.Product != nil && strings.TrimSpace(priceObj.Product.ID) != "" {
+		productObj, err := productapi.Get(priceObj.Product.ID, nil)
+		if err != nil {
+			if stripeErr, ok := err.(*stripe.Error); ok && strings.TrimSpace(stripeErr.Msg) != "" {
+				return errors.New(stripeErr.Msg)
+			}
+			return fmt.Errorf("failed to validate Stripe product '%s'", priceObj.Product.ID)
+		}
+
+		if productObj != nil && !productObj.Active {
+			return fmt.Errorf("Price '%s' cannot be purchased because its product is not active", priceID)
+		}
+	}
+
+	return nil
 }
 
 func errBadPlan() error {
