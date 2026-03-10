@@ -687,7 +687,7 @@
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div class="modal" on:click={(e) => e.stopPropagation()}>
             <div class="modal-header">
-                <h3>⚠️ Deletar Conta</h3>
+                <h3>Deletar Conta</h3>
             </div>
             <div class="modal-body">
                 <p>

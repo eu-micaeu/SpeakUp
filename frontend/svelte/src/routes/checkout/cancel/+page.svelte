@@ -4,7 +4,6 @@
 
 <section class="status-page cancel">
     <div class="card">
-        <div class="icon">⚠️</div>
         <h1>Assinatura não concluída</h1>
         <p>
             A assinatura foi cancelada ou não pôde ser finalizada. Você pode

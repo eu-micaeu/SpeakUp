@@ -340,6 +340,14 @@
 </script>
 
 <main>
+  <div class="betaBanner">
+    <div class="betaBannerContent">
+      <div class="betaText">
+         O SpeakUp está em desenvolvimento e ainda em fase beta. Sua experiência e feedback são valiosos para melhorar a plataforma!
+      </div>
+    </div>
+  </div>
+
   {#if toastMessage}
     <div class="toast {toastType}">
       {toastMessage}
@@ -1385,9 +1393,48 @@
     }
   }
 
+  .betaBanner {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    padding: 1rem 2rem;
+    border-bottom: 2px solid #b45309;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+  }
+
+  .betaBannerContent {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.95rem;
+  }
+
+  .betaText {
+    color: #1f2937;
+    font-weight: bold;
+    line-height: 1.5;
+    text-align: center;
+    width: 100%;
+  }
+
+  .betaText strong {
+    font-weight: 700;
+  }
+
   @media screen and (max-width: 768px) {
     .particles {
       display: none;
+    }
+
+    .betaBanner {
+      padding: 0.875rem 1rem;
+    }
+
+    .betaBannerContent {
+      font-size: 0.85rem;
+      gap: 0.75rem;
     }
 
     .hero {
