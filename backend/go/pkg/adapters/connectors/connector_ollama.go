@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
+	"strings"
 )
 
 type OllamaConnector struct {
@@ -32,8 +34,7 @@ type OllamaResponse struct {
 }
 
 func NewOllamaConnector() *OllamaConnector {
-	
-	baseURL := os.Getenv("OLLAMA_BASE_URL")
+	baseURL := normalizeOllamaBaseURL(os.Getenv("OLLAMA_BASE_URL"))
 	model := os.Getenv("OLLAMA_MODEL")
 
 	return &OllamaConnector{
@@ -41,6 +42,43 @@ func NewOllamaConnector() *OllamaConnector {
 		model:   model,
 		client:  &http.Client{},
 	}
+}
+
+func normalizeOllamaBaseURL(raw string) string {
+	baseURL := strings.TrimSpace(raw)
+	if baseURL == "" {
+		if runningInDocker() {
+			return "http://host.docker.internal:11434"
+		}
+		return "http://localhost:11434"
+	}
+
+	if !strings.Contains(baseURL, "://") {
+		baseURL = "http://" + baseURL
+	}
+
+	parsed, err := url.Parse(baseURL)
+	if err != nil || parsed.Host == "" {
+		return strings.TrimRight(baseURL, "/")
+	}
+
+	if runningInDocker() {
+		host := parsed.Hostname()
+		if host == "localhost" || host == "127.0.0.1" || host == "::1" {
+			port := parsed.Port()
+			if port == "" {
+				port = "11434"
+			}
+			parsed.Host = "host.docker.internal:" + port
+		}
+	}
+
+	return strings.TrimRight(parsed.String(), "/")
+}
+
+func runningInDocker() bool {
+	_, err := os.Stat("/.dockerenv")
+	return err == nil
 }
 
 func (o *OllamaConnector) GenerateResponse(ctx context.Context, message string) (string, error) {

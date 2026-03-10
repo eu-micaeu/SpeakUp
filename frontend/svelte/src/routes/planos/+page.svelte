@@ -110,7 +110,7 @@
 
         <article class="plan-card">
             <h2>Plano Mensal</h2>
-            <p class="price">R$ 18 <span>/ mês</span></p>
+            <p class="price">R$ 7 <span>/ mês</span></p>
             <p class="subtitle">Flexibilidade para começar agora</p>
             <ul>
                 <li>Chat com IA ilimitado.</li>
@@ -134,8 +134,8 @@
         <article class="plan-card highlight">
             <div class="highlight-pill">Mais vantajoso</div>
             <h2>Plano Anual</h2>
-            <p class="price">R$ 180 <span>/ ano</span></p>
-            <p class="discount">Economize R$ 36 (2 meses grátis)</p>
+            <p class="price">R$ 7 <span>/ ano</span></p>
+            <p class="discount">Economize R$ 14 no ano</p>
             <p class="subtitle">Economia e consistência</p>
             <ul>
                 <li>Chat com IA ilimitado.</li>

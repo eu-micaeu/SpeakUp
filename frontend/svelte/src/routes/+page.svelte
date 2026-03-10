@@ -390,7 +390,7 @@
       </article>
       <article class="planCard">
         <h3>Plano Mensal</h3>
-        <p class="planPrice">R$ 18 <span>/ mês</span></p>
+        <p class="planPrice">R$ 7 <span>/ mês</span></p>
         <p class="planDiscount">Com os seguintes benefícios:</p>
         <ul>
           <li>Chat com IA ilimitado.</li>
@@ -401,8 +401,8 @@
       <article class="planCard highlighted">
         <span class="planBadge">Mais vantajoso</span>
         <h3>Plano Anual</h3>
-        <p class="planPrice">R$ 180 <span>/ ano</span></p>
-        <p class="planDiscount">Economize R$ 36 (2 meses grátis)</p>
+        <p class="planPrice">R$ 70 <span>/ ano</span></p>
+        <p class="planDiscount">Economize R$ 14 no ano</p>
         <ul>
           <li>Chat com IA ilimitado.</li>
           <li>Correções e traduções ilimitadas.</li>

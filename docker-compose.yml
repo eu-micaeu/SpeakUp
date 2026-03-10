@@ -1,4 +1,11 @@
 services:
+  ollama:
+    image: ollama/ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+
   backend:
     build:
       context: ./backend/go
@@ -8,9 +15,9 @@ services:
       - ./backend/go:/app
     ports:
       - "8082:8082"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    command: [ "/go/bin/air" ]
+    depends_on:
+      - ollama
+    command: ["/go/bin/air"]
 
   frontend:
     build:
@@ -22,3 +29,6 @@ services:
       - "5175:5175"
     depends_on:
       - backend
+
+volumes:
+  ollama_data:

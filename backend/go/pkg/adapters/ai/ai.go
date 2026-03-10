@@ -21,6 +21,8 @@ var aiConnectorBuilder func() connectors.AIConnector = func() connectors.AIConne
 	return connectors.NewOllamaConnector()
 }
 
+const maxDialogResponseChars = 64
+
 func GetAIUsage(c *gin.Context) {
 	userID := middlewares.GetUserIDFromContext(c)
 	if userID == "" {
@@ -147,6 +149,7 @@ func GenerateResponseDialog(c *gin.Context) {
 		resumeHist,
 		request.Message,
 		middlewares.GetLanguageFromContext(c))
+	fullPrompt += fmt.Sprintf("\nIMPORTANT: Your final answer must be at most %d characters.", maxDialogResponseChars)
 
 	dialogueResp, err := connector.GenerateResponse(context.Background(), fullPrompt)
 	if err != nil {
@@ -154,7 +157,33 @@ func GenerateResponseDialog(c *gin.Context) {
 		return
 	}
 
+	dialogueResp = sanitizeDialogResponse(dialogueResp, maxDialogResponseChars)
+	if dialogueResp == "" {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "empty dialog response"})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{"response": dialogueResp})
+}
+
+func sanitizeDialogResponse(raw string, maxChars int) string {
+	cleaned := strings.TrimSpace(raw)
+	if cleaned == "" || maxChars <= 0 {
+		return ""
+	}
+
+	cleaned = strings.Join(strings.Fields(cleaned), " ")
+	runes := []rune(cleaned)
+	if len(runes) <= maxChars {
+		return cleaned
+	}
+
+	truncated := string(runes[:maxChars])
+	if splitAt := strings.LastIndex(truncated, " "); splitAt > maxChars/2 {
+		truncated = truncated[:splitAt]
+	}
+
+	return strings.TrimSpace(truncated)
 }
 
 func GenerateResponseCorrection(c *gin.Context) {
@@ -162,7 +191,6 @@ func GenerateResponseCorrection(c *gin.Context) {
 		return
 	}
 
-	// ... (prompt loading, request binding)
 	promptPath := filepath.Join("pkg/prompts", "promptCorrection.txt")
 	promptBytes, err := os.ReadFile(promptPath)
 	if err != nil {
@@ -236,16 +264,72 @@ func GenerateResponseTranslate(c *gin.Context) {
 	// Use the builder to get a connector instance
 	connector := aiConnectorBuilder() // MODIFIED LINE
 
-	// Concatenate prompt with user message for translation
-	fullPrompt := prompt + "\n\nText: " + req.Message + "\nTranslation:"
+	fullPrompt := fmt.Sprintf("%s\n\nINPUT:\n%s\n\nOUTPUT:", prompt, req.Message)
 
-	response, err := connector.GenerateResponse(context.Background(), fullPrompt)
+	var response string
+	if ollamaConnector, ok := connector.(*connectors.OllamaConnector); ok {
+		systemPrompt := "You are a strict translation engine. Translate the INPUT text into Brazilian Portuguese and return ONLY the translated text."
+		options := map[string]any{
+			"temperature": 0.1,
+			"top_p":       0.9,
+			"num_predict": 256,
+			"stop": []string{
+				"\n\n",
+				"Explanation:",
+				"Explicação:",
+			},
+		}
+		response, err = ollamaConnector.GenerateResponseWithOptions(context.Background(), fullPrompt, systemPrompt, options)
+	} else {
+		response, err = connector.GenerateResponse(context.Background(), fullPrompt)
+	}
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao gerar tradução: " + err.Error()})
 		return
 	}
 
+	response = sanitizeTranslationResponse(response)
+	if response == "" {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao gerar tradução: resposta vazia"})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{"response": response})
+}
+
+func sanitizeTranslationResponse(raw string) string {
+	cleaned := strings.TrimSpace(raw)
+	if cleaned == "" {
+		return ""
+	}
+
+	labels := []string{
+		"Translation:",
+		"Tradução:",
+		"Translated text:",
+		"OUTPUT:",
+		"Output:",
+	}
+
+	lower := strings.ToLower(cleaned)
+	for _, label := range labels {
+		labelLower := strings.ToLower(label)
+		if strings.HasPrefix(lower, labelLower) {
+			cleaned = strings.TrimSpace(cleaned[len(label):])
+			lower = strings.ToLower(cleaned)
+			break
+		}
+	}
+
+	for _, marker := range []string{"\ntranslation:", "\ntradução:", " translation:", " tradução:"} {
+		if idx := strings.Index(strings.ToLower(cleaned), marker); idx > 0 {
+			cleaned = strings.TrimSpace(cleaned[:idx])
+			break
+		}
+	}
+
+	cleaned = strings.TrimSpace(strings.Trim(cleaned, "\"'`"))
+	return cleaned
 }
 
 func GenerateResponseTopic(c *gin.Context) {

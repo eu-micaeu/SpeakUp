@@ -5,7 +5,6 @@ Rules (follow all):
 - Use only letters and one single space between words.
 - Use Title Case in both words.
 - Do not include punctuation, numbers, emojis, quotes, labels, or extra text.
-- If input is unclear or too generic, return: General Practice
 
 Examples:
 Input: I want to learn English for travel.
@@ -13,6 +12,3 @@ Output: Travel English
 
 Input: We discussed ordering food in restaurants.
 Output: Food Ordering
-
-Input: I need help but I do not know where to start.
-Output: General Practice
