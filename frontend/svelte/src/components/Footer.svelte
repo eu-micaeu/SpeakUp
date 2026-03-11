@@ -8,14 +8,12 @@
       <h4>Links úteis</h4>
       <ul>
         <li><a href="/login">Login</a></li>
-        <li><a href="#features">Funcionalidades</a></li>
         <li><a href="/about">Sobre</a></li>
       </ul>
     </div>
     <div class="column">
       <h4>Contato</h4>
-      <p>Email: contato@speakup.com</p>
-      <p>Suporte: suporte@speakup.com</p>
+      <p>Email: micaelrrocha13@gmail.com</p>
     </div>
   </div>
   <div class="bottomBar">
