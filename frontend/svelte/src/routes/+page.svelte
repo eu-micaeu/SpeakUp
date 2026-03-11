@@ -4,9 +4,6 @@
   import Footer from "../components/Footer.svelte";
   import { isAuthTokenValid } from "../utils/cookies";
   import { goto } from "$app/navigation";
-  import { env } from "$env/dynamic/public";
-  import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-  import { initializeApp } from "firebase/app";
   import { login as loginApi, register as registerApi } from "../utils/api";
 
   const cardData = [
@@ -81,33 +78,6 @@
       level: "C1",
     },
   ];
-
-  // Firebase config
-  const isFirebaseConfigured =
-    env.PUBLIC_FIREBASE_API_KEY &&
-    env.PUBLIC_FIREBASE_API_KEY !== "your_firebase_api_key_here";
-
-  const firebaseConfig = {
-    apiKey: env.PUBLIC_FIREBASE_API_KEY || "",
-    authDomain: env.PUBLIC_FIREBASE_AUTH_DOMAIN || "",
-    projectId: env.PUBLIC_FIREBASE_PROJECT_ID || "",
-    storageBucket: env.PUBLIC_FIREBASE_STORAGE_BUCKET || "",
-    messagingSenderId: env.PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "",
-    appId: env.PUBLIC_FIREBASE_APP_ID || "",
-    measurementId: env.PUBLIC_FIREBASE_MEASUREMENT_ID || "",
-  };
-
-  let app: any = null;
-  let auth: any = null;
-
-  if (isFirebaseConfigured) {
-    try {
-      app = initializeApp(firebaseConfig);
-      auth = getAuth(app);
-    } catch (error) {
-      console.warn("Firebase initialization failed:", error);
-    }
-  }
 
   function openAuthModal(mode: string) {
     authMode = mode;
@@ -285,49 +255,6 @@
       }
     } finally {
       isLoading = false;
-    }
-  }
-
-  async function handleGoogleLogin() {
-    if (!isFirebaseConfigured || !auth) {
-      showToast("Login com Google não está configurado", "error");
-      return;
-    }
-
-    const provider = new GoogleAuthProvider();
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      const email = user.email!;
-      const password = user.uid;
-      const name = user.displayName!;
-
-      let isFirstTime = false;
-
-      try {
-        await loginApi(email, password);
-      } catch (err) {
-        isFirstTime = true;
-        const userData = {
-          name,
-          email,
-          password,
-          language: "en",
-          level: "beginner",
-        };
-        await registerApi(userData);
-        await loginApi(email, password);
-      }
-
-      showToast(`Bem-vindo, ${name}!`, "success");
-      closeAuthModal();
-
-      setTimeout(() => {
-        goto("/chat");
-      }, 1500);
-    } catch (error) {
-      console.error(error);
-      showToast("Erro ao fazer login com Google", "error");
     }
   }
 
@@ -532,18 +459,6 @@
             <button type="submit" disabled={isLoading} class="submitButton">
               {isLoading ? "Entrando..." : "Entrar"}
             </button>
-
-            {#if isFirebaseConfigured}
-              <button
-                type="button"
-                on:click={handleGoogleLogin}
-                disabled={isLoading}
-                class="googleButton"
-              >
-                <img src="./google.png" alt="Google" />
-                Continuar com Google
-              </button>
-            {/if}
           </form>
         {:else}
           <form on:submit={handleRegister}>
