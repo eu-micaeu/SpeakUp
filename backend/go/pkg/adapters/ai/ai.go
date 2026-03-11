@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"unicode/utf8"
 
 	"speakup/pkg/adapters/connectors"
 	"speakup/pkg/config"
@@ -21,7 +22,8 @@ var aiConnectorBuilder func() connectors.AIConnector = func() connectors.AIConne
 	return connectors.NewOllamaConnector()
 }
 
-const maxDialogResponseChars = 64
+const maxDialogResponseChars = 128
+const maxDialogRewriteAttempts = 3
 
 func GetAIUsage(c *gin.Context) {
 	userID := middlewares.GetUserIDFromContext(c)
@@ -149,41 +151,74 @@ func GenerateResponseDialog(c *gin.Context) {
 		resumeHist,
 		request.Message,
 		middlewares.GetLanguageFromContext(c))
-	fullPrompt += fmt.Sprintf("\nIMPORTANT: Your final answer must be at most %d characters.", maxDialogResponseChars)
+	fullPrompt += fmt.Sprintf("\nIMPORTANT: Your final answer must be complete, natural, and at most %d characters. Never cut words or end mid-sentence.", maxDialogResponseChars)
 
-	dialogueResp, err := connector.GenerateResponse(context.Background(), fullPrompt)
+	dialogueResp, err := generateDialogResponseWithinLimit(connector, fullPrompt, maxDialogResponseChars)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	dialogueResp = sanitizeDialogResponse(dialogueResp, maxDialogResponseChars)
-	if dialogueResp == "" {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "empty dialog response"})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"response": dialogueResp})
 }
 
-func sanitizeDialogResponse(raw string, maxChars int) string {
+func normalizeDialogResponse(raw string) string {
 	cleaned := strings.TrimSpace(raw)
-	if cleaned == "" || maxChars <= 0 {
+	if cleaned == "" {
 		return ""
 	}
 
 	cleaned = strings.Join(strings.Fields(cleaned), " ")
-	runes := []rune(cleaned)
-	if len(runes) <= maxChars {
-		return cleaned
+	return cleaned
+}
+
+func generateDialogResponseWithinLimit(connector connectors.AIConnector, prompt string, maxChars int) (string, error) {
+	if maxChars <= 0 {
+		return "", fmt.Errorf("invalid dialog response limit")
 	}
 
-	truncated := string(runes[:maxChars])
-	if splitAt := strings.LastIndex(truncated, " "); splitAt > maxChars/2 {
-		truncated = truncated[:splitAt]
+	currentPrompt := prompt
+	options := map[string]any{
+		"temperature": 0.3,
+		"top_p":       0.9,
+		"num_predict": 96,
+	}
+	systemPrompt := fmt.Sprintf("You are a natural language exchange partner. Keep coherence with chat context and user message. Return exactly one complete answer with at most %d characters.", maxChars)
+
+	for attempt := 0; attempt < maxDialogRewriteAttempts; attempt++ {
+		var (
+			rawResp string
+			err     error
+		)
+
+		if ollamaConnector, ok := connector.(*connectors.OllamaConnector); ok {
+			rawResp, err = ollamaConnector.GenerateResponseWithOptions(context.Background(), currentPrompt, systemPrompt, options)
+		} else {
+			rawResp, err = connector.GenerateResponse(context.Background(), currentPrompt)
+		}
+		if err != nil {
+			return "", err
+		}
+
+		cleaned := normalizeDialogResponse(rawResp)
+		if cleaned == "" {
+			currentPrompt = prompt
+			continue
+		}
+
+		if utf8.RuneCountInString(cleaned) <= maxChars {
+			return cleaned, nil
+		}
+
+		currentPrompt = fmt.Sprintf(
+			"%s\n\nIMPORTANT: Your previous answer exceeded %d characters. Answer again with one complete, natural sentence up to %d characters, keeping the same context and language.",
+			prompt,
+			maxChars,
+			maxChars,
+		)
 	}
 
-	return strings.TrimSpace(truncated)
+	return "", fmt.Errorf("failed to generate response within %d characters", maxChars)
 }
 
 func GenerateResponseCorrection(c *gin.Context) {
