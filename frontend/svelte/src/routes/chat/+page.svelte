@@ -277,134 +277,60 @@
         <div class="chatBody" bind:this={chatBodyRef}>
             {#if messages.length === 0}
                 <div class="welcomeBox">
-                    <div class="welcomeHeader">
-                        <h2>Vamos iniciar uma conversa?</h2>
-                    </div>
-
                     <div class="welcomeContent">
-                        <div class="featureSection">
-                            <div class="featureIcon">
-                                <svg
-                                    width="24"
-                                    height="24"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                >
-                                    <path
-                                        d="M22 11.08V12a10 10 0 1 1-5.93-9.14"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                    />
-                                    <path
-                                        d="M22 4L12 14.01l-3-3"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                    />
-                                </svg>
+                        <div class="featuresGrid">
+                            <div class="featureItem">
+                                <div class="featureIcon magic">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+                                </div>
+                                <h3>Correção</h3>
+                                <p>Ajustes automáticos de gramática e ortografia.</p>
                             </div>
-                            <div class="featureText">
-                                <h3>Como funciona?</h3>
-                                <p>
-                                    Digite suas frases e nossa IA irá corrigir
-                                    erros gramaticais, fornecer traduções e
-                                    continuar a conversa!
-                                </p>
+                            <div class="featureItem">
+                                <div class="featureIcon globe">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+                                </div>
+                                <h3>Tradução</h3>
+                                <p>Veja o significado das frases instantaneamente.</p>
+                            </div>
+                            <div class="featureItem">
+                                <div class="featureIcon chat">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                                </div>
+                                <h3>IA Chat</h3>
+                                <p>Diálogo natural para fluidez e confiança.</p>
                             </div>
                         </div>
 
                         <div class="examplesSection">
                             <div class="examplesHeader">
-                                <svg
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                >
-                                    <circle
-                                        cx="12"
-                                        cy="12"
-                                        r="10"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                    />
-                                    <path
-                                        d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                    />
-                                    <path
-                                        d="M12 17h.01"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                    />
-                                </svg>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
                                 <h3>Exemplos de uso:</h3>
                             </div>
 
                             <div class="exampleCard">
                                 <div class="exampleInput">
-                                    <span class="exampleLabel"
-                                        >Você escreve:</span
-                                    >
-                                    <span class="exampleText"
-                                        >"I ned a car"</span
-                                    >
+                                    <span class="exampleLabel">Você escreve:</span>
+                                    <span class="exampleText">"I ned a car"</span>
                                 </div>
                                 <div class="exampleArrow">→</div>
                                 <div class="exampleOutput">
-                                    <span class="exampleLabel">IA corrige:</span
-                                    >
-                                    <span class="exampleText"
-                                        >"I need a car"</span
-                                    >
+                                    <span class="exampleLabel">IA corrige:</span>
+                                    <span class="exampleText">"I need a car"</span>
                                 </div>
                             </div>
 
                             <div class="exampleCard">
                                 <div class="exampleInput">
-                                    <span class="exampleLabel"
-                                        >Você escreve:</span
-                                    >
-                                    <span class="exampleText"
-                                        >"Let's go beach tomorrow?"</span
-                                    >
+                                    <span class="exampleLabel">Você escreve:</span>
+                                    <span class="exampleText">"Let's go beach tomorrow?"</span>
                                 </div>
                                 <div class="exampleArrow">→</div>
                                 <div class="exampleOutput">
-                                    <span class="exampleLabel">IA corrige:</span
-                                    >
-                                    <span class="exampleText"
-                                        >"Let's go to the beach tomorrow?"</span
-                                    >
+                                    <span class="exampleLabel">IA corrige:</span>
+                                    <span class="exampleText">"Let's go to the beach tomorrow?"</span>
                                 </div>
                             </div>
-
-                            <!-- <div class="exampleCard">
-                                <div class="exampleInput">
-                                    <span class="exampleLabel"
-                                        >Você escreve:</span
-                                    >
-                                    <span class="exampleText"
-                                        >"I don't know how say this"</span
-                                    >
-                                </div>
-                                <div class="exampleArrow">→</div>
-                                <div class="exampleOutput">
-                                    <span class="exampleLabel">IA corrige:</span
-                                    >
-                                    <span class="exampleText"
-                                        >"I don't know how to say this"</span
-                                    >
-                                </div>
-                            </div> -->
                         </div>
                     </div>
                 </div>
@@ -680,16 +606,20 @@
     .welcomeBox {
         max-width: 800px;
         margin: auto;
-        border-radius: 20px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         overflow: hidden;
-        animation: fadeInUp 0.6s ease;
+        animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     @keyframes fadeInUp {
         from {
             opacity: 0;
-            transform: translateY(20px);
+            transform: translateY(30px);
         }
         to {
             opacity: 1;
@@ -697,174 +627,171 @@
         }
     }
 
-    .welcomeHeader {
-        text-align: center;
-        padding: 2.5rem 2rem 2rem;
-        background: linear-gradient(
-            135deg,
-            rgba(255, 255, 255, 0.05),
-            rgba(255, 255, 255, 0.02)
-        );
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .welcomeHeader h2 {
-        font-size: 2rem;
-        font-weight: 700;
-        margin: 0 0 0.5rem 0;
-        color: #ffffff;
-    }
-
     .welcomeContent {
-        padding: 2rem;
+        padding: 2.5rem;
         display: flex;
         flex-direction: column;
-        gap: 2rem;
+        gap: 3rem;
     }
 
-    .featureSection {
-        display: flex;
+    .featuresGrid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
         gap: 1.5rem;
-        align-items: flex-start;
+    }
+
+    .featureItem {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 1rem;
         padding: 1.5rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .featureItem:hover {
         background: rgba(255, 255, 255, 0.05);
-        border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.1);
+        transform: translateY(-5px);
     }
 
     .featureIcon {
-        flex-shrink: 0;
-        width: 50px;
-        height: 50px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
+        width: 48px;
+        height: 48px;
+        border-radius: 6px;
         display: flex;
         align-items: center;
         justify-content: center;
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        margin-bottom: 0.5rem;
     }
 
-    .featureIcon svg {
-        color: #ffffff;
-    }
+    .featureIcon.magic { background: rgba(147, 51, 234, 0.15); color: #a855f7; }
+    .featureIcon.globe { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+    .featureIcon.chat { background: rgba(16, 185, 129, 0.15); color: #10b981; }
 
-    .featureText h3 {
-        margin: 0 0 0.5rem 0;
-        font-size: 1.2rem;
-        color: white;
-    }
-
-    .featureText p {
+    .featureItem h3 {
         margin: 0;
-        color: rgba(255, 255, 255, 0.8);
-        line-height: 1.6;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #fff;
+    }
+
+    .featureItem p {
+        margin: 0;
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.5);
+        line-height: 1.5;
     }
 
     .examplesSection {
         display: flex;
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 1rem;
     }
 
     .examplesHeader {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
-        color: rgba(255, 255, 255, 0.9);
+        gap: 0.75rem;
+        color: rgba(255, 255, 255, 0.7);
         margin-bottom: 0.5rem;
     }
 
     .examplesHeader h3 {
         margin: 0;
-        font-size: 1.1rem;
+        font-size: 1rem;
         font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
 
     .exampleCard {
         display: grid;
         grid-template-columns: 1fr auto 1fr;
-        gap: 1rem;
+        gap: 2rem;
         align-items: center;
-        padding: 1rem;
-        background: rgba(255, 255, 255, 0.03);
-        border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        transition: all 0.3s ease;
+        padding: 1.25rem 1.5rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        transition: all 0.2s ease;
     }
 
     .exampleCard:hover {
-        background: rgba(255, 255, 255, 0.06);
-        border-color: rgba(255, 255, 255, 0.15);
-        transform: translateX(4px);
+        background: rgba(255, 255, 255, 0.04);
+        border-color: rgba(255, 255, 255, 0.1);
     }
 
     .exampleInput,
     .exampleOutput {
         display: flex;
         flex-direction: column;
-        gap: 0.25rem;
+        gap: 0.35rem;
     }
 
     .exampleLabel {
-        font-size: 0.75rem;
-        color: rgba(255, 255, 255, 0.5);
+        font-size: 0.7rem;
+        color: rgba(255, 255, 255, 0.3);
         text-transform: uppercase;
-        font-weight: 600;
+        font-weight: 700;
         letter-spacing: 0.5px;
     }
 
-    .exampleInput .exampleText {
-        color: rgba(255, 255, 255, 0.7);
-        font-family: "Courier New", monospace;
+    .exampleText {
+        font-family: 'JetBrains Mono', 'Fira Code', monospace;
         font-size: 0.95rem;
+    }
+
+    .exampleInput .exampleText {
+        color: rgba(255, 255, 255, 0.5);
     }
 
     .exampleOutput .exampleText {
-        color: rgba(255, 255, 255, 0.9);
-        font-family: "Courier New", monospace;
-        font-size: 0.95rem;
+        color: #fff;
+        font-weight: 500;
     }
 
     .exampleArrow {
-        color: rgba(255, 255, 255, 0.4);
-        font-size: 1.5rem;
-        font-weight: bold;
+        color: rgba(255, 255, 255, 0.15);
+        font-size: 1.25rem;
     }
 
     @media (max-width: 768px) {
         .welcomeBox {
             margin: 1rem;
+            border-radius: 8px;
         }
 
-        .welcomeHeader {
-            padding: 2rem 1.5rem 1.5rem;
+        .featuresGrid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
         }
 
-        .welcomeHeader h2 {
-            font-size: 1.5rem;
+        .featureItem {
+            flex-direction: row;
+            text-align: left;
+            padding: 1.25rem;
         }
 
-        .welcomeContent {
-            padding: 1.5rem;
+        .featureIcon {
+            margin-bottom: 0;
+            flex-shrink: 0;
         }
 
         .exampleCard {
             grid-template-columns: 1fr;
-            gap: 0.75rem;
+            gap: 1rem;
+            padding: 1.25rem;
         }
 
         .exampleArrow {
             transform: rotate(90deg);
             text-align: center;
-        }
-
-        .featureSection {
-            flex-direction: column;
-            text-align: center;
-        }
-
-        .featureIcon {
-            margin: 0 auto;
+            margin: -0.5rem 0;
         }
     }
 
