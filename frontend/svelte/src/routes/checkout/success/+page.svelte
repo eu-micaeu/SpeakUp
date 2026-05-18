@@ -1,78 +1,142 @@
+<script lang="ts">
+    import { onMount } from "svelte";
+    import { goto } from "$app/navigation";
+
+    let countdown = 3;
+
+    onMount(() => {
+        const timer = setInterval(() => {
+            countdown -= 1;
+            if (countdown <= 0) {
+                clearInterval(timer);
+                goto("/chat");
+            }
+        }, 1000);
+
+        return () => clearInterval(timer);
+    });
+</script>
+
 <svelte:head>
     <title>Assinatura concluída | SpeakUp</title>
 </svelte:head>
 
-<section class="status-page success">
-    <div class="card">
-        <div class="icon">✅</div>
-        <h1>Assinatura concluída</h1>
-        <p>
-            Recebemos sua confirmação. Seu plano será atualizado em instantes.
-        </p>
-        <div class="actions">
-            <a class="btn primary" href="/planos">Ver planos</a>
-            <a class="btn ghost" href="/perfil">Ir para o perfil</a>
+<section class="success-page">
+    <div class="success-card">
+        <div class="icon-wrapper">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
         </div>
+        <h1>Assinatura Ativada!</h1>
+        <p>
+            Parabéns! Você agora tem acesso ilimitado ao SpeakUp Pro. 
+            Prepare-se para acelerar seu aprendizado.
+        </p>
+        
+        <div class="redirect-info">
+            <div class="spinner"></div>
+            <span>Redirecionando para o chat em {countdown}s...</span>
+        </div>
+
+        <a href="/chat" class="manual-btn">Ir agora</a>
     </div>
 </section>
 
 <style>
-    .status-page {
+    :global(body) {
+        background-color: #0a0a0a;
+        margin: 0;
+        font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .success-page {
         min-height: 100vh;
-        display: grid;
-        place-items: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         padding: 2rem;
-        background: #141414;
-        color: #e9e9e9;
+        background: radial-gradient(circle at center, rgba(92, 109, 255, 0.1) 0%, transparent 70%);
     }
 
-    .card {
-        max-width: 520px;
+    .success-card {
+        max-width: 480px;
         width: 100%;
-        padding: 2.5rem;
-        border-radius: 20px;
-        background: #1c1c1c;
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 3.5rem 2.5rem;
+        border-radius: 32px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(92, 109, 255, 0.3);
+        backdrop-filter: blur(20px);
         text-align: center;
+        animation: cardAppear 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    .icon {
-        font-size: 2.5rem;
-        margin-bottom: 1rem;
+    @keyframes cardAppear {
+        from { opacity: 0; transform: scale(0.9) translateY(20px); }
+        to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .icon-wrapper {
+        width: 80px;
+        height: 80px;
+        background: rgba(126, 229, 179, 0.1);
+        color: #7ee5b3;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 2rem;
+        box-shadow: 0 0 30px rgba(126, 229, 179, 0.2);
     }
 
     h1 {
-        margin: 0 0 0.75rem;
-        font-size: 2rem;
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: #fff;
+        margin: 0 0 1rem;
+        letter-spacing: -1px;
     }
 
     p {
-        margin: 0 0 2rem;
-        color: #bdbdbd;
+        color: #b5b5b5;
+        font-size: 1.1rem;
         line-height: 1.6;
+        margin: 0 0 2.5rem;
     }
 
-    .actions {
+    .redirect-info {
         display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
+        align-items: center;
         justify-content: center;
+        gap: 0.75rem;
+        color: #888;
+        font-size: 0.95rem;
+        margin-bottom: 2rem;
     }
 
-    .btn {
-        padding: 0.75rem 1.25rem;
+    .spinner {
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-top-color: #5c6dff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .manual-btn {
+        display: inline-block;
+        padding: 0.8rem 2rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 12px;
+        color: #fff;
         text-decoration: none;
         font-weight: 600;
+        transition: all 0.2s;
     }
 
-    .btn.primary {
-        background: #5c6dff;
-        color: #fff;
-    }
-
-    .btn.ghost {
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        color: #e9e9e9;
+    .manual-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
     }
 </style>
