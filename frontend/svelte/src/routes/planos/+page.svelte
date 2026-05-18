@@ -94,291 +94,285 @@
 </script>
 
 <section class="plans">
+    <div class="plans-header">
+        <a href="/chat" class="back-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            Voltar para o Chat
+        </a>
+        <h1>Escolha seu Plano</h1>
+        <p>Acelere seu aprendizado com acesso ilimitado à nossa inteligência artificial especializada em idiomas.</p>
+    </div>
 
     <div class="plans-grid">
         <article class="plan-card free">
-            <div class="highlight-pill neutral">Free</div>
+            <div class="highlight-pill neutral">Gratuito</div>
             <h2>Plano Free</h2>
             <p class="price">R$ 0 <span>/ sempre</span></p>
-            <p class="discount warning">Até 10 interações de IA/dia</p>
-            <p class="subtitle">Comece sem pagar</p>
+            <p class="discount warning">Até {usageStatus?.daily_limit || 10} interações/dia</p>
+            <p class="subtitle">Ideal para começar sua jornada</p>
             <ul>
-                <li>Chat com IA e correções básicas.</li>
-                <li>Traduções e tópicos com limite diário.</li>
-                <li>Histórico recente de conversas.</li>
+                <li>Chat com IA e correções</li>
+                <li>Traduções instantâneas</li>
+                <li>Histórico básico de chats</li>
+                <li>Suporte da comunidade</li>
             </ul>
             <div class="plan-footer">
-                <span class="tag">Sem cartão</span>
+                <span class="tag">Ativo por padrão</span>
             </div>
         </article>
 
         <article class="plan-card">
             <h2>Plano Mensal</h2>
             <p class="price">R$ 7 <span>/ mês</span></p>
-            <p class="subtitle">Flexibilidade para começar agora</p>
+            <p class="subtitle">Liberdade total para praticar</p>
             <ul>
-                <li>Chat com IA ilimitado.</li>
-                <li>Correções e traduções ilimitadas.</li>
-                <li>Geração de tópicos sem limite.</li>
+                <li>Interações de IA ilimitadas</li>
+                <li>Traduções sem restrições</li>
+                <li>Correções gramaticais infinitas</li>
+                <li>Prioridade no processamento</li>
             </ul>
             <div class="plan-footer">
-                <span class="tag">Cobrança mensal</span>
+                <span class="tag">Cancele quando quiser</span>
             </div>
             <div class="plan-actions">
                 <button
-                    class="action-button"
+                    class="action-button primary-btn"
                     on:click={() => handleSubscribe("monthly")}
-                    disabled={billingActionLoading}
+                    disabled={billingActionLoading || (billingStatus && isActive(billingStatus.stripe_status))}
                 >
-                    Assinar mensal
+                    {billingStatus && isActive(billingStatus.stripe_status) ? 'Plano Atual' : 'Assinar Mensal'}
                 </button>
             </div>
         </article>
 
         <article class="plan-card highlight">
-            <div class="highlight-pill">Mais vantajoso</div>
+            <div class="highlight-pill">Melhor Valor</div>
             <h2>Plano Anual</h2>
             <p class="price">R$ 70 <span>/ ano</span></p>
-            <p class="discount">Economize R$ 14 no ano</p>
-            <p class="subtitle">Economia e consistência</p>
+            <p class="discount">Economize R$ 14 por ano</p>
+            <p class="subtitle">Compromisso com a fluência</p>
             <ul>
-                <li>Chat com IA ilimitado.</li>
-                <li>Correções e traduções ilimitadas.</li>
-                <li>Geração de tópicos sem limite.</li>
+                <li>Tudo do plano Mensal</li>
+                <li>2 meses grátis inclusos</li>
+                <li>Acesso antecipado a novas IAs</li>
+                <li>Badges exclusivos no perfil</li>
             </ul>
             <div class="plan-footer">
-                <span class="tag">Cobrança anual</span>
+                <span class="tag">Pagamento único</span>
             </div>
             <div class="plan-actions">
                 <button
-                    class="action-button"
+                    class="action-button highlight-btn"
                     on:click={() => handleSubscribe("annual")}
-                    disabled={billingActionLoading}
+                    disabled={billingActionLoading || (billingStatus && isActive(billingStatus.stripe_status))}
                 >
-                    Assinar anual
+                    {billingStatus && isActive(billingStatus.stripe_status) ? 'Plano Atual' : 'Assinar Anual'}
                 </button>
             </div>
         </article>
     </div>
 
     <div class="billing-panel">
-        {#if billingLoading}
-            <p class="billing-note">Carregando status da assinatura...</p>
-        {:else if billingStatus && isActive(billingStatus.stripe_status)}
-            <p class="billing-note active">Assinatura ativa</p>
-            <button
-                class="action-button secondary"
-                on:click={handleManageSubscription}
-                disabled={billingActionLoading}
-            >
-                Gerenciar assinatura
-            </button>
-        {:else}
-            <p class="billing-note inactive">
-                Você ainda não possui assinatura ativa.
-            </p>
-            {#if usageLoading}
-                <p class="usage-text">Carregando créditos...</p>
-            {:else if usageStatus && !usageStatus.is_pro}
-                <p class="usage-text">
-                    Créditos hoje: {usageStatus.used_today} / {usageStatus.daily_limit}
-                    · Restam {usageStatus.remaining}
-                </p>
-                <div class="usage-bar" aria-hidden="true">
-                    <span
-                        style={`width: ${Math.min(
-                            100,
-                            (usageStatus.used_today /
-                                (usageStatus.daily_limit || 1)) *
-                                100,
-                        )}%`}
-                    ></span>
+        <div class="status-info">
+            {#if billingLoading}
+                <p class="billing-note">Verificando sua conta...</p>
+            {:else if billingStatus && isActive(billingStatus.stripe_status)}
+                <div class="active-status">
+                    <span class="status-icon active"></span>
+                    <p class="billing-note active">Sua assinatura está ativa! Aproveite o SpeakUp Pro.</p>
                 </div>
+                <button
+                    class="action-button secondary"
+                    on:click={handleManageSubscription}
+                    disabled={billingActionLoading}
+                >
+                    Configurações de Pagamento
+                </button>
+            {:else}
+                <div class="active-status">
+                    <span class="status-icon inactive"></span>
+                    <p class="billing-note inactive">Você está usando a versão gratuita.</p>
+                </div>
+                
+                {#if usageLoading}
+                    <p class="usage-text">Carregando uso diário...</p>
+                {:else if usageStatus && !usageStatus.is_pro}
+                    <div class="usage-container">
+                        <p class="usage-text">
+                            Interações hoje: <strong>{usageStatus.used_today} / {usageStatus.daily_limit}</strong>
+                        </p>
+                        <div class="usage-bar" aria-hidden="true">
+                            <span
+                                style={`width: ${Math.min(
+                                    100,
+                                    (usageStatus.used_today /
+                                        (usageStatus.daily_limit || 1)) *
+                                        100,
+                                )}%`}
+                            ></span>
+                        </div>
+                    </div>
+                {/if}
             {/if}
-        {/if}
+        </div>
     </div>
 </section>
 
 <style>
+    :global(body) {
+        background-color: #0a0a0a;
+        margin: 0;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
     .plans {
         min-height: 100vh;
         color: #e9e9e9;
-        background-color: #0a0a0a;
-        position: relative;
-        overflow: hidden;
         display: flex;
         flex-direction: column;
-        justify-content: center;
-        padding: 2rem;
+        align-items: center;
+        padding: 4rem 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
     }
 
     .plans-header {
-        max-width: 720px;
-        margin-bottom: 2.5rem;
-        display: grid;
-        gap: 0.75rem;
+        text-align: center;
+        margin-bottom: 4rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
         animation: slideDown 0.6s ease-out;
     }
 
     @keyframes slideDown {
-        from {
-            opacity: 0;
-            transform: translateY(-20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     .back-button {
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        padding: 0.75rem 1.25rem;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(92, 109, 255, 0.3);
+        padding: 0.6rem 1.2rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 12px;
-        color: white;
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        font-size: 0.95rem;
+        color: #b5b5b5;
+        text-decoration: none;
+        font-size: 0.9rem;
         font-weight: 500;
-        backdrop-filter: blur(10px);
-        width: fit-content;
+        transition: all 0.3s ease;
     }
 
     .back-button:hover {
-        background: rgba(255, 255, 255, 0.08);
-        border-color: rgba(255, 255, 255, 0.3);
-        transform: translateX(-4px);
-    }
-
-    .back-button:active {
-        transform: translateX(-2px);
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        transform: translateX(-5px);
     }
 
     .plans-header h1 {
-        font-size: 2.5rem;
-        font-weight: 700;
+        font-size: 3rem;
+        font-weight: 800;
         color: #ffffff;
         margin: 0;
-        letter-spacing: -0.5px;
+        letter-spacing: -1px;
+        background: linear-gradient(135deg, #fff 0%, #a5a9c8 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
 
     .plans-header p {
-        font-size: 1.1rem;
+        font-size: 1.2rem;
         color: #b5b5b5;
         margin: 0;
+        max-width: 600px;
         line-height: 1.6;
-    }
-
-    @media (max-width: 768px) {
-        .plans-header h1 {
-            font-size: 1.8rem;
-        }
-
-        .plans-header p {
-            font-size: 1rem;
-        }
-    }
-
-    .plan-card {
-        position: relative;
-        padding: 2.5rem;
-        border-radius: 20px;
-        background: linear-gradient(
-            145deg,
-            rgba(28, 28, 28, 0.9),
-            rgba(24, 24, 24, 0.8)
-        );
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        backdrop-filter: blur(10px);
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        display: flex;
-        flex-direction: column;
-        animation: fadeInUp 0.6s ease-out both;
-        height: 80%;
-    }
-
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .plans-grid > .plan-card:nth-child(1) {
-        animation-delay: 0.1s;
-    }
-
-    .plans-grid > .plan-card:nth-child(2) {
-        animation-delay: 0.2s;
-    }
-
-    .plans-grid > .plan-card:nth-child(3) {
-        animation-delay: 0.3s;
-    }
-
-    .plan-card:hover {
-        transform: translateY(-8px);
-    }
-
-    .plan-card.highlight {
-        background: linear-gradient(
-            145deg,
-            rgba(64, 86, 255, 0.15),
-            rgba(24, 24, 24, 0.8)
-        );
-    }
-
-    .plan-card.free {
-        background: linear-gradient(
-            145deg,
-            rgba(24, 24, 24, 0.8),
-            rgba(18, 18, 18, 0.8)
-        );
-        border-color: rgba(255, 255, 255, 0.12);
     }
 
     .plans-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-        gap: 2.5rem;
-        margin-bottom: 3rem;
-        align-items: start;
+        gap: 2rem;
+        width: 100%;
+        margin-bottom: 4rem;
+    }
+
+    .plan-card {
+        position: relative;
+        padding: 3rem 2rem;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        display: flex;
+        flex-direction: column;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        animation: fadeInUp 0.6s ease-out both;
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .plan-card:hover {
+        transform: translateY(-10px);
+        border-color: rgba(92, 109, 255, 0.4);
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .plan-card.highlight {
+        background: linear-gradient(180deg, rgba(92, 109, 255, 0.1) 0%, rgba(255, 255, 255, 0.03) 100%);
+        border: 1px solid rgba(92, 109, 255, 0.3);
+    }
+
+    .plan-card.highlight:hover {
+        border-color: rgba(92, 109, 255, 0.6);
+    }
+
+    .highlight-pill {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        padding: 0.4rem 1rem;
+        border-radius: 999px;
+        background: #5c6dff;
+        color: #fff;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .highlight-pill.neutral {
+        background: rgba(255, 255, 255, 0.1);
+        color: #b5b5b5;
     }
 
     .plan-card h2 {
-        margin: 0 0 1rem 0;
         font-size: 1.5rem;
-        font-weight: 700;
-        letter-spacing: -0.5px;
+        margin: 0 0 1.5rem 0;
     }
 
     .price {
-        margin: 0.6rem 0 0.2rem;
-        font-size: 2rem;
+        font-size: 2.5rem;
         font-weight: 800;
-        color: #f3f4ff;
-        letter-spacing: -1px;
+        margin: 0;
+        color: #fff;
     }
 
     .price span {
-        font-size: 0.95rem;
-        font-weight: 500;
-        color: #a5a9c8;
+        font-size: 1rem;
+        color: #888;
+        font-weight: 400;
     }
 
     .discount {
-        margin: -0.4rem 0 1rem;
-        font-size: 0.95rem;
-        font-weight: 700;
+        font-size: 0.9rem;
         color: #7ee5b3;
+        font-weight: 600;
+        margin-top: 0.5rem;
     }
 
     .discount.warning {
@@ -386,266 +380,165 @@
     }
 
     .subtitle {
-        margin: 0.35rem 0 1.5rem;
-        color: #a4a4a4;
+        color: #888;
+        margin: 1rem 0 2rem 0;
         font-size: 0.95rem;
     }
 
     .plan-card ul {
-        margin: 0;
-        padding-left: 1.5rem;
-        display: grid;
-        gap: 0.8rem;
-        color: #d1d1d1;
-        flex-grow: 1;
+        list-style: none;
+        padding: 0;
+        margin: 0 0 2.5rem 0;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        flex: 1;
     }
 
     .plan-card ul li {
-        line-height: 1.5;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: #d1d1d1;
+        font-size: 0.95rem;
+    }
+
+    .plan-card ul li::before {
+        content: "✓";
+        color: #5c6dff;
+        font-weight: 900;
     }
 
     .plan-footer {
-        margin-top: 1.75rem;
+        margin-bottom: 1.5rem;
     }
 
-    .plan-actions {
-        margin-top: auto;
-        padding-top: 1.5rem;
+    .tag {
+        font-size: 0.75rem;
+        color: #888;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 600;
     }
 
     .action-button {
         width: 100%;
-        padding: 0.875rem 1.5rem;
-        border-radius: 14px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 1rem;
+        border-radius: 16px;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+    .primary-btn {
         background: rgba(255, 255, 255, 0.1);
         color: #fff;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        overflow: hidden;
-        font-size: 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    .action-button::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: rgba(255, 255, 255, 0.2);
-        transition: left 0.3s ease;
-        z-index: 1;
+    .primary-btn:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateY(-2px);
     }
 
-    .action-button:hover {
-        transform: translateY(-3px);
+    .highlight-btn {
+        background: #5c6dff;
+        color: #fff;
     }
 
-    .action-button:hover::before {
-        left: 100%;
-    }
-
-    .action-button:active {
-        transform: translateY(-1px);
+    .highlight-btn:hover:not(:disabled) {
+        background: #4a59e6;
+        box-shadow: 0 8px 24px rgba(92, 109, 255, 0.3);
+        transform: translateY(-2px);
     }
 
     .action-button:disabled {
-        opacity: 0.6;
+        opacity: 0.5;
         cursor: not-allowed;
-        transform: none;
-    }
-
-    .action-button.secondary {
-        width: auto;
-        background: rgba(255, 255, 255, 0.08);
-        color: #e9e9e9;
-        border: 1px solid rgba(255, 255, 255, 0.15);
-    }
-
-    .action-button.secondary:hover {
-        background: rgba(255, 255, 255, 0.12);
-        border-color: rgba(255, 255, 255, 0.25);
-    }
-
-    .tag {
-        display: inline-flex;
-        padding: 0.4rem 0.9rem;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.1);
-        color: #cccccc;
-        font-size: 0.8rem;
-        font-weight: 600;
-        letter-spacing: 0.05em;
-    }
-
-    .highlight-pill {
-        position: absolute;
-        top: 1.5rem;
-        right: 1.5rem;
-        padding: 0.35rem 0.9rem;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.15);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        color: #fff;
-        font-size: 0.75rem;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        font-weight: 700;
-    }
-
-    .highlight-pill.neutral {
-        background: rgba(255, 255, 255, 0.12);
-        color: #e9e9e9;
     }
 
     .billing-panel {
-        margin-top: 3rem;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 24px;
         padding: 2rem;
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 1.5rem;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(92, 109, 255, 0.25);
-        border-radius: 18px;
-        backdrop-filter: blur(10px);
         animation: fadeInUp 0.7s ease-out 0.4s both;
     }
 
-    .billing-note {
-        margin: 0;
-        color: #b5b5b5;
-        font-weight: 500;
+    .status-info {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+        width: 100%;
     }
 
-    .billing-note.active {
-        color: #7ee5b3;
-        font-weight: 700;
+    .active-status {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
     }
 
-    .billing-note.inactive {
-        color: #f0a8a8;
+    .status-icon {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
     }
 
-    .usage-text {
-        margin: 0.5rem 0 0;
-        color: #f0c98b;
-        font-weight: 700;
-        font-size: 0.95rem;
+    .status-icon.active { background: #7ee5b3; box-shadow: 0 0 12px #7ee5b3; }
+    .status-icon.inactive { background: #888; }
+
+    .billing-note { margin: 0; font-weight: 600; }
+    .billing-note.active { color: #7ee5b3; }
+
+    .usage-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+        width: 100%;
+        max-width: 400px;
     }
+
+    .usage-text { margin: 0; color: #b5b5b5; font-size: 0.9rem; }
+    .usage-text strong { color: #fff; }
 
     .usage-bar {
         width: 100%;
-        max-width: 320px;
-        height: 10px;
-        border-radius: 999px;
+        height: 8px;
         background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        overflow: hidden;
     }
 
     .usage-bar span {
         display: block;
         height: 100%;
-        background: linear-gradient(90deg, #f0c98b, #f39b6d);
-        border-radius: inherit;
-        animation: progressFill 1.5s ease-out;
+        background: #5c6dff;
+        transition: width 1s ease-out;
     }
 
-    @keyframes progressFill {
-        from {
-            width: 0% !important;
-        }
+    .action-button.secondary {
+        width: auto;
+        min-width: 250px;
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #fff;
+        font-size: 0.9rem;
+        padding: 0.8rem 1.5rem;
+    }
+
+    .action-button.secondary:hover {
+        background: rgba(255, 255, 255, 0.05);
     }
 
     @media (max-width: 768px) {
-        .plans {
-            padding: 1.5rem 1rem 2.5rem;
-        }
-
-        .plan-card {
-            padding: 2rem;
-        }
-
-        .highlight-pill {
-            position: static;
-            margin-bottom: 0.75rem;
-            display: inline-flex;
-            width: fit-content;
-        }
-
-        .plan-card h2 {
-            font-size: 1.3rem;
-        }
-
-        .price {
-            font-size: 1.75rem;
-        }
-
-        .billing-panel {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 1rem;
-        }
-
-        .action-button {
-            padding: 0.75rem 1.25rem;
-        }
-
-        .action-button.secondary {
-            width: 100%;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .plans {
-            padding: 1rem 0.5rem 2rem;
-        }
-
-        .plans-header {
-            margin-bottom: 2rem;
-        }
-
-        .back-button {
-            padding: 0.6rem 1rem;
-            font-size: 0.9rem;
-        }
-
-        .plans-header h1 {
-            font-size: 1.5rem;
-        }
-
-        .plans-header p {
-            font-size: 0.9rem;
-        }
-
-        .plan-card {
-            padding: 1.5rem;
-            border-radius: 16px;
-        }
-
-        .plan-card h2 {
-            font-size: 1.1rem;
-        }
-
-        .price {
-            font-size: 1.5rem;
-        }
-
-        .subtitle {
-            font-size: 0.9rem;
-        }
-
-        .plan-card ul {
-            gap: 0.6rem;
-            padding-left: 1.2rem;
-        }
-
-        .action-button {
-            padding: 0.7rem 1rem;
-            font-size: 0.9rem;
-            border-radius: 12px;
-        }
+        .plans { padding: 2rem 1rem; }
+        .plans-header h1 { font-size: 2.2rem; }
+        .plans-grid { grid-template-columns: 1fr; }
+        .plan-card { padding: 2.5rem 1.5rem; }
     }
 </style>
