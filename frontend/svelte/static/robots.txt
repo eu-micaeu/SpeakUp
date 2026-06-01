@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Allow: /planos
+Disallow: /chat
+Disallow: /perfil
+
+Sitemap: https://speak-up.xyz/sitemap.xml
