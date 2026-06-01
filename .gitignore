@@ -1,3 +1,4 @@
 .env
 .vscode
 backend/go/tmp/
+/.antigravitycli

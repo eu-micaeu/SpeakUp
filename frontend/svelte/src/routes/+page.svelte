@@ -266,6 +266,15 @@
   });
 </script>
 
+<svelte:head>
+    <title>SpeakUp | Aprenda Inglês e Outros Idiomas com Inteligência Artificial</title>
+    <meta name="description" content="Melhore sua pronúncia, escrita e gramática em tempo real com a SpeakUp. A plataforma definitiva de aprendizado de idiomas baseada em Inteligência Artificial. Pratique agora mesmo de forma prática e inovadora!" />
+    <meta property="og:title" content="SpeakUp | Aprenda Inglês e Outros Idiomas com Inteligência Artificial" />
+    <meta property="og:description" content="Melhore sua pronúncia, escrita e gramática em tempo real com a SpeakUp. A plataforma definitiva de aprendizado de idiomas baseada em Inteligência Artificial. Pratique agora mesmo de forma prática e inovadora!" />
+    <meta name="twitter:title" content="SpeakUp | Aprenda Inglês e Outros Idiomas com Inteligência Artificial" />
+    <meta name="twitter:description" content="Melhore sua pronúncia, escrita e gramática em tempo real com a SpeakUp. A plataforma definitiva de aprendizado de idiomas baseada em Inteligência Artificial. Pratique agora mesmo de forma prática e inovadora!" />
+</svelte:head>
+
 <main>
   <div class="betaBanner">
     <div class="betaBannerContent">

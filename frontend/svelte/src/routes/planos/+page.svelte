@@ -93,6 +93,15 @@
     });
 </script>
 
+<svelte:head>
+    <title>Planos e Preços | SpeakUp</title>
+    <meta name="description" content="Escolha o melhor plano da SpeakUp e tenha acesso ilimitado à inteligência artificial para prática de idiomas, conversação e correções em tempo real." />
+    <meta property="og:title" content="Planos e Preços | SpeakUp" />
+    <meta property="og:description" content="Escolha o melhor plano da SpeakUp e tenha acesso ilimitado à inteligência artificial para prática de idiomas, conversação e correções em tempo real." />
+    <meta name="twitter:title" content="Planos e Preços | SpeakUp" />
+    <meta name="twitter:description" content="Escolha o melhor plano da SpeakUp e tenha acesso ilimitado à inteligência artificial para prática de idiomas, conversação e correções em tempo real." />
+</svelte:head>
+
 <section class="plans">
     <div class="plans-header">
         <a href="/chat" class="back-button">

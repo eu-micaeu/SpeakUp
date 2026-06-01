@@ -186,6 +186,15 @@
     });
 </script>
 
+<svelte:head>
+    <title>Meu Perfil | SpeakUp</title>
+    <meta name="description" content="Gerencie suas configurações de perfil, preferências de idioma, nível de aprendizado e assinatura na SpeakUp." />
+    <meta property="og:title" content="Meu Perfil | SpeakUp" />
+    <meta property="og:description" content="Gerencie suas configurações de perfil, preferências de idioma, nível de aprendizado e assinatura na SpeakUp." />
+    <meta name="twitter:title" content="Meu Perfil | SpeakUp" />
+    <meta name="twitter:description" content="Gerencie suas configurações de perfil, preferências de idioma, nível de aprendizado e assinatura na SpeakUp." />
+</svelte:head>
+
 <div class="profile-page">
     <div class="header-nav">
         <a href="/chat" class="back-link">
