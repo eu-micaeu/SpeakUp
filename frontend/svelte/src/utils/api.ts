@@ -163,7 +163,8 @@ export const generateAIResponseDialog = async (message: string, chatId: string):
             chat_id: chatId
         }, {
             headers: {
-                Authorization: `Bearer ${Cookies.get('authToken')}`
+                Authorization: `Bearer ${Cookies.get('authToken')}`,
+                'X-AI-Provider': typeof window !== 'undefined' ? (localStorage.getItem('aiProvider') || 'gemini') : 'gemini'
             }
         });
 
@@ -182,7 +183,8 @@ export const generateAIResponseCorrection = async (message: string): Promise<AIR
             message
         }, {
             headers: {
-                Authorization: `Bearer ${Cookies.get('authToken')}`
+                Authorization: `Bearer ${Cookies.get('authToken')}`,
+                'X-AI-Provider': typeof window !== 'undefined' ? (localStorage.getItem('aiProvider') || 'gemini') : 'gemini'
             }
         });
 
@@ -201,7 +203,8 @@ export const generateAIResponseTranslation = async (message: string): Promise<AI
             message
         }, {
             headers: {
-                Authorization: `Bearer ${Cookies.get('authToken')}`
+                Authorization: `Bearer ${Cookies.get('authToken')}`,
+                'X-AI-Provider': typeof window !== 'undefined' ? (localStorage.getItem('aiProvider') || 'gemini') : 'gemini'
             }
         });
 
@@ -220,7 +223,8 @@ export const generateAIResponseTopic = async (message: string): Promise<AIRespon
             message
         }, {
             headers: {
-                Authorization: `Bearer ${Cookies.get('authToken')}`
+                Authorization: `Bearer ${Cookies.get('authToken')}`,
+                'X-AI-Provider': typeof window !== 'undefined' ? (localStorage.getItem('aiProvider') || 'gemini') : 'gemini'
             }
         });
 

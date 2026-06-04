@@ -358,22 +358,30 @@
 
   <section class="apiSection">
     <div class="apiContainer">
-      <h1>Potencializado por IA local e privada.</h1>
+      <h1>Potencializado por Inteligência Artificial Avançada.</h1>
       <div class="apiLogos">
         <div class="apiCard">
           <img src="./ollama-logo.png" alt="Ollama Logo" />
           <h3>Ollama</h3>
           <p>
             Modelos de IA open-source executados localmente para total
-            privacidade e controle dos seus dados
+            privacidade e controle dos seus dados.
+          </p>
+        </div>
+        <div class="apiCard">
+          <img src="./gemini-logo.png" alt="Gemini Logo" />
+          <h3>Gemini API</h3>
+          <p>
+            Modelos de IA de última geração do Google em nuvem para
+            respostas e processamento rápidos e inteligentes.
           </p>
         </div>
       </div>
       <p class="apiDescription">
-        Utilizamos o Ollama para executar modelos de inteligência artificial
-        avançados diretamente no seu dispositivo, garantindo privacidade total e
-        oferecendo correções precisas e contextualizadas que se adaptam ao seu
-        nível de conhecimento.
+        Combinamos a privacidade e o controle dos modelos locais rodando com o Ollama
+        e o poder e a velocidade da API do Gemini na nuvem, garantindo correções
+        precisas, traduções instantâneas e uma experiência de aprendizado
+        altamente personalizada.
       </p>
     </div>
   </section>

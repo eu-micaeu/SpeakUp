@@ -12,8 +12,15 @@ import (
 	"speakup/pkg/models"
 )
 
-var aiConnectorBuilder func() connectors.AIConnector = func() connectors.AIConnector {
-	return connectors.NewOllamaConnector()
+var aiConnectorBuilder func(ctx context.Context) connectors.AIConnector = func(ctx context.Context) connectors.AIConnector {
+	provider, ok := ctx.Value("aiProvider").(string)
+	if !ok || provider == "" {
+		provider = "gemini"
+	}
+	if provider == "ollama" {
+		return connectors.NewOllamaConnector()
+	}
+	return connectors.NewGeminiConnector()
 }
 
 const maxDialogResponseChars = 128
@@ -32,7 +39,7 @@ func GetDialogResponse(ctx context.Context, message string, messages []models.Me
 		chatHistory.WriteString(fmt.Sprintf("%s: %s\n", msg.Sender, msg.Content))
 	}
 
-	connector := aiConnectorBuilder()
+	connector := aiConnectorBuilder(ctx)
 
 	resumeHist, err := connector.GenerateResponse(ctx, "Format the following chat history to only show user reponse and AI response: "+chatHistory.String())
 	if err != nil {
@@ -46,7 +53,7 @@ func GetDialogResponse(ctx context.Context, message string, messages []models.Me
 		language)
 	fullPrompt += fmt.Sprintf("\nIMPORTANT: Your final answer must be complete, natural, and at most %d characters. Never cut words or end mid-sentence.", maxDialogResponseChars)
 
-	return generateDialogResponseWithinLimit(connector, fullPrompt, maxDialogResponseChars)
+	return generateDialogResponseWithinLimit(ctx, connector, fullPrompt, maxDialogResponseChars)
 }
 
 func GetCorrectionResponse(ctx context.Context, message string) (string, error) {
@@ -57,18 +64,18 @@ func GetCorrectionResponse(ctx context.Context, message string) (string, error) 
 	}
 	prompt := string(promptBytes)
 
-	connector := aiConnectorBuilder()
+	connector := aiConnectorBuilder(ctx)
 	fullPrompt := fmt.Sprintf("%s\n\nINPUT:\n%s\n\nOUTPUT:", prompt, message)
 
 	var correctionResp string
-	if ollamaConnector, ok := connector.(*connectors.OllamaConnector); ok {
+	if optConnector, ok := connector.(connectors.OptionableConnector); ok {
 		systemPrompt := "You are a strict text correction tool. Return ONLY the corrected text. Do not answer the question. Do not add explanations."
 		options := map[string]any{
 			"temperature": 0.1,
 			"top_p":       0.9,
 			"num_predict": 128,
 		}
-		correctionResp, err = ollamaConnector.GenerateResponseWithOptions(ctx, fullPrompt, systemPrompt, options)
+		correctionResp, err = optConnector.GenerateResponseWithOptions(ctx, fullPrompt, systemPrompt, options)
 	} else {
 		correctionResp, err = connector.GenerateResponse(ctx, fullPrompt)
 	}
@@ -93,11 +100,11 @@ func GetTranslationResponse(ctx context.Context, message string) (string, error)
 	}
 	prompt := string(promptBytes)
 
-	connector := aiConnectorBuilder()
+	connector := aiConnectorBuilder(ctx)
 	fullPrompt := fmt.Sprintf("%s\n\nINPUT:\n%s\n\nOUTPUT:", prompt, message)
 
 	var response string
-	if ollamaConnector, ok := connector.(*connectors.OllamaConnector); ok {
+	if optConnector, ok := connector.(connectors.OptionableConnector); ok {
 		systemPrompt := "You are a strict translation engine. Translate the INPUT text into Brazilian Portuguese and return ONLY the translated text."
 		options := map[string]any{
 			"temperature": 0.1,
@@ -109,7 +116,7 @@ func GetTranslationResponse(ctx context.Context, message string) (string, error)
 				"Explicação:",
 			},
 		}
-		response, err = ollamaConnector.GenerateResponseWithOptions(ctx, fullPrompt, systemPrompt, options)
+		response, err = optConnector.GenerateResponseWithOptions(ctx, fullPrompt, systemPrompt, options)
 	} else {
 		response, err = connector.GenerateResponse(ctx, fullPrompt)
 	}
@@ -134,18 +141,18 @@ func GetTopicResponse(ctx context.Context, message string) (string, error) {
 	}
 	prompt := string(promptBytes)
 
-	connector := aiConnectorBuilder()
+	connector := aiConnectorBuilder(ctx)
 	strictPrompt := fmt.Sprintf("%s\n\nInput: %s\nOutput:", prompt, message)
 
 	var topicResp string
-	if ollamaConnector, ok := connector.(*connectors.OllamaConnector); ok {
+	if optConnector, ok := connector.(connectors.OptionableConnector); ok {
 		systemPrompt := "You are a strict topic labeler. Return exactly two words in Title Case with only letters and one space."
 		options := map[string]any{
 			"temperature": 0.1,
 			"top_p":       0.9,
 			"num_predict": 12,
 		}
-		topicResp, err = ollamaConnector.GenerateResponseWithOptions(ctx, strictPrompt, systemPrompt, options)
+		topicResp, err = optConnector.GenerateResponseWithOptions(ctx, strictPrompt, systemPrompt, options)
 	} else {
 		topicResp, err = connector.GenerateResponse(ctx, strictPrompt)
 	}
@@ -172,7 +179,7 @@ func normalizeDialogResponse(raw string) string {
 	return cleaned
 }
 
-func generateDialogResponseWithinLimit(connector connectors.AIConnector, prompt string, maxChars int) (string, error) {
+func generateDialogResponseWithinLimit(ctx context.Context, connector connectors.AIConnector, prompt string, maxChars int) (string, error) {
 	if maxChars <= 0 {
 		return "", fmt.Errorf("invalid dialog response limit")
 	}
@@ -191,10 +198,10 @@ func generateDialogResponseWithinLimit(connector connectors.AIConnector, prompt 
 			err     error
 		)
 
-		if ollamaConnector, ok := connector.(*connectors.OllamaConnector); ok {
-			rawResp, err = ollamaConnector.GenerateResponseWithOptions(context.Background(), currentPrompt, systemPrompt, options)
+		if optConnector, ok := connector.(connectors.OptionableConnector); ok {
+			rawResp, err = optConnector.GenerateResponseWithOptions(ctx, currentPrompt, systemPrompt, options)
 		} else {
-			rawResp, err = connector.GenerateResponse(context.Background(), currentPrompt)
+			rawResp, err = connector.GenerateResponse(ctx, currentPrompt)
 		}
 		if err != nil {
 			return "", err

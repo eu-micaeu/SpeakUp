@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"context"
+	"fmt"
 	"net/http"
 
 	"speakup/pkg/adapters/ai"
@@ -111,7 +113,12 @@ func GenerateResponseDialog(c *gin.Context) {
 	}
 
 	language := middlewares.GetLanguageFromContext(c)
-	response, err := ai.GetDialogResponse(c.Request.Context(), request.Message, messages, language)
+	aiProvider := c.GetHeader("X-AI-Provider")
+	if aiProvider == "" {
+		aiProvider = "gemini"
+	}
+	ctx := context.WithValue(c.Request.Context(), "aiProvider", aiProvider)
+	response, err := ai.GetDialogResponse(ctx, request.Message, messages, language)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -134,7 +141,12 @@ func GenerateResponseCorrection(c *gin.Context) {
 		return
 	}
 
-	response, err := ai.GetCorrectionResponse(c.Request.Context(), request.Message)
+	aiProvider := c.GetHeader("X-AI-Provider")
+	if aiProvider == "" {
+		aiProvider = "gemini"
+	}
+	ctx := context.WithValue(c.Request.Context(), "aiProvider", aiProvider)
+	response, err := ai.GetCorrectionResponse(ctx, request.Message)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -157,7 +169,12 @@ func GenerateResponseTranslate(c *gin.Context) {
 		return
 	}
 
-	response, err := ai.GetTranslationResponse(c.Request.Context(), req.Message)
+	aiProvider := c.GetHeader("X-AI-Provider")
+	if aiProvider == "" {
+		aiProvider = "gemini"
+	}
+	ctx := context.WithValue(c.Request.Context(), "aiProvider", aiProvider)
+	response, err := ai.GetTranslationResponse(ctx, req.Message)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao gerar tradução: " + err.Error()})
 		return
@@ -180,8 +197,14 @@ func GenerateResponseTopic(c *gin.Context) {
 		return
 	}
 
-	response, err := ai.GetTopicResponse(c.Request.Context(), request.Message)
+	aiProvider := c.GetHeader("X-AI-Provider")
+	if aiProvider == "" {
+		aiProvider = "gemini"
+	}
+	ctx := context.WithValue(c.Request.Context(), "aiProvider", aiProvider)
+	response, err := ai.GetTopicResponse(ctx, request.Message)
 	if err != nil {
+		fmt.Printf("Error generating topic response: %v\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
