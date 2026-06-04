@@ -113,12 +113,13 @@ func GenerateResponseDialog(c *gin.Context) {
 	}
 
 	language := middlewares.GetLanguageFromContext(c)
+	level := middlewares.GetLevelFromContext(c)
 	aiProvider := c.GetHeader("X-AI-Provider")
 	if aiProvider == "" {
 		aiProvider = "gemini"
 	}
 	ctx := context.WithValue(c.Request.Context(), "aiProvider", aiProvider)
-	response, err := ai.GetDialogResponse(ctx, request.Message, messages, language)
+	response, err := ai.GetDialogResponse(ctx, request.Message, messages, language, level)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -146,13 +147,16 @@ func GenerateResponseCorrection(c *gin.Context) {
 		aiProvider = "gemini"
 	}
 	ctx := context.WithValue(c.Request.Context(), "aiProvider", aiProvider)
-	response, err := ai.GetCorrectionResponse(ctx, request.Message)
+	response, explanation, err := ai.GetCorrectionResponse(ctx, request.Message)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"response": response})
+	c.JSON(http.StatusOK, gin.H{
+		"response":    response,
+		"explanation": explanation,
+	})
 }
 
 func GenerateResponseTranslate(c *gin.Context) {

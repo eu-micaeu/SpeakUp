@@ -136,7 +136,10 @@
     async function handleUpdate() {
         if (!user) return;
         try {
-            await updateUser(user.id, editForm);
+            const response: any = await updateUser(user.id, editForm);
+            if (response && response.token) {
+                Cookies.set("authToken", response.token);
+            }
             user = { ...user, ...editForm };
             editing = false;
             toast.success("Perfil atualizado com sucesso!");

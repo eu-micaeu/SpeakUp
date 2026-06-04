@@ -192,7 +192,23 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	utils.RespondWithJSON(c, http.StatusOK, gin.H{"message": "User updated successfully"})
+	updatedUser, err := h.Repo.FindByID(c, id)
+	if err != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to retrieve updated user info")
+		return
+	}
+
+	token, err := middlewares.GenerateJWT(updatedUser.ID, updatedUser.Name, updatedUser.Email, updatedUser.Language, updatedUser.Level)
+	if err != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to generate new session token")
+		return
+	}
+
+	utils.RespondWithJSON(c, http.StatusOK, gin.H{
+		"message": "User updated successfully",
+		"token": token,
+		"user": updatedUser,
+	})
 }
 
 // DeleteUser handles the deletion of a user

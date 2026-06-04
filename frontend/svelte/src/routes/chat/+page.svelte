@@ -13,6 +13,7 @@
         generateAIResponseTranslation,
         generateAIResponseTopic,
     } from "../../utils/api";
+    import Cookies from "js-cookie";
 
     interface Chat {
         id: string;
@@ -30,6 +31,7 @@
 
     interface ApiResponse {
         response: string;
+        explanation?: string;
     }
 
     let chats: Chat[] = [];
@@ -143,7 +145,10 @@
                 throw new Error("Failed to generate correction");
             }
 
-            const fullUserMsg = `${userInput}\n\nCorreção: ${correction.response}`;
+            let fullUserMsg = `${userInput}\n\nCorreção: ${correction.response}`;
+            if (correction.explanation) {
+                fullUserMsg += `\n\nExplicação: ${correction.explanation}`;
+            }
 
             const savedUserMsg = await addMessageToChat(
                 chatId,
@@ -266,6 +271,79 @@
             id: chat.id,
             topic: chat.title || chat.topic || "Untitled Chat",
         }));
+    let playingMsgId: string | null = null;
+
+    function getPracticingLanguage(): string {
+        try {
+            const token = Cookies.get("authToken");
+            if (!token) return "en-US";
+            const base64Url = token.split(".")[1];
+            const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+            const jsonPayload = decodeURIComponent(
+                atob(base64)
+                    .split("")
+                    .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+                    .join("")
+            );
+            const decoded = JSON.parse(jsonPayload);
+            const lang = decoded.language || "english";
+            
+            const mapping: Record<string, string> = {
+                "english": "en-US",
+                "japanese": "ja-JP",
+                "spanish": "es-ES",
+                "french": "fr-FR",
+                "german": "de-DE",
+                "italian": "it-IT"
+            };
+            return mapping[lang.toLowerCase()] || "en-US";
+        } catch (e) {
+            return "en-US";
+        }
+    }
+
+    function playTTS(msgId: string, text: string) {
+        if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+            console.error("Speech synthesis not supported");
+            return;
+        }
+
+        if (window.speechSynthesis.speaking && playingMsgId === msgId) {
+            window.speechSynthesis.cancel();
+            playingMsgId = null;
+            return;
+        }
+
+        window.speechSynthesis.cancel();
+
+        const cleanText = text
+            .replace(/\[TRANSLATION\]:.*/gi, "")
+            .replace(/Tradução:.*/gi, "")
+            .trim();
+
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        utterance.lang = getPracticingLanguage();
+
+        const voices = window.speechSynthesis.getVoices();
+        const preferredVoices = voices.filter(v => v.lang.startsWith(utterance.lang));
+        const naturalVoice = preferredVoices.find(v => v.name.toLowerCase().includes("natural") || v.name.toLowerCase().includes("google"));
+        if (naturalVoice) {
+            utterance.voice = naturalVoice;
+        } else if (preferredVoices.length > 0) {
+            utterance.voice = preferredVoices[0];
+        }
+
+        utterance.onend = () => {
+            playingMsgId = null;
+        };
+
+        utterance.onerror = () => {
+            playingMsgId = null;
+        };
+
+        playingMsgId = msgId;
+        window.speechSynthesis.speak(utterance);
+    }
 </script>
 
 <svelte:head>
@@ -392,15 +470,64 @@
                     class:botMessage={msg.sender === "ai"}
                 >
                     <div>
+                        {#if msg.sender === "ai"}
+                            <button
+                                class="ttsButton botBubbleTts"
+                                class:speaking={playingMsgId === msg.id}
+                                on:click={() => playTTS(msg.id, msg.text.split("\n\n")[0])}
+                                title="Ouvir pronúncia"
+                                type="button"
+                            >
+                                {#if playingMsgId === msg.id}
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="4" y="4" width="16" height="16" rx="2" ry="2"/>
+                                    </svg>
+                                {:else}
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                                    </svg>
+                                {/if}
+                            </button>
+                        {/if}
                         <p>{msg.text.split("\n\n")[0]}</p>
+
                         {#if msg.type === "request"}
                             <div class="responseExtras">
-                                <p>
-                                    <strong>Correção:</strong>
-                                    {msg.text
-                                        .split("\n\n")[1]
-                                        ?.replace("Correção: ", "") || ""}
+                                <p class="correctionTextLine">
+                                    <span>
+                                        <strong>Correção:</strong>
+                                        {msg.text
+                                            .split("\n\n")[1]
+                                            ?.replace("Correção: ", "") || ""}
+                                    </span>
+                                    <button
+                                        class="ttsButton inlineTts"
+                                        class:speaking={playingMsgId === `${msg.id}-corr`}
+                                        on:click={() => playTTS(`${msg.id}-corr`, msg.text.split("\n\n")[1]?.replace("Correção: ", "") || "")}
+                                        title="Ouvir pronúncia da correção"
+                                        type="button"
+                                    >
+                                        {#if playingMsgId === `${msg.id}-corr`}
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                <rect x="4" y="4" width="16" height="16" rx="2" ry="2"/>
+                                            </svg>
+                                        {:else}
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                                                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                                            </svg>
+                                        {/if}
+                                    </button>
                                 </p>
+                                {#if msg.text.split("\n\n")[2]}
+                                    <p class="explanationText">
+                                        <strong>Explicação:</strong>
+                                        {msg.text
+                                            .split("\n\n")[2]
+                                            ?.replace("Explicação: ", "") || ""}
+                                    </p>
+                                {/if}
                             </div>
                         {/if}
                         {#if msg.type === "response"}
@@ -586,9 +713,11 @@
     }
 
     .botMessage div {
+        position: relative;
         background-color: #1f1f1f;
         color: #e0e0e0;
         border-radius: 0 20px 20px 20px;
+        padding-right: 2.5rem !important;
     }
 
     .userMessage div {
@@ -606,6 +735,66 @@
     .responseExtras p {
         margin-bottom: 0.25rem;
         color: #aaa;
+    }
+
+    .explanationText {
+        margin-top: 0.5rem !important;
+        padding-top: 0.5rem;
+        border-top: 1px dashed rgba(255, 255, 255, 0.08);
+        color: #e0e0e0 !important;
+        line-height: 1.4;
+    }
+
+    .botBubbleTts {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 5;
+    }
+
+    .ttsButton {
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.4);
+        cursor: pointer;
+        padding: 6px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        flex-shrink: 0;
+        margin-top: -2px;
+    }
+
+    .ttsButton:hover {
+        color: #fff;
+        background-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .ttsButton.speaking {
+        color: #a855f7;
+        background-color: rgba(168, 85, 247, 0.15);
+        animation: ttsPulse 1.5s infinite;
+    }
+
+    .correctionTextLine {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .inlineTts {
+        padding: 4px;
+        margin-top: 0;
+    }
+
+    @keyframes ttsPulse {
+        0% { opacity: 0.7; }
+        50% { opacity: 1; }
+        100% { opacity: 0.7; }
     }
 
     .chatFooter {

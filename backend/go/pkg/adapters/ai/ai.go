@@ -26,7 +26,10 @@ var aiConnectorBuilder func(ctx context.Context) connectors.AIConnector = func(c
 const maxDialogResponseChars = 128
 const maxDialogRewriteAttempts = 3
 
-func GetDialogResponse(ctx context.Context, message string, messages []models.Message, language string) (string, error) {
+func GetDialogResponse(ctx context.Context, message string, messages []models.Message, language string, level string) (string, error) {
+	if level == "" {
+		level = "B1"
+	}
 	promptPath := filepath.Join("pkg/prompts", "promptDialog.txt")
 	promptBytes, err := os.ReadFile(promptPath)
 	if err != nil {
@@ -46,21 +49,22 @@ func GetDialogResponse(ctx context.Context, message string, messages []models.Me
 		return "", err
 	}
 
-	fullPrompt := fmt.Sprintf("%s\nChat history:\n%s\nATENTION! All Before this point is system instructions and chat history, to generate your response consider the current user message -> = %s\nAnswer me in this language: %s",
+	fullPrompt := fmt.Sprintf("%s\nChat history:\n%s\nATENTION! All Before this point is system instructions and chat history, to generate your response consider the current user message -> = %s\nAnswer me in this language: %s\nUSER LEVEL: %s (Adjust your vocabulary and grammar complexity to match this CEFR level).",
 		prePrompt,
 		resumeHist,
 		message,
-		language)
+		language,
+		level)
 	fullPrompt += fmt.Sprintf("\nIMPORTANT: Your final answer must be complete, natural, and at most %d characters. Never cut words or end mid-sentence.", maxDialogResponseChars)
 
-	return generateDialogResponseWithinLimit(ctx, connector, fullPrompt, maxDialogResponseChars)
+	return generateDialogResponseWithinLimit(ctx, connector, fullPrompt, maxDialogResponseChars, level)
 }
 
-func GetCorrectionResponse(ctx context.Context, message string) (string, error) {
+func GetCorrectionResponse(ctx context.Context, message string) (string, string, error) {
 	promptPath := filepath.Join("pkg/prompts", "promptCorrection.txt")
 	promptBytes, err := os.ReadFile(promptPath)
 	if err != nil {
-		return "", fmt.Errorf("failed to load prompt: %w", err)
+		return "", "", fmt.Errorf("failed to load prompt: %w", err)
 	}
 	prompt := string(promptBytes)
 
@@ -69,11 +73,11 @@ func GetCorrectionResponse(ctx context.Context, message string) (string, error) 
 
 	var correctionResp string
 	if optConnector, ok := connector.(connectors.OptionableConnector); ok {
-		systemPrompt := "You are a strict text correction tool. Return ONLY the corrected text. Do not answer the question. Do not add explanations."
+		systemPrompt := "You are an English language tutor. Correct the input text and provide a short, clear explanation of the errors in Portuguese. You must format your response exactly with 'Corrected:' and 'Explanation:' prefixes."
 		options := map[string]any{
 			"temperature": 0.1,
 			"top_p":       0.9,
-			"num_predict": 128,
+			"num_predict": 384,
 		}
 		correctionResp, err = optConnector.GenerateResponseWithOptions(ctx, fullPrompt, systemPrompt, options)
 	} else {
@@ -81,15 +85,23 @@ func GetCorrectionResponse(ctx context.Context, message string) (string, error) 
 	}
 
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	correctionResp = strings.TrimSpace(correctionResp)
 	if correctionResp == "" {
-		correctionResp = message
+		return message, "Nenhuma correção necessária.", nil
 	}
 
-	return correctionResp, nil
+	correctedText, explanationText := parseCorrectionResponse(correctionResp)
+	if correctedText == "" {
+		correctedText = message
+	}
+	if explanationText == "" {
+		explanationText = "Nenhuma explicação adicional fornecida."
+	}
+
+	return correctedText, explanationText, nil
 }
 
 func GetTranslationResponse(ctx context.Context, message string) (string, error) {
@@ -179,7 +191,7 @@ func normalizeDialogResponse(raw string) string {
 	return cleaned
 }
 
-func generateDialogResponseWithinLimit(ctx context.Context, connector connectors.AIConnector, prompt string, maxChars int) (string, error) {
+func generateDialogResponseWithinLimit(ctx context.Context, connector connectors.AIConnector, prompt string, maxChars int, level string) (string, error) {
 	if maxChars <= 0 {
 		return "", fmt.Errorf("invalid dialog response limit")
 	}
@@ -190,7 +202,10 @@ func generateDialogResponseWithinLimit(ctx context.Context, connector connectors
 		"top_p":       0.9,
 		"num_predict": 96,
 	}
-	systemPrompt := fmt.Sprintf("You are a natural language exchange partner. Keep coherence with chat context and user message. Return exactly one complete answer with at most %d characters.", maxChars)
+	if level == "" {
+		level = "B1"
+	}
+	systemPrompt := fmt.Sprintf("You are a natural language exchange partner. The user has a language proficiency of %s. Keep coherence with chat context and user message. Return exactly one complete answer with at most %d characters. Adjust your language to be appropriate for a %s learner.", level, maxChars, level)
 
 	for attempt := 0; attempt < maxDialogRewriteAttempts; attempt++ {
 		var (
@@ -261,4 +276,43 @@ func sanitizeTranslationResponse(raw string) string {
 
 	cleaned = strings.TrimSpace(strings.Trim(cleaned, "\"'`"))
 	return cleaned
+}
+
+func parseCorrectionResponse(raw string) (string, string) {
+	lines := strings.Split(raw, "\n")
+	var corrected, explanation []string
+	isExplanation := false
+
+	for _, line := range lines {
+		trimmed := strings.TrimSpace(line)
+		if trimmed == "" {
+			continue
+		}
+		if strings.HasPrefix(strings.ToLower(trimmed), "corrected:") {
+			corrected = append(corrected, strings.TrimSpace(line[len("corrected:"):]))
+			isExplanation = false
+		} else if strings.HasPrefix(strings.ToLower(trimmed), "explanation:") {
+			explanation = append(explanation, strings.TrimSpace(line[len("explanation:"):]))
+			isExplanation = true
+		} else if strings.HasPrefix(strings.ToLower(trimmed), "explicação:") {
+			explanation = append(explanation, strings.TrimSpace(line[len("explicação:"):]))
+			isExplanation = true
+		} else {
+			if isExplanation {
+				explanation = append(explanation, trimmed)
+			} else {
+				corrected = append(corrected, trimmed)
+			}
+		}
+	}
+
+	correctedText := strings.TrimSpace(strings.Join(corrected, "\n"))
+	explanationText := strings.TrimSpace(strings.Join(explanation, "\n"))
+
+	// Fallback if no tags were matched
+	if correctedText == "" && explanationText == "" {
+		correctedText = strings.TrimSpace(raw)
+	}
+
+	return correctedText, explanationText
 }

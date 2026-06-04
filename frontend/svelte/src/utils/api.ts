@@ -38,6 +38,7 @@ interface Message {
 interface AIResponse {
     message: string;
     response: string;
+    explanation?: string;
 }
 
 interface User {
