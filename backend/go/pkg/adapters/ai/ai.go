@@ -13,13 +13,6 @@ import (
 )
 
 var aiConnectorBuilder func(ctx context.Context) connectors.AIConnector = func(ctx context.Context) connectors.AIConnector {
-	provider, ok := ctx.Value("aiProvider").(string)
-	if !ok || provider == "" {
-		provider = "gemini"
-	}
-	if provider == "ollama" {
-		return connectors.NewOllamaConnector()
-	}
 	return connectors.NewGeminiConnector()
 }
 

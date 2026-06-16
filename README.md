@@ -48,7 +48,7 @@ Além disso, o sistema conta com chat adaptativo baseado nos níveis do quadro e
 *   **Banco de Dados:** MongoDB (com drivers nativos em Go)
 *   **Autenticação:** JWT (JSON Web Tokens) e Criptografia com bcrypt
 *   **Hot-reloads:** Air (para desenvolvimento rápido)
-*   **APIs de IA:** Google Gemini API (padrão via SDK) e Ollama (para execução offline local de LLMs como Llama 3.1)
+*   **APIs de IA:** Google Gemini API (via SDK)
 
 ### Frontend
 *   **Framework:** SvelteKit (Svelte 5)
@@ -68,7 +68,7 @@ SpeakUp/
 │       ├── cmd/
 │       │   └── api/          # Ponto de entrada (main.go)
 │       └── pkg/
-│           ├── adapters/     # Conectores externos (Gemini, Ollama, IA)
+│           ├── adapters/     # Conectores externos (Gemini, IA)
 │           ├── config/       # Conexão com MongoDB e Configurações gerais
 │           ├── handlers/     # Controladores das rotas
 │           ├── middlewares/  # Middlewares de Auth (JWT) e CORS
@@ -107,13 +107,9 @@ DB_NAME=speakup
 # Autenticação
 JWT_KEY=insira-um-segredo-longo-e-seguro
 
-# Provedor de IA Principal (Gemini)
+# Provedor de IA (Gemini)
 GEMINI_API_KEY=sua_chave_gemini_aqui
 GEMINI_MODEL=gemini-1.5-flash
-
-# Provedor Local Opcional (Ollama)
-OLLAMA_BASE_URL=http://ollama:11434
-OLLAMA_MODEL=llama3.1
 
 # Limites do Plano Gratuito
 FREE_DAILY_AI_LIMIT=10
@@ -165,7 +161,6 @@ A forma mais simples de subir toda a aplicação é utilizando o Docker Compose 
     Isso subirá os serviços:
     *   **Frontend (SvelteKit):** `http://localhost:5175`
     *   **Backend (Go/Gin):** `http://localhost:8082`
-    *   **Ollama (Local LLM):** `http://localhost:11434`
 
 2.  Para derrubar e limpar os containers:
     ```bash
@@ -232,10 +227,9 @@ Principais grupos de rotas (todas as rotas protegidas exigem o header `Authoriza
 
 ## 🧠 Integração com IA (Modelos)
 
-O backend possui uma arquitetura desacoplada baseada no padrão de projeto Adapter para gerenciar diferentes conectores de IA:
+O backend possui uma arquitetura desacoplada baseada no padrão de projeto Adapter para gerenciar a integração com a inteligência artificial:
 
-*   **Google Gemini (Padrão):** É altamente eficiente e rápido. O modelo default configurado é o `gemini-1.5-flash`.
-*   **Ollama (Local):** Caso você queira rodar offline e de graça sem chaves de API externas. Permite conectar a um container Ollama rodando localmente modelos como o `llama3.1`. Pode ser ativado definindo o provedor de IA no contexto das chamadas para `ollama`.
+*   **Google Gemini:** É altamente eficiente e rápido. O modelo padrão configurado é o `gemini-1.5-flash`.
 
 ---
 
