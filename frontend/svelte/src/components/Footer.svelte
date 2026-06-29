@@ -14,22 +14,7 @@
         Pratique idiomas todos os dias com chat inteligente, correções instantâneas
         e acompanhamento da sua evolução.
       </p>
-      <a class="primaryLink" href="/chat">Começar agora</a>
     </section>
-
-    <nav class="column" aria-label="Links de navegação">
-      <h4>Navegação</h4>
-      <ul>
-        <li><a href="/planos">Planos</a></li>
-      </ul>
-    </nav>
-
-    <div class="column">
-      <h4>Contato</h4>
-      <a class="contactLink" href="mailto:micaelrrocha13@gmail.com"
-        >micaelrrocha13@gmail.com</a
-      >
-    </div>
   </div>
 
   <div class="bottomBar">
