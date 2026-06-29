@@ -49,6 +49,7 @@
         }
     }
 
+    /* Lógica do Stripe comentada para uso futuro
     async function handleSubscribe(plan: "monthly" | "annual") {
         try {
             billingActionLoading = true;
@@ -82,6 +83,7 @@
             billingActionLoading = false;
         }
     }
+    */
 
     function isActive(status?: string) {
         return status === "active" || status === "trialing";
@@ -108,10 +110,21 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
             Voltar para o Chat
         </a>
-        <h1>Escolha seu Plano</h1>
-        <p>Acelere seu aprendizado com acesso ilimitado à nossa inteligência artificial especializada em idiomas.</p>
+        <h1>O SpeakUp agora é Gratuito!</h1>
+        <p>Liberamos todos os recursos do plano Pro para todos os nossos usuários, sem qualquer custo ou necessidade de assinatura.</p>
     </div>
 
+    <div class="billing-panel">
+        <div class="status-info">
+            <div class="active-status">
+                <span class="status-icon active"></span>
+                <p class="billing-note active">Seu Acesso Pro Gratuito está Ativo!</p>
+            </div>
+            <p class="usage-text">Aproveite conversas com IA sem limites diários, correções gramaticais completas e muito mais.</p>
+        </div>
+    </div>
+
+    <!-- Sistema de cobrança e planos pagos comentado para uso futuro
     <div class="plans-grid">
         <article class="plan-card free">
             <div class="highlight-pill neutral">Gratuito</div>
@@ -225,6 +238,7 @@
             {/if}
         </div>
     </div>
+    -->
 </section>
 
 <style>

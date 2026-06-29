@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"speakup/pkg/config"
-	"speakup/pkg/models"
+	// "speakup/pkg/models"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -33,6 +33,7 @@ func parseInt64(value string) (int64, error) {
 }
 
 func IsProUser(ctx context.Context, userID string) (bool, error) {
+	/*
 	db := config.GetMongoClient()
 	collection := db.Database("speakup").Collection("users")
 
@@ -43,6 +44,8 @@ func IsProUser(ctx context.Context, userID string) (bool, error) {
 
 	status := strings.ToLower(user.StripeStatus)
 	return status == "active" || status == "trialing", nil
+	*/
+	return true, nil
 }
 
 func GetUsageCount(ctx context.Context, userID string) (int64, error) {

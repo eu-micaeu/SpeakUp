@@ -213,7 +213,7 @@
             <span>Perfil</span>
           </button>
 
-          <button class="modal-option" on:click={goToPlans}>
+          <!-- <button class="modal-option" on:click={goToPlans}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
               <path
                 d="M3 7h18M5 7v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7"
@@ -231,7 +231,7 @@
               />
             </svg>
             <span>Planos</span>
-          </button>
+          </button> -->
 
           <button class="modal-option" on:click={goToIndex}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">

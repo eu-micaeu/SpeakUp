@@ -315,6 +315,7 @@
     </div>
   </section>
 
+  <!-- Seção de Planos e Preços comentada para uso futuro
   <section class="plansSection">
     <div class="sectionHeader">
       <h1>Planos e preços</h1>
@@ -355,6 +356,7 @@
       </article>
     </div>
   </section>
+  -->
 
   <section class="apiSection">
     <div class="apiContainer">

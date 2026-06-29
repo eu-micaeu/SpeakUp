@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"encoding/json"
+	// "encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -14,13 +14,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/stripe/stripe-go/v79"
-	billingportal "github.com/stripe/stripe-go/v79/billingportal/session"
-	checkout "github.com/stripe/stripe-go/v79/checkout/session"
-	"github.com/stripe/stripe-go/v79/customer"
+	// billingportal "github.com/stripe/stripe-go/v79/billingportal/session"
+	// checkout "github.com/stripe/stripe-go/v79/checkout/session"
+	// "github.com/stripe/stripe-go/v79/customer"
 	priceapi "github.com/stripe/stripe-go/v79/price"
 	productapi "github.com/stripe/stripe-go/v79/product"
 	"github.com/stripe/stripe-go/v79/subscription"
-	"github.com/stripe/stripe-go/v79/webhook"
+	// "github.com/stripe/stripe-go/v79/webhook"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -42,11 +42,12 @@ type BillingStatusResponse struct {
 }
 
 func NewBillingHandler(repo repositories.UserRepository) *BillingHandler {
-	stripe.Key = os.Getenv("STRIPE_SECRET_KEY")
+	// stripe.Key = os.Getenv("STRIPE_SECRET_KEY")
 	return &BillingHandler{Repo: repo}
 }
 
 func (h *BillingHandler) CreateCheckoutSession(c *gin.Context) {
+	/*
 	if err := validateStripeSecretKey(); err != nil {
 		utils.RespondWithError(c, http.StatusInternalServerError, err.Error())
 		return
@@ -132,9 +133,12 @@ func (h *BillingHandler) CreateCheckoutSession(c *gin.Context) {
 	}
 
 	utils.RespondWithJSON(c, http.StatusOK, gin.H{"url": sess.URL})
+	*/
+	utils.RespondWithError(c, http.StatusNotImplemented, "Sessão de pagamento desativada temporariamente. O SpeakUp agora é gratuito!")
 }
 
 func (h *BillingHandler) CreatePortalSession(c *gin.Context) {
+	/*
 	if err := validateStripeSecretKey(); err != nil {
 		utils.RespondWithError(c, http.StatusInternalServerError, err.Error())
 		return
@@ -175,6 +179,8 @@ func (h *BillingHandler) CreatePortalSession(c *gin.Context) {
 	}
 
 	utils.RespondWithJSON(c, http.StatusOK, gin.H{"url": portalSession.URL})
+	*/
+	utils.RespondWithError(c, http.StatusNotImplemented, "Portal de pagamentos desativado temporariamente. O SpeakUp agora é gratuito!")
 }
 
 func (h *BillingHandler) GetBillingStatus(c *gin.Context) {
@@ -184,13 +190,14 @@ func (h *BillingHandler) GetBillingStatus(c *gin.Context) {
 		return
 	}
 
-	user, err := h.Repo.FindByID(c, userID)
+	_, err := h.Repo.FindByID(c, userID)
 	if err != nil {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to load user")
 		return
 	}
 
 	// Sempre sincroniza com o Stripe se houver um customer ID para garantir dados atualizados
+	/*
 	if user.StripeCustomerID != "" {
 		subscriptionData, priceID, err := fetchLatestSubscription(user.StripeCustomerID)
 		if err == nil && subscriptionData != nil {
@@ -201,13 +208,14 @@ func (h *BillingHandler) GetBillingStatus(c *gin.Context) {
 			_ = h.Repo.Update(c, user.ID, mapStripeFields(user.StripeCustomerID, subscriptionData.ID, priceID, user.StripeStatus, user.StripeCurrentPeriodEnd))
 		}
 	}
+	*/
 
 	utils.RespondWithJSON(c, http.StatusOK, BillingStatusResponse{
-		StripeCustomerID:       user.StripeCustomerID,
-		StripeSubscriptionID:   user.StripeSubscriptionID,
-		StripePriceID:          user.StripePriceID,
-		StripeStatus:           user.StripeStatus,
-		StripeCurrentPeriodEnd: user.StripeCurrentPeriodEnd,
+		StripeCustomerID:       "free_tier_customer",
+		StripeSubscriptionID:   "free_tier_subscription",
+		StripePriceID:          "free_tier_price",
+		StripeStatus:           "active",
+		StripeCurrentPeriodEnd: 9999999999,
 	})
 }
 
@@ -237,6 +245,7 @@ func fetchLatestSubscription(customerID string) (*stripe.Subscription, string, e
 }
 
 func (h *BillingHandler) HandleWebhook(c *gin.Context) {
+	/*
 	webhookSecret := os.Getenv("STRIPE_WEBHOOK_SECRET")
 	if webhookSecret == "" {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Stripe webhook secret not configured")
@@ -268,8 +277,9 @@ func (h *BillingHandler) HandleWebhook(c *gin.Context) {
 			h.handleSubscriptionUpdate(c, &subscription)
 		}
 	}
+	*/
 
-	c.Status(http.StatusOK)
+	c.Status(http.StatusNotImplemented)
 }
 
 func (h *BillingHandler) handleCheckoutCompleted(c *gin.Context, session *stripe.CheckoutSession) {

@@ -281,14 +281,17 @@
                 <section class="profile-section subscription">
                     <div class="section-header">
                         <h3>Plano & Assinatura</h3>
-                        {#if billingStatus && isActive(billingStatus.stripe_status)}
-                            <span class="status-pill active">Pro</span>
-                        {:else}
-                            <span class="status-pill free">Free</span>
-                        {/if}
+                        <span class="status-pill active">Gratuito</span>
                     </div>
 
                     <div class="sub-details">
+                        <div class="sub-row">
+                            <span class="label">Status</span>
+                            <span class="value active">Acesso Ilimitado</span>
+                        </div>
+                        <p class="promo-text" style="margin-top: 1rem;">O SpeakUp Pro agora é gratuito para todos os usuários!</p>
+
+                        <!-- Lógica do Stripe comentada para uso futuro
                         {#if billingLoading}
                             <p class="loading-text">Carregando detalhes...</p>
                         {:else if billingStatus && isActive(billingStatus.stripe_status)}
@@ -307,6 +310,7 @@
                             <p class="promo-text">Você está usando a versão gratuita com limites diários.</p>
                             <a href="/planos" class="upgrade-btn">Fazer Upgrade</a>
                         {/if}
+                        -->
                     </div>
                 </section>
 

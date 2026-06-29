@@ -19,7 +19,7 @@
 
   <div class="bottomBar">
     <p>&copy; {currentYear} SpeakUp. Todos os direitos reservados.</p>
-    <a href="/planos">Conheça os planos</a>
+    <!-- <a href="/planos">Conheça os planos</a> -->
   </div>
 </footer>
 
