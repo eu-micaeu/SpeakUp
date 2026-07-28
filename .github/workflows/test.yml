@@ -1,36 +1,36 @@
 name: CI - Test Automation
 
-    on:
-      push:
-        branches:
-          - main
-      pull_request:
-        branches:
-          - main
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
-    jobs:
-      backend-tests:
-        name: Backend Tests
-        runs-on: ubuntu-latest
-        timeout-minutes: 15
-        env:
-          GO111MODULE: on
+jobs:
+  backend-tests:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GO111MODULE: on
 
-        steps:
-          - name: Checkout code
-            uses: actions/checkout@v4
-            with:
-              fetch-depth: 0
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-          - name: Set up Go 1.23.0
-            uses: actions/setup-go@v4
-            with:
-              go-version: '1.23.0'
+      - name: Set up Go 1.23.0
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.23.0'
 
-          - name: Install dependencies
-            working-directory: ./backend/go
-            run: go mod tidy
+      - name: Install dependencies
+        working-directory: ./backend/go
+        run: go mod tidy
 
-          - name: Run tests
-            working-directory: ./backend/go
-            run: go test ./... -v -coverprofile=coverage.out -covermode=atomic
+      - name: Run tests
+        working-directory: ./backend/go
+        run: go test ./... -v -coverprofile=coverage.out -covermode=atomic
