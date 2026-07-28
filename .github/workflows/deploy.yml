@@ -1,0 +1,26 @@
+name: CD - Deploy Automation
+
+    on:
+      workflow_run:
+        workflows: ["CI - Test Automation"]
+        types:
+          - completed
+        branches:
+          - main
+
+    jobs:
+      deploy:
+        name: Deploy to Local Server
+        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+        runs-on: self-hosted
+
+        steps:
+          - name: Checkout code on self-hosted runner
+            uses: actions/checkout@v4
+
+          - name: Deploy Docker containers
+            run: |
+              echo "🚀 Atualizando repositório e reiniciando containers Docker..."
+              git pull origin main
+              docker compose up -d --build
+              echo "✅ Deploy concluído com sucesso!"
