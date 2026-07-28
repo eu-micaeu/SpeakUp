@@ -19,6 +19,13 @@ jobs:
       - name: Checkout code on self-hosted runner
         uses: actions/checkout@v4
 
+      - name: Ensure environment file exists
+        run: |
+          if [ ! -f ./backend/go/.env ]; then
+            echo "⚠️  backend/go/.env não encontrado no runner. Copiando de .env.example..."
+            cp ./backend/go/.env.example ./backend/go/.env
+          fi
+
       - name: Deploy Docker containers
         run: |
           echo "🚀 Atualizando repositório e reiniciando containers Docker..."

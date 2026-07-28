@@ -3,7 +3,8 @@ services:
     build:
       context: ./backend/go
     env_file:
-      - ./backend/go/.env
+      - path: ./backend/go/.env
+        required: false
     volumes:
       - ./backend/go:/app
     ports:
