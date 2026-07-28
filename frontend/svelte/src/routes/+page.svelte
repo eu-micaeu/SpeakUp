@@ -279,7 +279,7 @@
   <div class="betaBanner">
     <div class="betaBannerContent">
       <div class="betaText">
-         O SpeakUp está em desenvolvimento e ainda em fase beta.
+         O SpeakUp está em desenvolvimento.
       </div>
     </div>
   </div>
