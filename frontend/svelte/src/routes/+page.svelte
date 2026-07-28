@@ -279,7 +279,7 @@
   <div class="betaBanner">
     <div class="betaBannerContent">
       <div class="betaText">
-         O SpeakUp está em desenvolvimento e ainda em fase beta. Sua experiência e feedback são valiosos para melhorar a plataforma!
+         O SpeakUp está em desenvolvimento e ainda em fase beta.
       </div>
     </div>
   </div>
