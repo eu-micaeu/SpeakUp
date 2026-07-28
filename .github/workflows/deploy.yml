@@ -18,6 +18,8 @@ jobs:
     steps:
       - name: Checkout code on self-hosted runner
         uses: actions/checkout@v4
+        with:
+          clean: false
 
       - name: Ensure environment file exists
         run: |
