@@ -360,7 +360,7 @@
 
   <section class="apiSection">
     <div class="apiContainer">
-      <h1>Potencializado por Inteligência Artificial Avançada.</h1>
+      <h1>Potencializado por Inteligência Artificial.</h1>
       <div class="apiLogos">
         <div class="apiCard">
           <img src="./gemini-logo.png" alt="Gemini Logo" />
