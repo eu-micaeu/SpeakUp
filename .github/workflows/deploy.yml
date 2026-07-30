@@ -18,9 +18,9 @@ jobs:
     steps:
       - name: Clean up root-owned files via Docker
         run: |
-          if [ -d "./backend/go/tmp" ]; then
+          if [ -d "./backend/go/tmp" ] || [ -d "./frontend/svelte/.svelte-kit" ]; then
             echo "🧹 Limpando arquivos temporários do root usando Docker..."
-            docker run --rm -v "$(pwd)":/workspace alpine rm -rf /workspace/backend/go/tmp || true
+            docker run --rm -v "$(pwd)":/workspace alpine rm -rf /workspace/backend/go/tmp /workspace/frontend/svelte/.svelte-kit || true
           fi
 
       - name: Checkout code on self-hosted runner
