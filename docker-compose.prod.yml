@@ -1,0 +1,82 @@
+services:
+  mongodb_prod:
+    image: mongo:7.0
+    container_name: speakup_mongodb_prod
+    ports:
+      - "${MONGODB_PROD_PORT:-27020}:27017"
+    volumes:
+      - mongodb_data_prod:/data/db
+    restart: unless-stopped
+    networks:
+      - speakup_prod_network
+
+  backend:
+    build:
+      context: ./backend/go
+      dockerfile: Dockerfile
+    container_name: speakup_backend_prod
+    ports:
+      - "8082:8082"
+    environment:
+      GO_ENV: production
+      PORT: 8082
+      MONGO_CONNECTION_STRING: ${MONGO_CONNECTION_STRING:-mongodb://mongodb_prod:27017/speakup}
+      DB_NAME: ${DB_NAME:-speakup}
+      JWT_KEY: ${JWT_KEY:-change-me-to-a-long-random-secret}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-1.5-flash}
+      SAMBANOVA_API_KEY: ${SAMBANOVA_API_KEY:-}
+      SAMBANOVA_MODEL: ${SAMBANOVA_MODEL:-Meta-Llama-3.3-70B-Instruct}
+      OLLAMA_HOST: ${OLLAMA_HOST:-http://host.docker.internal:11434}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2:latest}
+      FREE_DAILY_AI_LIMIT: ${FREE_DAILY_AI_LIMIT:-10}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USERNAME: ${SMTP_USERNAME:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_SUCCESS_URL: ${STRIPE_SUCCESS_URL:-http://localhost:5175/checkout/success}
+      STRIPE_CANCEL_URL: ${STRIPE_CANCEL_URL:-http://localhost:5175/checkout/cancel}
+      STRIPE_PORTAL_RETURN_URL: ${STRIPE_PORTAL_RETURN_URL:-http://localhost:5175/perfil}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      STRIPE_PRICE_MONTHLY: ${STRIPE_PRICE_MONTHLY:-}
+      STRIPE_PRICE_ANNUAL: ${STRIPE_PRICE_ANNUAL:-}
+    depends_on:
+      - mongodb_prod
+    restart: unless-stopped
+    networks:
+      - speakup_prod_network
+
+  frontend:
+    build:
+      context: ./frontend/svelte
+      dockerfile: Dockerfile
+    container_name: speakup_frontend_prod
+    ports:
+      - "5175:5175"
+    environment:
+      NODE_ENV: production
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:8082/api}
+      VITE_STRIPE_PRICE_MONTHLY: ${VITE_STRIPE_PRICE_MONTHLY:-}
+      VITE_STRIPE_PRICE_ANNUAL: ${VITE_STRIPE_PRICE_ANNUAL:-}
+      PUBLIC_FIREBASE_API_KEY: ${PUBLIC_FIREBASE_API_KEY:-}
+      PUBLIC_FIREBASE_AUTH_DOMAIN: ${PUBLIC_FIREBASE_AUTH_DOMAIN:-}
+      PUBLIC_FIREBASE_PROJECT_ID: ${PUBLIC_FIREBASE_PROJECT_ID:-}
+      PUBLIC_FIREBASE_STORAGE_BUCKET: ${PUBLIC_FIREBASE_STORAGE_BUCKET:-}
+      PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${PUBLIC_FIREBASE_MESSAGING_SENDER_ID:-}
+      PUBLIC_FIREBASE_APP_ID: ${PUBLIC_FIREBASE_APP_ID:-}
+      PUBLIC_FIREBASE_MEASUREMENT_ID: ${PUBLIC_FIREBASE_MEASUREMENT_ID:-}
+    depends_on:
+      - backend
+      - mongodb_prod
+    restart: unless-stopped
+    networks:
+      - speakup_prod_network
+
+volumes:
+  mongodb_data_prod:
+
+networks:
+  speakup_prod_network:
+    driver: bridge

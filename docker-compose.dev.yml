@@ -1,0 +1,92 @@
+services:
+  mongodb_dev:
+    image: mongo:7.0
+    container_name: speakup_mongodb_dev
+    ports:
+      - "${MONGODB_DEV_PORT:-27019}:27017"
+    volumes:
+      - mongodb_data_dev:/data/db
+    restart: unless-stopped
+    networks:
+      - speakup_dev_network
+
+  backend:
+    image: golang:1.24-alpine
+    working_dir: /app
+    command: sh -c "go mod tidy && go run ./cmd/api/main.go"
+    ports:
+      - "8082:8082"
+    environment:
+      GO_ENV: development
+      PORT: 8082
+      MONGO_CONNECTION_STRING: ${MONGO_CONNECTION_STRING:-mongodb://mongodb_dev:27017/speakup}
+      DB_NAME: ${DB_NAME:-speakup}
+      JWT_KEY: ${JWT_KEY:-dev-jwt-secret-key-change-in-prod}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-1.5-flash}
+      SAMBANOVA_API_KEY: ${SAMBANOVA_API_KEY:-}
+      SAMBANOVA_MODEL: ${SAMBANOVA_MODEL:-Meta-Llama-3.3-70B-Instruct}
+      OLLAMA_HOST: ${OLLAMA_HOST:-http://host.docker.internal:11434}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2:latest}
+      FREE_DAILY_AI_LIMIT: ${FREE_DAILY_AI_LIMIT:-10}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USERNAME: ${SMTP_USERNAME:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_SUCCESS_URL: ${STRIPE_SUCCESS_URL:-http://localhost:5175/checkout/success}
+      STRIPE_CANCEL_URL: ${STRIPE_CANCEL_URL:-http://localhost:5175/checkout/cancel}
+      STRIPE_PORTAL_RETURN_URL: ${STRIPE_PORTAL_RETURN_URL:-http://localhost:5175/perfil}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      STRIPE_PRICE_MONTHLY: ${STRIPE_PRICE_MONTHLY:-}
+      STRIPE_PRICE_ANNUAL: ${STRIPE_PRICE_ANNUAL:-}
+    depends_on:
+      - mongodb_dev
+    volumes:
+      - ./backend/go:/app
+    restart: unless-stopped
+    networks:
+      - speakup_dev_network
+
+  frontend:
+    image: node:22-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    ports:
+      - "5175:5175"
+    environment:
+      NODE_ENV: development
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:8082/api}
+      VITE_STRIPE_PRICE_MONTHLY: ${VITE_STRIPE_PRICE_MONTHLY:-}
+      VITE_STRIPE_PRICE_ANNUAL: ${VITE_STRIPE_PRICE_ANNUAL:-}
+      PUBLIC_FIREBASE_API_KEY: ${PUBLIC_FIREBASE_API_KEY:-}
+      PUBLIC_FIREBASE_AUTH_DOMAIN: ${PUBLIC_FIREBASE_AUTH_DOMAIN:-}
+      PUBLIC_FIREBASE_PROJECT_ID: ${PUBLIC_FIREBASE_PROJECT_ID:-}
+      PUBLIC_FIREBASE_STORAGE_BUCKET: ${PUBLIC_FIREBASE_STORAGE_BUCKET:-}
+      PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${PUBLIC_FIREBASE_MESSAGING_SENDER_ID:-}
+      PUBLIC_FIREBASE_APP_ID: ${PUBLIC_FIREBASE_APP_ID:-}
+      PUBLIC_FIREBASE_MEASUREMENT_ID: ${PUBLIC_FIREBASE_MEASUREMENT_ID:-}
+      DISABLE_HMR: "false"
+      CHOKIDAR_USEPOLLING: "true"
+      CHOKIDAR_INTERVAL: "100"
+      WATCHPACK_POLLING: "true"
+      WATCHPACK_POLLING_INTERVAL: "100"
+    volumes:
+      - ./frontend/svelte:/app
+      - frontend_node_modules_dev:/app/node_modules
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    networks:
+      - speakup_dev_network
+    depends_on:
+      - backend
+
+volumes:
+  frontend_node_modules_dev:
+  mongodb_data_dev:
+
+networks:
+  speakup_dev_network:
+    driver: bridge
