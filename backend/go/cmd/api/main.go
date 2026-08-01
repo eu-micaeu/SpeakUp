@@ -1,8 +1,6 @@
 package main
 
 import (
-	"log"
-
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	swaggerFiles "github.com/swaggo/files"
@@ -23,11 +21,8 @@ import (
 
 func main() {
 
-	// Carregar variáveis de ambiente do arquivo .env PRIMEIRO
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalf("Erro ao carregar o arquivo .env: %v", err)
-	}
+	// Carregar variáveis de ambiente do arquivo .env único da raiz do projeto
+	_ = godotenv.Load("../../.env", "../.env", ".env")
 
 	r := gin.Default()
 
