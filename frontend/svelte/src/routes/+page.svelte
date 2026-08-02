@@ -967,167 +967,195 @@
 
   .modalOverlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(8px);
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
+    animation: modalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes modalFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes modalScaleUp {
+    from { opacity: 0; transform: scale(0.96) translateY(6px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
   }
 
   .modalContent {
-    background: linear-gradient(135deg, #1f1f1f 0%, #2a2a2a 100%);
-    border-radius: 24px;
-    padding: 2rem;
-    max-width: 550px;
+    background: #111113;
+    border-radius: 8px;
+    padding: 2rem 2.25rem;
+    max-width: 440px;
     width: 90%;
     overflow-y: auto;
+    max-height: 90vh;
     position: relative;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    animation: modalScaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .closeButton {
     position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: rgba(255, 255, 255, 0.1);
+    top: 1.25rem;
+    right: 1.25rem;
+    background: transparent;
     border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    border-radius: 4px;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: white;
+    color: rgba(255, 255, 255, 0.4);
+    transition: all 0.2s ease;
   }
 
   .closeButton:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
   }
 
   .modalHeader {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1.25rem;
   }
 
   .modalLogo {
-    width: 50px;
-    height: 50px;
-    margin-bottom: 1rem;
+    width: 42px;
+    height: 42px;
+    margin-bottom: 0.75rem;
   }
 
   .modalHeader h2 {
-    font-size: 1.8rem;
+    font-size: 1.4rem;
     font-weight: 700;
-    margin-bottom: 0.5rem;
-    color: white;
+    margin-bottom: 0.25rem;
+    color: #ffffff;
+    letter-spacing: -0.02em;
   }
 
   .modalSubtitle {
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 0.85rem;
   }
 
   .authTabs {
     display: flex;
-    gap: 1rem;
-    margin-bottom: 2rem;
-    background: rgba(255, 255, 255, 0.05);
-    padding: 0.4rem;
-    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 3px;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
   }
 
   .authTab {
     flex: 1;
-    padding: 0.75rem;
+    padding: 0.55rem;
     background: transparent;
     border: none;
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 1rem;
-    font-weight: 600;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.88rem;
+    font-weight: 500;
     cursor: pointer;
-    border-radius: 8px;
-    transition: all 0.3s;
+    border-radius: 4px;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .authTab.active {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   }
 
   .authTab:hover:not(.active) {
     color: rgba(255, 255, 255, 0.8);
   }
 
-  .inputGroup {
+  .errorMessage {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+    border-radius: 4px;
+    padding: 0.6rem 0.9rem;
+    font-size: 0.85rem;
     margin-bottom: 1.25rem;
+    text-align: center;
+  }
+
+  .inputGroup {
+    margin-bottom: 1rem;
   }
 
   .inputGroup label {
     display: block;
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 0.9rem;
-    margin-bottom: 0.5rem;
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 0.78rem;
+    margin-bottom: 0.35rem;
     font-weight: 500;
   }
 
   .inputGroup input,
   .inputGroup select {
     width: 100%;
-    padding: 0.875rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    color: white;
-    font-size: 1rem;
-    transition: all 0.3s;
+    padding: 0.7rem 0.85rem;
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    color: #ffffff;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
     box-sizing: border-box;
   }
 
   .inputGroup input:focus,
   .inputGroup select:focus {
     outline: none;
-    border-color: rgba(255, 255, 255, 0.3);
-    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(92, 109, 255, 0.6);
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 0 0 3px rgba(92, 109, 255, 0.15);
   }
 
   .inputGroup input::placeholder {
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(255, 255, 255, 0.3);
   }
 
   .inputGroup select {
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' opacity='0.5' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right 0.875rem center;
+    background-position: right 0.85rem center;
     background-size: 12px;
-    padding-right: 2.5rem;
+    padding-right: 2.25rem;
     cursor: pointer;
   }
 
   .inputGroup select:disabled {
-    opacity: 0.5;
+    opacity: 0.4;
     cursor: not-allowed;
   }
 
   .inputGroup select option {
-    background: #1a1a1a;
+    background: #18181b;
     color: white;
     padding: 0.5rem;
   }
 
   .inputGroup select option:disabled {
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.4);
   }
 
   .inputRow {
     display: flex;
-    gap: 1rem;
+    gap: 0.75rem;
   }
 
   .inputRow .inputGroup {
@@ -1136,77 +1164,50 @@
 
   .submitButton {
     width: 100%;
-    padding: 1rem;
-    background: linear-gradient(135deg, #4a4a4a 0%, #353535 100%);
+    padding: 0.8rem;
+    background: #ffffff;
     border: none;
-    border-radius: 10px;
-    color: white;
-    font-size: 1rem;
+    border-radius: 6px;
+    color: #09090b;
+    font-size: 0.92rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s;
-    margin-bottom: 1rem;
+    transition: all 0.2s ease;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
   }
 
   .submitButton:hover:not(:disabled) {
-    background: linear-gradient(135deg, #5a5a5a 0%, #454545 100%);
-    transform: translateY(-2px);
+    background: #f4f4f5;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(255, 255, 255, 0.15);
+  }
+
+  .submitButton:active:not(:disabled) {
+    transform: translateY(0);
   }
 
   .submitButton:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-
-  .googleButton {
-    width: 100%;
-    padding: 1rem;
-    background: white;
-    border: none;
-    border-radius: 10px;
-    color: #333;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-  }
-
-  .googleButton img {
-    width: 20px;
-    height: 20px;
-  }
-
-  .googleButton:hover:not(:disabled) {
-    background: #f5f5f5;
-    transform: translateY(-2px);
-  }
-
-  .googleButton:disabled {
-    opacity: 0.6;
+    opacity: 0.5;
     cursor: not-allowed;
   }
 
   .levelTestButton {
     width: 100%;
-    padding: 0.75rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 0.875rem;
+    padding: 0.4rem 0;
+    background: transparent;
+    border: none;
+    color: #8c9eff;
+    font-size: 0.8rem;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.3s;
+    text-align: right;
+    transition: all 0.2s ease;
   }
 
   .levelTestButton:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.3);
-    transform: translateY(-1px);
+    color: #b3c0ff;
+    text-decoration: underline;
   }
 
   .levelTestButton:disabled {
@@ -1221,6 +1222,7 @@
   .testModal {
     max-width: 600px;
     min-height: 400px;
+    border-radius: 8px;
   }
 
   .testHeader {

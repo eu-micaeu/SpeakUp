@@ -465,7 +465,7 @@
   .modal-content {
     background: linear-gradient(145deg, #1e1e1e, #1a1a1a);
     padding: 0;
-    border-radius: 16px;
+    border-radius: 8px;
     color: white;
     min-width: 320px;
     max-width: 400px;
@@ -507,7 +507,7 @@
     color: rgba(255, 255, 255, 0.7);
     cursor: pointer;
     padding: 0.5rem;
-    border-radius: 8px;
+    border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -535,7 +535,7 @@
     background: rgba(255, 255, 255, 0.05);
     color: rgba(255, 255, 255, 0.9);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
+    border-radius: 6px;
     cursor: pointer;
     transition: all 0.3s ease;
     font-size: 1rem;

@@ -487,13 +487,13 @@
 
     /* Modal */
     .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 1.5rem; }
-    .modal { background: #1a1a1a; border: 1px solid rgba(255, 255, 255, 0.1); padding: 2.5rem; border-radius: 24px; max-width: 450px; text-align: center; }
+    .modal { background: #1a1a1a; border: 1px solid rgba(255, 255, 255, 0.1); padding: 2.5rem; border-radius: 8px; max-width: 450px; text-align: center; }
     .modal h3 { color: #fff; margin-top: 0; font-size: 1.4rem; }
     .modal p { color: #888; margin-bottom: 2rem; line-height: 1.6; }
-    .modal input { width: 100%; box-sizing: border-box; margin-bottom: 1.5rem; text-align: center; border-color: #ff6b6b; }
+    .modal input { width: 100%; box-sizing: border-box; margin-bottom: 1.5rem; text-align: center; border-color: #ff6b6b; border-radius: 6px; }
     .modal-buttons { display: flex; gap: 1rem; }
-    .confirm-delete { flex: 1; background: #ff6b6b; color: #fff; border: none; padding: 0.9rem; border-radius: 12px; font-weight: 700; cursor: pointer; }
-    .cancel-modal { flex: 1; background: transparent; color: #fff; border: 1px solid rgba(255, 255, 255, 0.1); padding: 0.9rem; border-radius: 12px; font-weight: 600; cursor: pointer; }
+    .confirm-delete { flex: 1; background: #ff6b6b; color: #fff; border: none; padding: 0.9rem; border-radius: 6px; font-weight: 700; cursor: pointer; }
+    .cancel-modal { flex: 1; background: transparent; color: #fff; border: 1px solid rgba(255, 255, 255, 0.1); padding: 0.9rem; border-radius: 6px; font-weight: 600; cursor: pointer; }
 
     @media (max-width: 900px) {
         .profile-container { grid-template-columns: 1fr; }
