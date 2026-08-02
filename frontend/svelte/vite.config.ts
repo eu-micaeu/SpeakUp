@@ -3,6 +3,7 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
 	envDir: '../../',
+	envPrefix: ['VITE_', 'PUBLIC_'],
 	plugins: [sveltekit()],
 	server: {
 		// Garante que o servidor escute fora do container

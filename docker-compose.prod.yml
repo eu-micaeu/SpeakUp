@@ -52,6 +52,8 @@ services:
     build:
       context: ./frontend/svelte
       dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8082/api}
     container_name: speakup_frontend_prod
     ports:
       - "5175:5175"

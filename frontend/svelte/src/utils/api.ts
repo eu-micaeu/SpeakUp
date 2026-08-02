@@ -2,7 +2,7 @@ import axios, { AxiosError } from 'axios';
 import Cookies from 'js-cookie';
 
 // For Vite projects, use import.meta.env; for SvelteKit, use $env/static/public
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 // Types
 interface LoginResponse {
