@@ -135,9 +135,6 @@
             }
 
             let fullUserMsg = `${userInput}\n\nCorreção: ${correction.response}`;
-            if (correction.explanation) {
-                fullUserMsg += `\n\nExplicação: ${correction.explanation}`;
-            }
 
             const savedUserMsg = await addMessageToChat(
                 chatId,
@@ -480,14 +477,7 @@
                                         {/if}
                                     </button>
                                 </p>
-                                {#if msg.text.split("\n\n")[2]}
-                                    <p class="explanationText">
-                                        <strong>Explicação:</strong>
-                                        {msg.text
-                                            .split("\n\n")[2]
-                                            ?.replace("Explicação: ", "") || ""}
-                                    </p>
-                                {/if}
+
                             </div>
                         {/if}
                         {#if msg.type === "response"}
@@ -697,13 +687,7 @@
         color: #aaa;
     }
 
-    .explanationText {
-        margin-top: 0.5rem !important;
-        padding-top: 0.5rem;
-        border-top: 1px dashed rgba(255, 255, 255, 0.08);
-        color: #e0e0e0 !important;
-        line-height: 1.4;
-    }
+
 
     .botBubbleTts {
         position: absolute;
