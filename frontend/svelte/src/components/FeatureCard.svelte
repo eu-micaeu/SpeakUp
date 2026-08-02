@@ -27,7 +27,7 @@
     margin: 0 auto 2rem;
     padding: 2.5rem;
     background: rgba(255, 255, 255, 0.03);
-    border-radius: 20px;
+    border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.08);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
@@ -86,20 +86,16 @@
       rgba(255, 255, 255, 0.1),
       rgba(255, 255, 255, 0.05)
     );
-    border-radius: 24px;
+    border-radius: 6px;
     border: 1px solid rgba(255, 255, 255, 0.15);
     transition: all 0.4s ease;
-  }
-
-  .feature:hover .iconWrapper {
-    transform: scale(1.1) rotate(5deg);
   }
 
   .iconGlow {
     position: absolute;
     width: 100%;
     height: 100%;
-    border-radius: 24px;
+    border-radius: 6px;
     opacity: 0;
   }
 

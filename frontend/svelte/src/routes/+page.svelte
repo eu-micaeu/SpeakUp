@@ -11,7 +11,7 @@
       imgSrc: "./chat.png",
       alt: "Ícone de chat representando conversação",
       title:
-        "Plataforma inovadora que utiliza IA para auxiliar no aprendizado de idiomas.",
+        "Plataforma que utiliza IA para auxiliar no aprendizado de idiomas.",
       content:
         "Analisa textos em tempo real, identificando e corrigindo erros com explicações detalhadas para um aprendizado contínuo.",
     },
@@ -22,14 +22,6 @@
         "Oferece experiência personalizada com análise em tempo real de erros gramaticais e de digitação.",
       content:
         "Fornece correções com explicações para melhor compreensão das regras linguísticas.",
-    },
-    {
-      imgSrc: "./mic.png",
-      alt: "Ícone de microfone para reconhecimento de voz",
-      title:
-        "Reconhecimento de voz avançado com análise de pronúncia em tempo real.",
-      content:
-        "Transforme sua fala em texto e receba feedback instantâneo sobre pronúncia, entonação e fluência. Pratique conversação de forma natural e aprimore suas habilidades de comunicação oral com suporte completo da IA.",
     },
   ];
 
