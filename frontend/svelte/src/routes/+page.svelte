@@ -303,10 +303,12 @@
       Já possui uma conta? Aperte aqui!
     </button>
   </section>
+
+  <!-- Seção 1: Recursos -->
   <section class="featureSection">
     <div class="sectionHeader">
       <h1>Recursos do SpeakUp</h1>
-      <p class="sectionSubtitle">Descubra tudo o que você pode fazer.</p>
+      <p class="sectionSubtitle">Descubra tudo o que você pode fazer para alcançar a fluência.</p>
     </div>
     <div class="featuresGrid">
       {#each cardData as card, i}
@@ -315,67 +317,47 @@
     </div>
   </section>
 
-  <!-- Seção de Planos e Preços comentada para uso futuro
-  <section class="plansSection">
+  <!-- Seção 2: 100% Gratuito -->
+  <section class="freeSection">
     <div class="sectionHeader">
-      <h1>Planos e preços</h1>
-      <p class="sectionSubtitle">Escolha o plano ideal para sua jornada.</p>
+      <h1>Projeto gratuito!</h1>
+      <p class="sectionSubtitle">
+        Um projeto dedicado à educação de idiomas sem barreiras financeiras.
+      </p>
     </div>
-    <div class="plansGrid">
-      <article class="planCard free">
-        <span class="planBadge neutral">Free</span>
-        <h3>Plano Free</h3>
-        <p class="planPrice">R$ 0 <span>/ sempre</span></p>
-        <p class="planLimit">Até 10 interações de IA/dia</p>
-        <ul>
-          <li>Chat com IA e correções básicas.</li>
-          <li>Traduções e tópicos com limite diário.</li>
-          <li>Histórico recente de conversas.</li>
-        </ul>
-      </article>
-      <article class="planCard">
-        <h3>Plano Mensal</h3>
-        <p class="planPrice">R$ 7 <span>/ mês</span></p>
-        <p class="planDiscount">Com os seguintes benefícios:</p>
-        <ul>
-          <li>Chat com IA ilimitado.</li>
-          <li>Correções e traduções ilimitadas.</li>
-          <li>Geração de tópicos sem limite.</li>
-        </ul>
-      </article>
-      <article class="planCard highlighted">
-        <span class="planBadge">Mais vantajoso</span>
-        <h3>Plano Anual</h3>
-        <p class="planPrice">R$ 70 <span>/ ano</span></p>
-        <p class="planDiscount">Economize R$ 14 no ano</p>
-        <ul>
-          <li>Chat com IA ilimitado.</li>
-          <li>Correções e traduções ilimitadas.</li>
-          <li>Geração de tópicos sem limite.</li>
-        </ul>
-      </article>
+
+    <div class="freeGrid">
+      <div class="freeCard">
+        <h3>Sem Assinaturas</h3>
+        <p>Acesso livre a todas as ferramentas sem mensalidades ou taxas ocultas.</p>
+      </div>
+      <div class="freeCard">
+        <h3>Uso Ilimitado</h3>
+        <p>Pratique conversas, correções gramaticais e traduções sem limite diário.</p>
+      </div>
+      <div class="freeCard">
+        <h3>Para Todos</h3>
+        <p>Aprenda no seu ritmo com suporte de IA adaptado ao seu nível de proficiência.</p>
+      </div>
     </div>
   </section>
-  -->
 
+  <!-- Seção 3: Inteligência Artificial -->
   <section class="apiSection">
-    <div class="apiContainer">
-      <h1>Potencializado por Inteligência Artificial.</h1>
-      <div class="apiLogos">
-        <div class="apiCard">
-          <img src="./gemini-logo.png" alt="Gemini Logo" />
-          <h3>Gemini API</h3>
-          <p>
-            Modelos de IA de última geração do Google em nuvem para
-            respostas e processamento rápidos e inteligentes.
-          </p>
-        </div>
-      </div>
-      <p class="apiDescription">
-        Utilizamos o poder e a velocidade da API do Gemini na nuvem, garantindo correções
-        precisas, traduções instantâneas e uma experiência de aprendizado
-        altamente personalizada.
+    <div class="sectionHeader">
+      <h1>Potencializado por IA</h1>
+      <p class="sectionSubtitle">
+        Utilizamos os modelos em nuvem do Google Gemini para respostas rápidas, correções instantâneas e aprendizado adaptativo.
       </p>
+    </div>
+    <div class="apiLogos">
+      <div class="apiCard">
+        <img src="./gemini-logo.png" alt="Gemini Logo" />
+        <h3>Gemini API</h3>
+        <p>
+          Modelos de IA de última geração para análise gramatical profunda, traduções em tempo real e conversa fluida.
+        </p>
+      </div>
     </div>
   </section>
 
@@ -722,34 +704,23 @@
     margin: 15px 0;
   }
 
-  .ctaSecondary:hover {
-    transform: translateY(-2px);
-  }
-
-  .featureSection {
-    padding: 6rem 2rem;
-    background: linear-gradient(180deg, #0a0a0a 0%, #121212 50%, #0a0a0a 100%);
+  /* Seções Padronizadas da Tela Inicial */
+  .featureSection,
+  .freeSection,
+  .apiSection {
+    padding: 5rem 2rem;
+    background: #0a0a0a;
     position: relative;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
   }
 
-  .featureSection::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.2),
-      transparent
-    );
+  .freeSection {
+    background: rgba(255, 255, 255, 0.015);
   }
 
   .sectionHeader {
     text-align: center;
-    margin-bottom: 4rem;
+    margin-bottom: 3.5rem;
     animation: fadeIn 1s ease-out;
   }
 
@@ -765,9 +736,9 @@
   }
 
   .sectionHeader h1 {
-    font-size: 3rem;
+    font-size: 2.4rem;
     font-weight: 800;
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
     background: linear-gradient(
       270deg,
       #ffffff,
@@ -783,178 +754,106 @@
     color: transparent;
     -webkit-text-fill-color: transparent;
     animation: chromeShine 6s ease-in-out infinite;
+    letter-spacing: -0.02em;
   }
 
   .sectionSubtitle {
-    font-size: 1.2rem;
-    opacity: 0.7;
-    color: #e0e0e0;
+    font-size: 1.05rem;
+    color: rgba(255, 255, 255, 0.6);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
   }
 
   .featuresGrid {
-    max-width: 1200px;
+    max-width: 1100px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
     gap: 2rem;
   }
 
-  .plansSection {
-    padding: 6rem 2rem;
-    background: #0f0f0f;
-    border-top: 1px solid #1f1f1f;
-    border-bottom: 1px solid #1f1f1f;
-  }
-
-  .plansGrid {
-    max-width: 1200px;
-    margin: 0 auto;
+  .freeGrid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 2rem;
-  }
-
-  .planCard {
-    position: relative;
-    padding: 2.5rem;
-    border-radius: 20px;
-    background: #1b1b1b;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-  }
-
-  .planCard h3 {
-    margin: 0 0 0.5rem;
-    font-size: 1.6rem;
-  }
-
-  .planPrice {
-    margin: 0 0 1.5rem;
-    font-size: 2rem;
-    font-weight: 700;
-    color: #f3f4ff;
-  }
-
-  .planPrice span {
-    font-size: 1rem;
-    font-weight: 500;
-    color: #a5a9c8;
-  }
-
-  .planDiscount {
-    margin: -0.75rem 0 1.5rem;
-    font-size: 0.95rem;
-    color: #a9e6c3;
-    font-weight: 600;
-  }
-
-  .planLimit {
-    margin: -0.75rem 0 1.5rem;
-    font-size: 0.95rem;
-    color: #f0c98b;
-    font-weight: 600;
-  }
-
-  .planCard ul {
-    margin: 0 0 2rem;
-    padding-left: 1.2rem;
-    display: grid;
-    gap: 0.6rem;
-    color: #cfcfcf;
-  }
-
-  .planBadge {
-    position: absolute;
-    top: 1.5rem;
-    right: 1.5rem;
-    padding: 0.3rem 0.8rem;
-    border-radius: 999px;
-    background: #5163ff;
-    color: #fff;
-    font-size: 0.75rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .planBadge.neutral {
-    background: rgba(255, 255, 255, 0.12);
-    color: #e9e9e9;
-  }
-
-  .planCard.free {
-    border-color: rgba(255, 255, 255, 0.15);
-    background: #181818;
-  }
-
-  .apiSection {
-    background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
-    padding: 4rem 2rem;
-    border-top: 1px solid #333;
-  }
-
-  .apiContainer {
-    max-width: 1200px;
+    gap: 1.5rem;
+    max-width: 1100px;
     margin: 0 auto;
-    text-align: center;
   }
 
-  .apiContainer h1 {
-    font-size: 2.5rem;
-    margin-bottom: 3rem;
-    background: linear-gradient(
-      270deg,
-      #ffffff,
-      #bfbfbf,
-      #a0a0a0,
-      #8a8a8a,
-      #bfbfbf,
-      #ffffff
-    );
-    background-size: 200% auto;
-    background-clip: text;
-    -webkit-background-clip: text;
-    color: transparent;
-    -webkit-text-fill-color: transparent;
-    animation: chromeShine 6s ease-in-out infinite;
+  .freeCard {
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 2.25rem 1.75rem;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .freeCard:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.18);
+    transform: translateY(-3px);
+  }
+
+  .freeCard h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 0.75rem;
+  }
+
+  .freeCard p {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 0;
   }
 
   .apiLogos {
     display: flex;
     justify-content: center;
-    gap: 4rem;
-    margin-bottom: 3rem;
+    gap: 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
     flex-wrap: wrap;
   }
 
   .apiCard {
-    background: rgba(255, 255, 255, 0.05);
-    padding: 2rem;
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.025);
+    padding: 2.25rem 2rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
     transition: all 0.3s ease;
-    width: 280px;
-    backdrop-filter: blur(10px);
+    max-width: 450px;
+    width: 100%;
+    text-align: center;
   }
 
   .apiCard:hover {
-    transform: translateY(-10px);
-    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.18);
+    transform: translateY(-3px);
   }
 
   .apiCard img {
-    width: 80px;
-    height: 80px;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 1rem;
   }
 
   .apiCard h3 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
     color: #ffffff;
   }
 
   .apiCard p {
     font-size: 0.95rem;
-    opacity: 0.7;
+    color: rgba(255, 255, 255, 0.6);
     line-height: 1.6;
+    margin: 0;
   }
 
   .apiDescription {
