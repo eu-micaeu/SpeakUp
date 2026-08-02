@@ -333,11 +333,11 @@
 </script>
 
 <svelte:head>
-    <title>Área de Conversação | SpeakUp</title>
+    <title>SpeakUp</title>
     <meta name="description" content="Pratique conversação com Inteligência Artificial na SpeakUp. Melhore sua pronúncia, vocabulário e entonação de forma dinâmica e interativa." />
-    <meta property="og:title" content="Área de Conversação | SpeakUp" />
+    <meta property="og:title" content="SpeakUp" />
     <meta property="og:description" content="Pratique conversação com Inteligência Artificial na SpeakUp. Melhore sua pronúncia, vocabulário e entonação de forma dinâmica e interativa." />
-    <meta name="twitter:title" content="Área de Conversação | SpeakUp" />
+    <meta name="twitter:title" content="SpeakUp" />
     <meta name="twitter:description" content="Pratique conversação com Inteligência Artificial na SpeakUp. Melhore sua pronúncia, vocabulário e entonação de forma dinâmica e interativa." />
 </svelte:head>
 
