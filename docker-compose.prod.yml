@@ -24,7 +24,7 @@ services:
       DB_NAME: ${DB_NAME:-speakup}
       JWT_KEY: ${JWT_KEY:-change-me-to-a-long-random-secret}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
-      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-1.5-flash}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
       SAMBANOVA_API_KEY: ${SAMBANOVA_API_KEY:-}
       SAMBANOVA_MODEL: ${SAMBANOVA_MODEL:-Meta-Llama-3.3-70B-Instruct}
       OLLAMA_HOST: ${OLLAMA_HOST:-http://host.docker.internal:11434}
