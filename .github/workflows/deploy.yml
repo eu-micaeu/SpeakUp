@@ -37,5 +37,5 @@ jobs:
         run: |
           echo "🚀 Atualizando repositório e reiniciando containers Docker..."
           git pull origin main
-          docker compose up -d --build
+          docker compose -f docker-compose.prod.yml up -d --build
           echo "✅ Deploy concluído com sucesso!"
