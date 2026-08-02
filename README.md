@@ -25,9 +25,7 @@ Além disso, o sistema conta com chat adaptativo baseado nos níveis do quadro e
 *   **Chat Inteligente Adaptativo:** Converse com a IA no idioma de destino. A IA ajusta automaticamente a complexidade e vocabulário ao seu nível de proficiência.
 *   **Nivelamento Automático:** Questionário rápido de nivelamento (A1 a C1) durante o cadastro para definir o ponto de partida do aprendizado.
 *   **Gravação de Voz (Audio Transcription):** Funcionalidade para converter áudio gravado em texto e responder no chat.
-*   **Controle de Uso & Assinaturas (Stripe):**
-    *   **Plano Gratuito:** Limite configurável de requisições de IA diárias (padrão de 10 interações).
-    *   **Plano Pro:** Acesso ilimitado às ferramentas com planos de assinatura mensais e anuais integrados ao Stripe.
+*   **Plataforma 100% Gratuita e Ilimitada:** Acesso total a todas as ferramentas de IA sem limites de requisições diárias ou necessidade de assinatura.
 *   **Documentação Interativa:** API documentada com Swagger disponível localmente.
 
 ---

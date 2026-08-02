@@ -9,85 +9,20 @@ import (
 	"speakup/pkg/config"
 	"speakup/pkg/middlewares"
 	"speakup/pkg/models"
-	"speakup/pkg/planlimits"
 
 	"github.com/gin-gonic/gin"
 )
 
 func GetAIUsage(c *gin.Context) {
-	userID := middlewares.GetUserIDFromContext(c)
-	if userID == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-		return
-	}
-
-	pro, err := planlimits.IsProUser(c, userID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load subscription status"})
-		return
-	}
-
-	limit := planlimits.GetFreeDailyLimit()
-	used := int64(0)
-	remaining := int64(0)
-	if !pro {
-		used, err = planlimits.GetUsageCount(c, userID)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load usage"})
-			return
-		}
-		remaining = limit - used
-		if remaining < 0 {
-			remaining = 0
-		}
-	}
-
 	c.JSON(http.StatusOK, gin.H{
-		"is_pro":      pro,
-		"daily_limit": limit,
-		"used_today":  used,
-		"remaining":   remaining,
+		"is_pro":      true,
+		"daily_limit": -1,
+		"used_today":  0,
+		"remaining":   -1,
 	})
 }
 
-func EnforcePlanLimits(c *gin.Context) bool {
-	userID := middlewares.GetUserIDFromContext(c)
-	if userID == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-		return false
-	}
-
-	pro, err := planlimits.IsProUser(c, userID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load subscription status"})
-		return false
-	}
-
-	if pro {
-		return true
-	}
-
-	limit := planlimits.GetFreeDailyLimit()
-	used, err := planlimits.GetUsageCount(c, userID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to enforce plan limits"})
-		return false
-	}
-	if used >= limit {
-		c.JSON(http.StatusTooManyRequests, gin.H{
-			"error": "Limite diário do plano Free atingido. Faça upgrade para continuar.",
-		})
-		return false
-	}
-
-	return true
-}
-
 func GenerateResponseDialog(c *gin.Context) {
-	if !EnforcePlanLimits(c) {
-		return
-	}
-
 	var request struct {
 		Message string `json:"message"`
 		ChatID  string `json:"chat_id"`
@@ -129,10 +64,6 @@ func GenerateResponseDialog(c *gin.Context) {
 }
 
 func GenerateResponseCorrection(c *gin.Context) {
-	if !EnforcePlanLimits(c) {
-		return
-	}
-
 	var request struct {
 		Message string `json:"message"`
 	}
@@ -160,10 +91,6 @@ func GenerateResponseCorrection(c *gin.Context) {
 }
 
 func GenerateResponseTranslate(c *gin.Context) {
-	if !EnforcePlanLimits(c) {
-		return
-	}
-
 	var req struct {
 		Message string `json:"message" binding:"required"`
 	}
@@ -188,10 +115,6 @@ func GenerateResponseTranslate(c *gin.Context) {
 }
 
 func GenerateResponseTopic(c *gin.Context) {
-	if !EnforcePlanLimits(c) {
-		return
-	}
-
 	var request struct {
 		Message string `json:"message"`
 	}
@@ -215,3 +138,4 @@ func GenerateResponseTopic(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"response": response})
 }
+

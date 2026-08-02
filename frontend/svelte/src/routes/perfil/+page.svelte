@@ -5,8 +5,6 @@
         getUserById,
         deleteUser,
         updateUser,
-        getBillingStatus,
-        createPortalSession,
     } from "../../utils/api";
     import { toast } from "svelte-sonner";
     import Cookies from "js-cookie";
@@ -19,23 +17,11 @@
         level: string;
     }
 
-    interface BillingStatus {
-        stripe_customer_id: string;
-        stripe_subscription_id: string;
-        stripe_price_id: string;
-        stripe_status: string;
-        stripe_current_period_end: number;
-    }
-
     let user: User | null = null;
     let loading = true;
     let editing = false;
     let showDeleteModal = false;
     let deleteConfirmation = "";
-
-    let billingStatus: BillingStatus | null = null;
-    let billingLoading = false;
-    let billingActionLoading = false;
 
     let editForm = {
         name: "",
@@ -44,13 +30,6 @@
     };
 
     let levels: string[] = [];
-
-    const monthly =
-        (import.meta.env.VITE_STRIPE_PRICE_MONTHLY as string | undefined)
-            ?.trim() || "";
-    const annual =
-        (import.meta.env.VITE_STRIPE_PRICE_ANNUAL as string | undefined)
-            ?.trim() || "";
 
     function parseJwt(token: string) {
         try {
@@ -97,23 +76,11 @@
             };
 
             updateLevels(user.language);
-            await loadBillingStatus();
         } catch (error) {
             console.error("Erro ao carregar dados do usuário:", error);
             toast.error("Erro ao carregar perfil");
         } finally {
             loading = false;
-        }
-    }
-
-    async function loadBillingStatus() {
-        try {
-            billingLoading = true;
-            billingStatus = await getBillingStatus();
-        } catch (error) {
-            console.error("Erro ao carregar billing:", error);
-        } finally {
-            billingLoading = false;
         }
     }
 
@@ -162,26 +129,6 @@
         } catch (error) {
             toast.error("Erro ao deletar conta");
         }
-    }
-
-    async function handleManageSubscription() {
-        try {
-            billingActionLoading = true;
-            const { url } = await createPortalSession();
-            if (url) window.location.href = url;
-        } catch (error) {
-            toast.error("Erro ao abrir portal de pagamento");
-        } finally {
-            billingActionLoading = false;
-        }
-    }
-
-    function formatPeriodEnd(timestamp: number) {
-        return new Date(timestamp * 1000).toLocaleDateString("pt-BR");
-    }
-
-    function isActive(status?: string) {
-        return status === "active" || status === "trialing";
     }
 
     onMount(() => {

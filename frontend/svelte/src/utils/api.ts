@@ -360,49 +360,32 @@ export const transcribeAudio = async (audioBlob: Blob): Promise<string> => {
 
 // Billing status
 export const getBillingStatus = async (): Promise<BillingStatus> => {
-    const response = await axios.get<BillingStatus>(API_URL + '/billing/status', {
-        headers: {
-            Authorization: `Bearer ${Cookies.get('authToken')}`
-        }
-    });
-    return response.data;
+    return {
+        stripe_customer_id: 'free_user',
+        stripe_subscription_id: 'free_subscription',
+        stripe_price_id: 'free_price',
+        stripe_status: 'active',
+        stripe_current_period_end: 9999999999
+    };
 }
 
 // Create Stripe checkout session
-export const createCheckoutSession = async (plan: 'monthly' | 'annual'): Promise<{ url: string }> => {
-    try {
-        const response = await axios.post<{ url: string }>(API_URL + '/billing/checkout', {
-            plan
-        }, {
-            headers: {
-                Authorization: `Bearer ${Cookies.get('authToken')}`
-            }
-        });
-        return response.data;
-    }
-    catch (error: unknown) {
-        const axiosError = error as AxiosError<{ error?: string; message?: string }>;
-        const apiMessage = axiosError.response?.data?.error || axiosError.response?.data?.message;
-        throw new Error(apiMessage || 'Erro ao criar sessão de checkout');
-    }
+export const createCheckoutSession = async (_plan: 'monthly' | 'annual'): Promise<{ url: string }> => {
+    throw new Error('O SpeakUp é 100% gratuito!');
 }
 
 // Create Stripe customer portal session
 export const createPortalSession = async (): Promise<{ url: string }> => {
-    const response = await axios.post<{ url: string }>(API_URL + '/billing/portal', {}, {
-        headers: {
-            Authorization: `Bearer ${Cookies.get('authToken')}`
-        }
-    });
-    return response.data;
+    throw new Error('O SpeakUp é 100% gratuito!');
 }
 
 // AI usage status
 export const getAIUsageStatus = async (): Promise<AIUsageStatus> => {
-    const response = await axios.get<AIUsageStatus>(API_URL + '/ai/usage', {
-        headers: {
-            Authorization: `Bearer ${Cookies.get('authToken')}`
-        }
-    });
-    return response.data;
+    return {
+        is_pro: true,
+        daily_limit: -1,
+        used_today: 0,
+        remaining: -1
+    };
 }
+

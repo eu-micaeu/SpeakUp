@@ -2,12 +2,10 @@ package handlers
 
 import (
 	"net/http"
-	"strings"
 	"time"
 
 	"speakup/pkg/middlewares"
 	"speakup/pkg/models"
-	"speakup/pkg/planlimits"
 	"speakup/pkg/repositories"
 	"speakup/pkg/utils"
 
@@ -46,31 +44,10 @@ func (h *MessageHandler) CreateMessage(c *gin.Context) {
 		return
 	}
 
-	if strings.ToLower(message.Sender) == "user" {
-		userID := middlewares.GetUserIDFromContext(c)
-		if userID == "" {
-			utils.RespondWithError(c, http.StatusUnauthorized, "Unauthorized")
-			return
-		}
-
-		pro, err := planlimits.IsProUser(c, userID)
-		if err != nil {
-			utils.RespondWithError(c, http.StatusInternalServerError, "Failed to load subscription status")
-			return
-		}
-
-		if !pro {
-			limit := planlimits.GetFreeDailyLimit()
-			allowed, err := planlimits.CheckAndIncrementUsage(c, userID, limit)
-			if err != nil {
-				utils.RespondWithError(c, http.StatusInternalServerError, "Failed to enforce plan limits")
-				return
-			}
-			if !allowed {
-				utils.RespondWithError(c, http.StatusTooManyRequests, "Limite diário do plano Free atingido. Faça upgrade para continuar.")
-				return
-			}
-		}
+	userID := middlewares.GetUserIDFromContext(c)
+	if userID == "" {
+		utils.RespondWithError(c, http.StatusUnauthorized, "Unauthorized")
+		return
 	}
 
 	message.ID = uuid.New().String()
