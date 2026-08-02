@@ -28,9 +28,9 @@ jobs:
 
       - name: Ensure environment file exists
         run: |
-          if [ ! -f ./backend/go/.env ]; then
-            echo "⚠️  backend/go/.env não encontrado no runner. Copiando de .env.example..."
-            cp ./backend/go/.env.example ./backend/go/.env
+          if [ ! -f ./.env ]; then
+            echo "⚠️  .env não encontrado no runner. Copiando de .env.example..."
+            cp ./.env.example ./.env
           fi
 
       - name: Deploy Docker containers
