@@ -16,6 +16,7 @@ RUN apk add --no-cache ca-certificates
 WORKDIR /app
 
 COPY --from=build /out/speakup-backend ./speakup-backend
+COPY --from=build /src/pkg/prompts ./pkg/prompts
 
 EXPOSE 8082
 

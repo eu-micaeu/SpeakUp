@@ -3,13 +3,12 @@ package ai
 import (
 	"context"
 	"fmt"
-	"os"
-	"path/filepath"
 	"strings"
 	"unicode/utf8"
 
 	"speakup/pkg/adapters/connectors"
 	"speakup/pkg/models"
+	"speakup/pkg/prompts"
 )
 
 var aiConnectorBuilder func(ctx context.Context) connectors.AIConnector = func(ctx context.Context) connectors.AIConnector {
@@ -23,12 +22,10 @@ func GetDialogResponse(ctx context.Context, message string, messages []models.Me
 	if level == "" {
 		level = "B1"
 	}
-	promptPath := filepath.Join("pkg/prompts", "promptDialog.txt")
-	promptBytes, err := os.ReadFile(promptPath)
+	prePrompt, err := prompts.GetPrompt("promptDialog.txt")
 	if err != nil {
 		return "", fmt.Errorf("failed to load prompt: %w", err)
 	}
-	prePrompt := string(promptBytes)
 
 	var chatHistory strings.Builder
 	for _, msg := range messages {
@@ -54,12 +51,10 @@ func GetDialogResponse(ctx context.Context, message string, messages []models.Me
 }
 
 func GetCorrectionResponse(ctx context.Context, message string) (string, string, error) {
-	promptPath := filepath.Join("pkg/prompts", "promptCorrection.txt")
-	promptBytes, err := os.ReadFile(promptPath)
+	prompt, err := prompts.GetPrompt("promptCorrection.txt")
 	if err != nil {
 		return "", "", fmt.Errorf("failed to load prompt: %w", err)
 	}
-	prompt := string(promptBytes)
 
 	connector := aiConnectorBuilder(ctx)
 	fullPrompt := fmt.Sprintf("%s\n\nINPUT:\n%s\n\nOUTPUT:", prompt, message)
@@ -98,12 +93,10 @@ func GetCorrectionResponse(ctx context.Context, message string) (string, string,
 }
 
 func GetTranslationResponse(ctx context.Context, message string) (string, error) {
-	promptPath := filepath.Join("pkg/prompts", "promptTranslate.txt")
-	promptBytes, err := os.ReadFile(promptPath)
+	prompt, err := prompts.GetPrompt("promptTranslate.txt")
 	if err != nil {
 		return "", fmt.Errorf("failed to load prompt: %w", err)
 	}
-	prompt := string(promptBytes)
 
 	connector := aiConnectorBuilder(ctx)
 	fullPrompt := fmt.Sprintf("%s\n\nINPUT:\n%s\n\nOUTPUT:", prompt, message)
@@ -139,12 +132,10 @@ func GetTranslationResponse(ctx context.Context, message string) (string, error)
 }
 
 func GetTopicResponse(ctx context.Context, message string) (string, error) {
-	promptPath := filepath.Join("pkg/prompts", "promptTopic.txt")
-	promptBytes, err := os.ReadFile(promptPath)
+	prompt, err := prompts.GetPrompt("promptTopic.txt")
 	if err != nil {
 		return "", fmt.Errorf("failed to load prompt: %w", err)
 	}
-	prompt := string(promptBytes)
 
 	connector := aiConnectorBuilder(ctx)
 	strictPrompt := fmt.Sprintf("%s\n\nInput: %s\nOutput:", prompt, message)
