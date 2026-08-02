@@ -300,7 +300,7 @@
       >Vamos começar!</button
     >
     <button on:click={() => openAuthModal("login")} class="ctaSecondary">
-      Já possui uma conta? Faça o login aqui!
+      Já possui uma conta? Aperte aqui!
     </button>
   </section>
   <section class="featureSection">
