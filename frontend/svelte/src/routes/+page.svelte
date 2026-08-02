@@ -294,7 +294,7 @@
     <img src="logo.png" alt="Logo" width={60} />
     <h1 class="heroTitle">SpeakUp</h1>
     <p class="heroSubtitle">
-      Aprenda qualquer idioma conversando com uma inteligência artificial!
+      Aprenda qualquer idioma conversando com uma inteligência artificial.
     </p>
     <button on:click={() => openAuthModal("register")} class="cta"
       >Vamos começar!</button
