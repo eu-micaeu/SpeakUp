@@ -10,6 +10,29 @@ services:
     networks:
       - speakup_prod_network
 
+  ollama:
+    build:
+      context: ./ollama
+      dockerfile: Dockerfile
+    container_name: speakup_ollama_prod
+    ports:
+      - "11434:11434"
+    environment:
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2:latest}
+    volumes:
+      - ollama_data_prod:/root/.ollama
+    restart: unless-stopped
+    networks:
+      - speakup_prod_network
+    # Uncomment for NVIDIA GPU acceleration:
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
   backend:
     build:
       context: ./backend/go
@@ -23,11 +46,12 @@ services:
       MONGO_CONNECTION_STRING: ${MONGO_CONNECTION_STRING:-mongodb://mongodb_prod:27017/speakup}
       DB_NAME: ${DB_NAME:-speakup}
       JWT_KEY: ${JWT_KEY:-change-me-to-a-long-random-secret}
+      AI_PROVIDER: ${AI_PROVIDER:-ollama}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
       SAMBANOVA_API_KEY: ${SAMBANOVA_API_KEY:-}
       SAMBANOVA_MODEL: ${SAMBANOVA_MODEL:-Meta-Llama-3.3-70B-Instruct}
-      OLLAMA_HOST: ${OLLAMA_HOST:-http://host.docker.internal:11434}
+      OLLAMA_HOST: ${OLLAMA_HOST:-http://ollama:11434}
       OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2:latest}
       SMTP_HOST: ${SMTP_HOST:-}
       SMTP_PORT: ${SMTP_PORT:-587}
@@ -36,7 +60,10 @@ services:
       SMTP_FROM: ${SMTP_FROM:-}
     depends_on:
       - mongodb_prod
+      - ollama
     restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - speakup_prod_network
 
@@ -68,6 +95,7 @@ services:
 
 volumes:
   mongodb_data_prod:
+  ollama_data_prod:
 
 networks:
   speakup_prod_network:

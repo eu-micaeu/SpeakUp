@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
 
 	"speakup/pkg/adapters/ai"
 	"speakup/pkg/config"
@@ -51,7 +52,10 @@ func GenerateResponseDialog(c *gin.Context) {
 	level := middlewares.GetLevelFromContext(c)
 	aiProvider := c.GetHeader("X-AI-Provider")
 	if aiProvider == "" {
-		aiProvider = "gemini"
+		aiProvider = os.Getenv("AI_PROVIDER")
+	}
+	if aiProvider == "" {
+		aiProvider = "ollama"
 	}
 	ctx := context.WithValue(c.Request.Context(), "aiProvider", aiProvider)
 	response, err := ai.GetDialogResponse(ctx, request.Message, messages, language, level)
@@ -75,7 +79,10 @@ func GenerateResponseCorrection(c *gin.Context) {
 
 	aiProvider := c.GetHeader("X-AI-Provider")
 	if aiProvider == "" {
-		aiProvider = "gemini"
+		aiProvider = os.Getenv("AI_PROVIDER")
+	}
+	if aiProvider == "" {
+		aiProvider = "ollama"
 	}
 	ctx := context.WithValue(c.Request.Context(), "aiProvider", aiProvider)
 	response, explanation, err := ai.GetCorrectionResponse(ctx, request.Message)
@@ -102,7 +109,10 @@ func GenerateResponseTranslate(c *gin.Context) {
 
 	aiProvider := c.GetHeader("X-AI-Provider")
 	if aiProvider == "" {
-		aiProvider = "gemini"
+		aiProvider = os.Getenv("AI_PROVIDER")
+	}
+	if aiProvider == "" {
+		aiProvider = "ollama"
 	}
 	ctx := context.WithValue(c.Request.Context(), "aiProvider", aiProvider)
 	response, err := ai.GetTranslationResponse(ctx, req.Message)
@@ -126,7 +136,10 @@ func GenerateResponseTopic(c *gin.Context) {
 
 	aiProvider := c.GetHeader("X-AI-Provider")
 	if aiProvider == "" {
-		aiProvider = "gemini"
+		aiProvider = os.Getenv("AI_PROVIDER")
+	}
+	if aiProvider == "" {
+		aiProvider = "ollama"
 	}
 	ctx := context.WithValue(c.Request.Context(), "aiProvider", aiProvider)
 	response, err := ai.GetTopicResponse(ctx, request.Message)

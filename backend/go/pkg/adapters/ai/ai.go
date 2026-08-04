@@ -3,6 +3,7 @@ package ai
 import (
 	"context"
 	"fmt"
+	"os"
 	"strings"
 	"unicode/utf8"
 
@@ -11,8 +12,28 @@ import (
 	"speakup/pkg/prompts"
 )
 
-var aiConnectorBuilder func(ctx context.Context) connectors.AIConnector = func(ctx context.Context) connectors.AIConnector {
-	return connectors.NewGeminiConnector()
+func getConnector(ctx context.Context) connectors.AIConnector {
+	var provider string
+	if ctx != nil {
+		if val, ok := ctx.Value("aiProvider").(string); ok && val != "" {
+			provider = val
+		}
+	}
+	if provider == "" {
+		provider = os.Getenv("AI_PROVIDER")
+	}
+
+	switch strings.ToLower(strings.TrimSpace(provider)) {
+	case "ollama":
+		return connectors.NewOllamaConnector()
+	case "gemini":
+		return connectors.NewGeminiConnector()
+	default:
+		if os.Getenv("GEMINI_API_KEY") != "" && strings.EqualFold(os.Getenv("AI_PROVIDER"), "gemini") {
+			return connectors.NewGeminiConnector()
+		}
+		return connectors.NewOllamaConnector()
+	}
 }
 
 const maxDialogResponseChars = 128
@@ -32,7 +53,7 @@ func GetDialogResponse(ctx context.Context, message string, messages []models.Me
 		chatHistory.WriteString(fmt.Sprintf("%s: %s\n", msg.Sender, msg.Content))
 	}
 
-	connector := aiConnectorBuilder(ctx)
+	connector := getConnector(ctx)
 
 	resumeHist, err := connector.GenerateResponse(ctx, "Format the following chat history to only show user reponse and AI response: "+chatHistory.String())
 	if err != nil {
@@ -56,7 +77,7 @@ func GetCorrectionResponse(ctx context.Context, message string) (string, string,
 		return "", "", fmt.Errorf("failed to load prompt: %w", err)
 	}
 
-	connector := aiConnectorBuilder(ctx)
+	connector := getConnector(ctx)
 	fullPrompt := fmt.Sprintf("%s\n\nINPUT:\n%s\n\nOUTPUT:", prompt, message)
 
 	var correctionResp string
@@ -98,7 +119,7 @@ func GetTranslationResponse(ctx context.Context, message string) (string, error)
 		return "", fmt.Errorf("failed to load prompt: %w", err)
 	}
 
-	connector := aiConnectorBuilder(ctx)
+	connector := getConnector(ctx)
 	fullPrompt := fmt.Sprintf("%s\n\nINPUT:\n%s\n\nOUTPUT:", prompt, message)
 
 	var response string
@@ -137,7 +158,7 @@ func GetTopicResponse(ctx context.Context, message string) (string, error) {
 		return "", fmt.Errorf("failed to load prompt: %w", err)
 	}
 
-	connector := aiConnectorBuilder(ctx)
+	connector := getConnector(ctx)
 	strictPrompt := fmt.Sprintf("%s\n\nInput: %s\nOutput:", prompt, message)
 
 	var topicResp string

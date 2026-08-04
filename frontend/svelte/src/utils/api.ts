@@ -156,6 +156,16 @@ export const addMessageToChat = async (chat_id: string, content: string, sender:
     return response.data;
 }
 
+const getAIProvider = (): string => {
+    if (typeof window === 'undefined') return 'ollama';
+    const stored = localStorage.getItem('aiProvider');
+    if (!stored || stored === 'gemini') {
+        localStorage.setItem('aiProvider', 'ollama');
+        return 'ollama';
+    }
+    return stored;
+};
+
 // generate AI response dialog
 export const generateAIResponseDialog = async (message: string, chatId: string): Promise<AIResponse | undefined> => {
     try {
@@ -165,7 +175,7 @@ export const generateAIResponseDialog = async (message: string, chatId: string):
         }, {
             headers: {
                 Authorization: `Bearer ${Cookies.get('authToken')}`,
-                'X-AI-Provider': typeof window !== 'undefined' ? (localStorage.getItem('aiProvider') || 'gemini') : 'gemini'
+                'X-AI-Provider': getAIProvider()
             }
         });
 
@@ -185,7 +195,7 @@ export const generateAIResponseCorrection = async (message: string): Promise<AIR
         }, {
             headers: {
                 Authorization: `Bearer ${Cookies.get('authToken')}`,
-                'X-AI-Provider': typeof window !== 'undefined' ? (localStorage.getItem('aiProvider') || 'gemini') : 'gemini'
+                'X-AI-Provider': getAIProvider()
             }
         });
 
@@ -205,7 +215,7 @@ export const generateAIResponseTranslation = async (message: string): Promise<AI
         }, {
             headers: {
                 Authorization: `Bearer ${Cookies.get('authToken')}`,
-                'X-AI-Provider': typeof window !== 'undefined' ? (localStorage.getItem('aiProvider') || 'gemini') : 'gemini'
+                'X-AI-Provider': getAIProvider()
             }
         });
 
@@ -225,7 +235,7 @@ export const generateAIResponseTopic = async (message: string): Promise<AIRespon
         }, {
             headers: {
                 Authorization: `Bearer ${Cookies.get('authToken')}`,
-                'X-AI-Provider': typeof window !== 'undefined' ? (localStorage.getItem('aiProvider') || 'gemini') : 'gemini'
+                'X-AI-Provider': getAIProvider()
             }
         });
 
