@@ -337,17 +337,17 @@
   <!-- Seção 3: Inteligência Artificial -->
   <section class="apiSection">
     <div class="sectionHeader">
-      <h1>Potencializado por IA</h1>
+      <h1>Potencializado por Inteligência Artificial</h1>
       <p class="sectionSubtitle">
-        Utilizamos os modelos em nuvem do Google Gemini para respostas rápidas, correções instantâneas e aprendizado adaptativo.
+        Utilizamos modelos locais e open-source do Ollama para respostas rápidas, privacidade total, correções instantâneas e aprendizado adaptativo.
       </p>
     </div>
     <div class="apiLogos">
       <div class="apiCard">
-        <img src="./gemini-logo.png" alt="Gemini Logo" />
-        <h3>Gemini API</h3>
+        <img src="/Ollama Logo - White - zonalogo.com.svg" alt="Ollama Logo" />
+        <h3>Ollama</h3>
         <p>
-          Modelos de IA de última geração para análise gramatical profunda, traduções em tempo real e conversa fluida.
+          Modelos de linguagem open-source rodando localmente para análise gramatical precisa, conversação fluida e privacidade completa dos seus dados.
         </p>
       </div>
     </div>
