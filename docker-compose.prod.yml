@@ -72,13 +72,13 @@ services:
       context: ./frontend/svelte
       dockerfile: Dockerfile
       args:
-        VITE_API_URL: ${VITE_API_URL:-http://localhost:8082/api}
+        VITE_API_URL: ${VITE_API_URL:-https://api.speak-up.xyz/api}
     container_name: speakup_frontend_prod
     ports:
       - "5175:5175"
     environment:
       NODE_ENV: production
-      VITE_API_URL: ${VITE_API_URL:-http://localhost:8082/api}
+      VITE_API_URL: ${VITE_API_URL:-https://api.speak-up.xyz/api}
       PUBLIC_FIREBASE_API_KEY: ${PUBLIC_FIREBASE_API_KEY:-}
       PUBLIC_FIREBASE_AUTH_DOMAIN: ${PUBLIC_FIREBASE_AUTH_DOMAIN:-}
       PUBLIC_FIREBASE_PROJECT_ID: ${PUBLIC_FIREBASE_PROJECT_ID:-}
