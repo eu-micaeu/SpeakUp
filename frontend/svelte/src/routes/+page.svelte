@@ -23,6 +23,14 @@
       content:
         "Fornece correções com explicações para melhor compreensão das regras linguísticas.",
     },
+    {
+      svg: `<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18M8 15h3" stroke-linecap="round"/></svg>`,
+      alt: "Ícone representando Flashcards e Memória",
+      title:
+        "Sistema de Flashcards com Repetição Espaçada (SuperMemo-2).",
+      content:
+        "Memorize vocabulário e expressões salvas do chat com áudio em tempo real e revisões diárias otimizadas para retenção de longo prazo.",
+    },
   ];
 
   // Auth modal state

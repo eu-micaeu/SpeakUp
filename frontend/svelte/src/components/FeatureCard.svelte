@@ -1,14 +1,19 @@
 <script>
-  export let imgSrc,
-    alt,
-    title,
-    content,
+  export let imgSrc = "",
+    svg = "",
+    alt = "",
+    title = "",
+    content = "",
     index = 0;
 </script>
 
 <div class="feature" style="animation-delay: {index * 0.2}s">
   <div class="iconWrapper">
-    <img src={imgSrc} {alt} />
+    {#if svg}
+      {@html svg}
+    {:else}
+      <img src={imgSrc} {alt} />
+    {/if}
     <div class="iconGlow"></div>
   </div>
   <div class="content">
