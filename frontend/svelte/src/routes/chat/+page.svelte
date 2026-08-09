@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onMount, tick } from "svelte";
     import { browser } from "$app/environment";
+    import { goto } from "$app/navigation";
     import Sidebar from "../../components/Sidebar.svelte";
     import AudioRecorder from "../../components/AudioRecorder.svelte";
     import {
@@ -14,6 +15,11 @@
         generateAIResponseTopic,
     } from "../../utils/api";
     import Cookies from "js-cookie";
+
+    function handleLogout() {
+        Cookies.remove("authToken");
+        goto("/");
+    }
 
     interface Chat {
         id: string;
@@ -258,6 +264,79 @@
             topic: chat.title || chat.topic || "Untitled Chat",
         }));
     let playingMsgId: string | null = null;
+    let toastMessage = "";
+
+    async function quickAddFlashcard(term: string, context: string) {
+        if (!term) return;
+        toastMessage = "🤖 Gerando Flashcard com IA...";
+        try {
+            const resGen = await fetch("http://localhost:8082/api/flashcards/generate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ term, context_sentence: context })
+            });
+            const genData = resGen.ok ? await resGen.json() : { back: term, explanation: "" };
+
+            const resSave = await fetch("http://localhost:8082/api/flashcards", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-User-ID": "default_user"
+                },
+                body: JSON.stringify({
+                    front: term,
+                    back: genData.back || term,
+                    context_sentence: context || genData.context_sentence,
+                    explanation: genData.explanation || ""
+                })
+            });
+
+            if (resSave.ok) {
+                toastMessage = "🎴 Flashcard adicionado com sucesso!";
+                setTimeout(() => { toastMessage = ""; }, 3000);
+            } else if (resSave.status === 409) {
+                toastMessage = `⚠️ O flashcard para "${term.trim()}" já existe!`;
+                setTimeout(() => { toastMessage = ""; }, 4000);
+            } else {
+                toastMessage = "Erro ao adicionar flashcard";
+                setTimeout(() => { toastMessage = ""; }, 3000);
+            }
+        } catch (e) {
+            console.error("Erro ao adicionar flashcard:", e);
+            toastMessage = "Erro ao adicionar flashcard";
+            setTimeout(() => { toastMessage = ""; }, 3000);
+        }
+    }
+
+    let selectedText = "";
+    let selectionCoords = { x: 0, y: 0 };
+    let showSelectionMenu = false;
+
+    function handleTextSelection() {
+        if (typeof window === "undefined") return;
+        const selection = window.getSelection();
+        if (!selection || selection.isCollapsed) {
+            showSelectionMenu = false;
+            return;
+        }
+        const text = selection.toString().trim();
+        if (text.length > 0 && text.length < 60) {
+            selectedText = text;
+            try {
+                const range = selection.getRangeAt(0);
+                const rect = range.getBoundingClientRect();
+                selectionCoords = {
+                    x: rect.left + rect.width / 2,
+                    y: rect.top - 40
+                };
+                showSelectionMenu = true;
+            } catch (e) {
+                showSelectionMenu = false;
+            }
+        } else {
+            showSelectionMenu = false;
+        }
+    }
 
     function getPracticingLanguage(): string {
         try {
@@ -341,25 +420,77 @@
     <meta name="twitter:description" content="Pratique conversação com Inteligência Artificial na SpeakUp. Melhore sua pronúncia, vocabulário e entonação de forma dinâmica e interativa." />
 </svelte:head>
 
-<div class="Chat">
-    <Sidebar
-        chats={sidebarChats}
-        on:selectChat={handleChatSelect}
-        on:chatDeleted={handleChatDeleted}
-        bind:sidebarOpen
-        selectedChat={selectedChat ? { id: selectedChat.id } : null}
-        on:newChat={() => {
-            currentChatId = null;
-            messages = [];
-            inputMessage = "";
-            selectedChat = null;
-            sidebarOpen = false;
-        }}
-    />
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<div class="Chat" on:mouseup={handleTextSelection}>
+    <!-- Top Navbar Padronizado ocupando 100% da largura da página -->
+    <nav class="top-nav">
+        <div class="nav-brand" on:click={() => goto("/dashboard")} role="button" tabindex="0">
+            <img src="/logo.png" alt="SpeakUp Logo" width="32" />
+            <span class="brand-name">SpeakUp</span>
+        </div>
 
-    <main class="main" class:sidebarClosed={!sidebarOpen}>
+        <div class="nav-user">
+            <button class="nav-btn" on:click={() => goto("/dashboard")}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke-linecap="round" stroke-linejoin="round"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+                <span>Hub</span>
+            </button>
 
-        <div class="chatBody" bind:this={chatBodyRef}>
+            <button class="nav-btn" on:click={() => goto("/perfil")}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="8" r="4"/>
+                    <path d="M5 20c0-4 3-7 7-7s7 3 7 7"/>
+                </svg>
+                <span>Perfil</span>
+            </button>
+
+            <button class="nav-btn btn-logout" on:click={handleLogout}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <path d="M16 17l5-5-5-5M21 12H9"/>
+                </svg>
+                <span>Sair</span>
+            </button>
+        </div>
+    </nav>
+
+    {#if showSelectionMenu}
+        <div
+            class="selectionPopover"
+            style="top: {selectionCoords.y}px; left: {selectionCoords.x}px;"
+        >
+            <button
+                type="button"
+                on:click={() => {
+                    quickAddFlashcard(selectedText, "");
+                    showSelectionMenu = false;
+                }}
+            >
+                🎴 Salvar "{selectedText}" em Flashcards
+            </button>
+        </div>
+    {/if}
+
+    <div class="chatContent">
+        <Sidebar
+            chats={sidebarChats}
+            on:selectChat={handleChatSelect}
+            on:chatDeleted={handleChatDeleted}
+            bind:sidebarOpen
+            selectedChat={selectedChat ? { id: selectedChat.id } : null}
+            on:newChat={() => {
+                currentChatId = null;
+                messages = [];
+                inputMessage = "";
+                selectedChat = null;
+                sidebarOpen = false;
+            }}
+        />
+
+        <main class="main" class:sidebarClosed={!sidebarOpen}>
+            <div class="chatBody" bind:this={chatBodyRef}>
             {#if messages.length === 0}
                 <div class="welcomeBox">
                     <div class="welcomeContent">
@@ -476,6 +607,14 @@
                                             </svg>
                                         {/if}
                                     </button>
+                                    <button
+                                        class="flashcardAddBtn"
+                                        on:click={() => quickAddFlashcard(msg.text.split("\n\n")[1]?.replace("Correção: ", "") || "", msg.text.split("\n\n")[0])}
+                                        title="Salvar nos Flashcards"
+                                        type="button"
+                                    >
+                                        🎴 +Flashcard
+                                    </button>
                                 </p>
 
                             </div>
@@ -530,6 +669,12 @@
                 <span
                     >Transcrição indisponível. Digite sua mensagem abaixo.</span
                 >
+            </div>
+        {/if}
+
+        {#if toastMessage}
+            <div class="transcriptionNotice">
+                <span>{toastMessage}</span>
             </div>
         {/if}
 
@@ -602,14 +747,23 @@
             </div>
         </footer>
     </main>
+    </div>
 </div>
 
 <style>
     .Chat {
         display: flex;
+        flex-direction: column;
         height: 100vh;
         background-color: #111;
         color: #f0f0f0;
+        overflow: hidden;
+    }
+
+    .chatContent {
+        display: flex;
+        flex: 1;
+        position: relative;
         overflow: hidden;
     }
 
@@ -620,10 +774,70 @@
         background-color: #111;
         margin-left: 360px;
         transition: margin-left 0.3s ease;
+        height: 100%;
     }
 
     .main.sidebarClosed {
         margin-left: 60px;
+    }
+
+    /* Top Navigation Header */
+    .top-nav {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem 2.5rem;
+        background-color: #0f0f0f;
+        border-bottom: 1px solid #1a1a1a;
+        z-index: 101;
+        box-sizing: border-box;
+    }
+
+    .nav-brand {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        cursor: pointer;
+    }
+
+    .brand-name {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #ffffff;
+        letter-spacing: -0.01em;
+    }
+
+    .nav-user {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .nav-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: transparent;
+        border: 1px solid #262626;
+        color: #cccccc;
+        padding: 0.5rem 0.9rem;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .nav-btn:hover {
+        background-color: #1a1a1a;
+        color: #ffffff;
+        border-color: #444444;
+    }
+
+    .btn-logout:hover {
+        border-color: rgba(239, 68, 68, 0.4);
+        color: #ef4444;
     }
 
     .chatBody {
@@ -1058,4 +1272,49 @@
         }
     }
 
+    .flashcardAddBtn {
+        background: rgba(168, 85, 247, 0.2);
+        color: #c084fc;
+        border: 1px solid rgba(168, 85, 247, 0.4);
+        border-radius: 6px;
+        padding: 2px 8px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        cursor: pointer;
+        margin-left: 8px;
+        transition: all 0.2s;
+    }
+
+    .flashcardAddBtn:hover {
+        background: rgba(168, 85, 247, 0.4);
+        color: white;
+    }
+
+    .selectionPopover {
+        position: fixed;
+        transform: translateX(-50%);
+        background: linear-gradient(135deg, #1e1e2e, #2d1b4e);
+        border: 1px solid rgba(168, 85, 247, 0.6);
+        border-radius: 8px;
+        padding: 4px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+        z-index: 9999;
+        animation: fadeIn 0.15s ease-out;
+    }
+
+    .selectionPopover button {
+        background: #8b5cf6;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .selectionPopover button:hover {
+        background: #7c3aed;
+    }
 </style>

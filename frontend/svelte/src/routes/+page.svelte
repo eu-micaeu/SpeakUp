@@ -186,7 +186,7 @@
         showToast("Login realizado com sucesso!", "success");
         closeAuthModal();
         setTimeout(() => {
-          goto("/chat");
+          goto("/dashboard");
         }, 1500);
       } else {
         error = "Email ou senha inválidos";
@@ -252,7 +252,7 @@
 
   onMount(() => {
     if (isAuthTokenValid()) {
-      goto("/chat");
+      goto("/dashboard");
       return;
     }
   });
@@ -320,7 +320,7 @@
 
     <div class="freeGrid">
       <div class="freeCard">
-        <h3>Sem Assinaturas</h3>
+        <h3>100% Gratuito</h3>
         <p>Acesso livre a todas as ferramentas sem mensalidades ou taxas ocultas.</p>
       </div>
       <div class="freeCard">

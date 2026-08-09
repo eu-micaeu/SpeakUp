@@ -2,9 +2,11 @@ package ai
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
+	"unicode"
 	"unicode/utf8"
 
 	"speakup/pkg/adapters/connectors"
@@ -321,3 +323,87 @@ func parseCorrectionResponse(raw string) (string, string) {
 
 	return correctedText, explanationText
 }
+
+type GeneratedFlashcardData struct {
+	Back            string `json:"back"`
+	ContextSentence string `json:"context_sentence"`
+	Explanation     string `json:"explanation"`
+}
+
+func GetFlashcardGenerateResponse(ctx context.Context, term string, contextSentence string) (GeneratedFlashcardData, error) {
+	var result GeneratedFlashcardData
+
+	prompt, err := prompts.GetPrompt("promptFlashcard.txt")
+	if err != nil {
+		return result, fmt.Errorf("failed to load prompt: %w", err)
+	}
+
+	connector := getConnector(ctx)
+	fullPrompt := fmt.Sprintf("%s\n\nWORD/PHRASE:\n%s\n\nCONTEXT SENTENCE:\n%s\n\nOUTPUT (JSON ONLY):", prompt, term, contextSentence)
+
+	var resp string
+	if optConnector, ok := connector.(connectors.OptionableConnector); ok {
+		systemPrompt := "You are a strict language flashcard generator. Output raw JSON only."
+		options := map[string]any{
+			"temperature": 0.2,
+			"top_p":       0.9,
+			"num_predict": 256,
+		}
+		resp, err = optConnector.GenerateResponseWithOptions(ctx, fullPrompt, systemPrompt, options)
+	} else {
+		resp, err = connector.GenerateResponse(ctx, fullPrompt)
+	}
+
+	if err != nil {
+		return result, err
+	}
+
+	cleaned := strings.TrimSpace(resp)
+	cleaned = strings.TrimPrefix(cleaned, "```json")
+	cleaned = strings.TrimPrefix(cleaned, "```")
+	cleaned = strings.TrimSuffix(cleaned, "```")
+	cleaned = strings.TrimSpace(cleaned)
+
+	if err := json.Unmarshal([]byte(cleaned), &result); err != nil {
+		// Fallback if parsing fails
+		result.Back = term
+		result.ContextSentence = contextSentence
+		result.Explanation = "Tradução/Explicação automática."
+	}
+
+	result.Back = FormatSingleWordTranslation(result.Back)
+
+	return result, nil
+}
+
+func FormatSingleWordTranslation(s string) string {
+	s = strings.TrimSpace(s)
+	s = strings.Trim(s, " \t\n\r\"'.,;:!?()-")
+	if s == "" {
+		return ""
+	}
+	fields := strings.FieldsFunc(s, func(r rune) bool {
+		return r == ' ' || r == '/' || r == ',' || r == ';'
+	})
+	if len(fields) == 0 {
+		return ""
+	}
+
+	targetWord := fields[0]
+	// Skip common articles/particles if there is a second word
+	lowerFirst := strings.ToLower(strings.Trim(fields[0], " \t\n\r\"'.,;:!?()-"))
+	if len(fields) > 1 && (lowerFirst == "a" || lowerFirst == "o" || lowerFirst == "um" || lowerFirst == "uma" || lowerFirst == "to") {
+		targetWord = fields[1]
+	}
+
+	word := strings.TrimSpace(targetWord)
+	word = strings.Trim(word, " \t\n\r\"'.,;:!?()-")
+	if word == "" {
+		return ""
+	}
+
+	runes := []rune(strings.ToLower(word))
+	runes[0] = unicode.ToUpper(runes[0])
+	return string(runes)
+}
+

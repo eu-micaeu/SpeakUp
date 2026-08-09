@@ -131,6 +131,11 @@
         }
     }
 
+    function handleLogout() {
+        Cookies.remove("authToken");
+        goto("/");
+    }
+
     onMount(() => {
         loadUserData();
     });
@@ -145,13 +150,42 @@
     <meta name="twitter:description" content="Gerencie suas configurações de perfil, preferências de idioma, nível de aprendizado e assinatura na SpeakUp." />
 </svelte:head>
 
-<div class="profile-page">
-    <div class="header-nav">
-        <a href="/chat" class="back-link">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-            Voltar para o Chat
-        </a>
-    </div>
+<div class="profile-wrapper">
+    <!-- Minimalist Top Navbar -->
+    <nav class="top-nav">
+        <div class="nav-brand" on:click={() => goto("/dashboard")} role="button" tabindex="0">
+            <img src="/logo.png" alt="SpeakUp Logo" width="32" />
+            <span class="brand-name">SpeakUp</span>
+        </div>
+
+        <div class="nav-user">
+            <button class="nav-btn" on:click={() => goto("/dashboard")}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke-linecap="round" stroke-linejoin="round"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+                <span>Hub</span>
+            </button>
+
+            <button class="nav-btn" on:click={() => goto("/perfil")}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="8" r="4"/>
+                    <path d="M5 20c0-4 3-7 7-7s7 3 7 7"/>
+                </svg>
+                <span>Perfil</span>
+            </button>
+
+            <button class="nav-btn btn-logout" on:click={handleLogout}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <path d="M16 17l5-5-5-5M21 12H9"/>
+                </svg>
+                <span>Sair</span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="profile-page">
 
     {#if loading}
         <div class="loading-state">
@@ -223,43 +257,8 @@
                 {/if}
             </section>
 
-            <!-- Coluna da Direita: Assinatura e Conta -->
+            <!-- Coluna da Direita: Conta -->
             <div class="secondary-columns">
-                <section class="profile-section subscription">
-                    <div class="section-header">
-                        <h3>Plano & Assinatura</h3>
-                        <span class="status-pill active">Gratuito</span>
-                    </div>
-
-                    <div class="sub-details">
-                        <div class="sub-row">
-                            <span class="label">Status</span>
-                            <span class="value active">Acesso Ilimitado</span>
-                        </div>
-                        <p class="promo-text" style="margin-top: 1rem;">O SpeakUp Pro agora é gratuito para todos os usuários!</p>
-
-                        <!-- Lógica do Stripe comentada para uso futuro
-                        {#if billingLoading}
-                            <p class="loading-text">Carregando detalhes...</p>
-                        {:else if billingStatus && isActive(billingStatus.stripe_status)}
-                            <div class="sub-row">
-                                <span class="label">Status</span>
-                                <span class="value active">Ativa</span>
-                            </div>
-                            <div class="sub-row">
-                                <span class="label">Próxima renovação</span>
-                                <span class="value">{formatPeriodEnd(billingStatus.stripe_current_period_end)}</span>
-                            </div>
-                            <button class="manage-btn" on:click={handleManageSubscription} disabled={billingActionLoading}>
-                                Gerenciar na Stripe
-                            </button>
-                        {:else}
-                            <p class="promo-text">Você está usando a versão gratuita com limites diários.</p>
-                            <a href="/planos" class="upgrade-btn">Fazer Upgrade</a>
-                        {/if}
-                        -->
-                    </div>
-                </section>
 
                 <section class="profile-section danger-zone">
                     <h3>Zona de Perigo</h3>
@@ -271,6 +270,7 @@
             </div>
         </div>
     {/if}
+    </div>
 </div>
 
 {#if showDeleteModal}
@@ -294,29 +294,80 @@
         font-family: 'Inter', system-ui, sans-serif;
     }
 
-    .profile-page {
+    .profile-wrapper {
         min-height: 100vh;
+        background-color: #0a0a0a;
         color: #e9e9e9;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .profile-page {
+        flex: 1;
         padding: 2rem;
         max-width: 1100px;
+        width: 100%;
         margin: 0 auto;
+        box-sizing: border-box;
     }
 
-    .header-nav {
-        margin-bottom: 2rem;
+    /* Top Navbar */
+    .top-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem 2.5rem;
+        border-bottom: 1px solid #1a1a1a;
+        background-color: #0f0f0f;
+        box-sizing: border-box;
+        width: 100%;
     }
 
-    .back-link {
+    .nav-brand {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
-        color: #888;
-        text-decoration: none;
-        font-size: 0.9rem;
-        transition: color 0.2s;
+        gap: 0.75rem;
+        cursor: pointer;
     }
 
-    .back-link:hover { color: #fff; }
+    .brand-name {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #ffffff;
+        letter-spacing: -0.01em;
+    }
+
+    .nav-user {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .nav-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: transparent;
+        border: 1px solid #262626;
+        color: #cccccc;
+        padding: 0.5rem 0.9rem;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .nav-btn:hover {
+        background-color: #1a1a1a;
+        color: #ffffff;
+        border-color: #444444;
+    }
+
+    .btn-logout:hover {
+        border-color: rgba(239, 68, 68, 0.4);
+        color: #ef4444;
+    }
 
     .loading-state {
         display: flex;

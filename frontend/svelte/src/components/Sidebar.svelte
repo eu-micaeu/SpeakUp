@@ -28,11 +28,6 @@
     openSettings = false;
   }
 
-  function goToPlans() {
-    goto("/planos");
-    openSettings = false;
-  }
-
   function goToIndex() {
     Cookies.remove("authToken");
     goto("/");
@@ -64,11 +59,6 @@
   </div>
 
   <div class="sidebarContent">
-    <div class="header">
-      <img src="/logo.png" alt="Logo" width={35} />
-      <h3>SpeakUp</h3>
-    </div>
-
     <button class="newChat" on:click={handleNewChat}>
       <!-- SVG de "Add" -->
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -115,56 +105,6 @@
         </button>
       </div>
     {/each}
-
-    <div class="footer">
-      <!-- <button on:click={() => goto("/teaching-plan")}>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-          <rect
-            x="4"
-            y="4"
-            width="16"
-            height="16"
-            rx="2"
-            stroke="currentColor"
-            stroke-width="2"
-          />
-        </svg>
-        <span>Plano de Estudo</span>
-      </button> -->
-
-      <!-- <button on:click={() => goto("/palavreco")}>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-          <circle
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            stroke-width="2"
-          />
-        </svg>
-        <span>Palavreco</span>
-      </button> -->
-
-      <button on:click={() => (openSettings = true)}>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-          <circle
-            cx="12"
-            cy="12"
-            r="3"
-            stroke="currentColor"
-            stroke-width="2"
-          />
-          <path
-            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82A1.65 1.65 0 0 0 3 12c0-.55.27-1.04.7-1.35a1.65 1.65 0 0 0 .33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01A1.65 1.65 0 0 0 10 3.09V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82c.43.31.7.8.7 1.35s-.27 1.04-.7 1.35z"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
-        <span>Configurações</span>
-      </button>
-    </div>
   </div>
 
   {#if openSettings}
@@ -192,67 +132,6 @@
             </svg>
           </button>
         </div>
-
-        <div class="modal-options">
-          <button class="modal-option" on:click={goToPerfil}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <circle
-                cx="12"
-                cy="8"
-                r="4"
-                stroke="currentColor"
-                stroke-width="2"
-              />
-              <path
-                d="M5 20c0-4 3-7 7-7s7 3 7 7"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-              />
-            </svg>
-            <span>Perfil</span>
-          </button>
-
-          <!-- <button class="modal-option" on:click={goToPlans}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M3 7h18M5 7v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-              <path
-                d="M8 11h8M8 15h5"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
-            <span>Planos</span>
-          </button> -->
-
-          <button class="modal-option" on:click={goToIndex}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-              <path
-                d="M16 17l5-5-5-5M21 12H9"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
-            <span>Sair</span>
-          </button>
-        </div>
       </div>
     </div>
   {/if}
@@ -266,10 +145,11 @@
     display: flex;
     flex-direction: column;
     transition: width 0.1s ease;
-    position: fixed;
+    position: absolute;
     left: 0;
     top: 0;
-    height: 100vh;
+    bottom: 0;
+    height: 100%;
     z-index: 100;
   }
 

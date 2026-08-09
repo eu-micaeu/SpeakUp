@@ -8,14 +8,19 @@ import (
 func CorsMiddleware() gin.HandlerFunc {
 	config := cors.DefaultConfig()
 
-	// Permitir credenciais (opcional se necessário)
+	config.AllowOriginFunc = func(origin string) bool { return true }
 	config.AllowCredentials = true
-	config.AllowOrigins = []string{"*"}                                       // Permitir apenas a origem do frontend
-	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"} // Métodos permitidos
-	config.AllowHeaders = []string{"Authorization", "Content-Type", "X-AI-Provider"}           // Cabeçalhos permitidos
-
-	// Permitir credenciais (opcional se necessário)
-	config.AllowCredentials = true
+	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"}
+	config.AllowHeaders = []string{
+		"Authorization",
+		"Content-Type",
+		"X-AI-Provider",
+		"X-User-ID",
+		"X-User-Id",
+		"x-user-id",
+		"Origin",
+		"Accept",
+	}
 
 	return cors.New(config)
 }

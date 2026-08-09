@@ -41,12 +41,14 @@ func main() {
 	chatRepo := repositories.NewMongoChatRepository(db)
 	userRepo := repositories.NewMongoUserRepository(db)
 	messageRepo := repositories.NewMongoMessageRepository(db)
+	flashcardRepo := repositories.NewMongoFlashcardRepository(db)
 
 	// Handlers
 	chatHandler := handlers.NewChatHandler(chatRepo)
 	userHandler := handlers.NewUserHandler(userRepo)
 	messageHandler := handlers.NewMessageHandler(messageRepo)
 	billingHandler := handlers.NewBillingHandler(userRepo)
+	flashcardHandler := handlers.NewFlashcardHandler(flashcardRepo)
 
 	// Load routes
 	routes.UserRoutes(r, userHandler)
@@ -54,6 +56,7 @@ func main() {
 	routes.MessageRoutes(r, messageHandler)
 	routes.AIRoutes(r)
 	routes.BillingRoutes(r, billingHandler)
+	routes.FlashcardRoutes(r, flashcardHandler)
 
 	// Load Swagger
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
