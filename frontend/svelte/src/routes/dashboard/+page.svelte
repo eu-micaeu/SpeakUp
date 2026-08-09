@@ -2,12 +2,11 @@
   import { onMount } from "svelte";
   import Cookies from "js-cookie";
   import { goto } from "$app/navigation";
+  import { API_URL } from "../../utils/api";
 
   let userName = "Estudante";
   let userLevel = "B1";
   let dueFlashcardsCount = 0;
-
-  const API_URL = "http://localhost:8082/api";
 
   onMount(async () => {
     await fetchUserData();

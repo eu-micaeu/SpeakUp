@@ -270,14 +270,14 @@
         if (!term) return;
         toastMessage = "🤖 Gerando Flashcard com IA...";
         try {
-            const resGen = await fetch("http://localhost:8082/api/flashcards/generate", {
+            const resGen = await fetch(`${API_URL}/flashcards/generate`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ term, context_sentence: context })
             });
             const genData = resGen.ok ? await resGen.json() : { back: term, explanation: "" };
 
-            const resSave = await fetch("http://localhost:8082/api/flashcards", {
+            const resSave = await fetch(`${API_URL}/flashcards`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

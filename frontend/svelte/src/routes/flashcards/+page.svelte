@@ -2,6 +2,7 @@
   import { onMount } from "svelte";
   import Cookies from "js-cookie";
   import { goto } from "$app/navigation";
+  import { API_URL } from "../../utils/api";
 
   interface Flashcard {
     id: string;
@@ -33,8 +34,6 @@
   let newExplanation = "";
   let isGenerating = false;
   let isSaving = false;
-
-  const API_URL = "http://localhost:8082/api";
 
   function formatSingleWord(str: string): string {
     if (!str) return "";
