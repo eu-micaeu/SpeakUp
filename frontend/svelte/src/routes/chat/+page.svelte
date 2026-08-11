@@ -292,7 +292,7 @@
             });
 
             if (resSave.ok) {
-                toastMessage = "🎴 Flashcard adicionado com sucesso!";
+                toastMessage = "Flashcard adicionado com sucesso!";
                 setTimeout(() => { toastMessage = ""; }, 3000);
             } else if (resSave.status === 409) {
                 toastMessage = `⚠️ O flashcard para "${term.trim()}" já existe!`;
@@ -468,7 +468,7 @@
                     showSelectionMenu = false;
                 }}
             >
-                🎴 Salvar "{selectedText}" em Flashcards
+                Salvar "{selectedText}" em Flashcards
             </button>
         </div>
     {/if}
@@ -613,7 +613,7 @@
                                         title="Salvar nos Flashcards"
                                         type="button"
                                     >
-                                        🎴 +Flashcard
+                                        +Flashcard
                                     </button>
                                 </p>
 

@@ -22,9 +22,21 @@
   let dueCards: Flashcard[] = [];
   let loading = true;
 
+  // View modes & filters
+  let activeTab: "study" | "library" = "study";
+  let searchQuery = "";
+  let filterStatus: "all" | "due" | "mastered" = "all";
+
   // Study mode state
   let currentCardIndex = 0;
   let isFlipped = false;
+
+  // Batch Generation & 24h Cooldown State
+  let isGeneratingBatch = false;
+  let batchNotification = "";
+  let isBatchOnCooldown = false;
+  let timeUntilNextBatch = "";
+  let cooldownTimerInterval: any = null;
 
   // Add/Generate Modal state
   let showModal = false;
@@ -34,6 +46,72 @@
   let newExplanation = "";
   let isGenerating = false;
   let isSaving = false;
+
+  function checkBatchCooldown() {
+    if (typeof localStorage === "undefined") return;
+    const saved = localStorage.getItem("last_daily_batch_timestamp");
+    if (!saved) {
+      isBatchOnCooldown = false;
+      timeUntilNextBatch = "";
+      return;
+    }
+
+    const lastTime = parseInt(saved, 10);
+    const now = Date.now();
+    const cooldownMs = 24 * 60 * 60 * 1000; // 24 hours
+    const elapsed = now - lastTime;
+
+    if (elapsed < cooldownMs) {
+      isBatchOnCooldown = true;
+      const remainingMs = cooldownMs - elapsed;
+      const hours = Math.floor(remainingMs / (1000 * 60 * 60));
+      const minutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+      timeUntilNextBatch = `${hours}h ${minutes}m`;
+    } else {
+      isBatchOnCooldown = false;
+      timeUntilNextBatch = "";
+    }
+  }
+
+  async function handleGenerateBatch() {
+    checkBatchCooldown();
+    if (isBatchOnCooldown) return;
+
+    isGeneratingBatch = true;
+    batchNotification = "";
+    try {
+      const res = await fetch(`${API_URL}/flashcards/generate-batch`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-User-ID": "default_user"
+        }
+      });
+      const data = await res.json();
+      if (res.ok) {
+        if (typeof localStorage !== "undefined") {
+          localStorage.setItem("last_daily_batch_timestamp", Date.now().toString());
+        }
+        checkBatchCooldown();
+
+        batchNotification = data.message || "20 novos flashcards gerados com sucesso!";
+        await fetchFlashcards();
+        activeTab = "study";
+        currentCardIndex = 0;
+        isFlipped = false;
+        setTimeout(() => {
+          batchNotification = "";
+        }, 5000);
+      } else {
+        alert(data.error || "Erro ao gerar lote de flashcards.");
+      }
+    } catch (e) {
+      console.error("Erro ao gerar flashcards em lote:", e);
+      alert("Erro de comunicação ao gerar lote de flashcards.");
+    } finally {
+      isGeneratingBatch = false;
+    }
+  }
 
   function formatSingleWord(str: string): string {
     if (!str) return "";
@@ -52,6 +130,11 @@
 
   onMount(async () => {
     await fetchFlashcards();
+    checkBatchCooldown();
+    cooldownTimerInterval = setInterval(checkBatchCooldown, 30000);
+    return () => {
+      if (cooldownTimerInterval) clearInterval(cooldownTimerInterval);
+    };
   });
 
   async function fetchFlashcards() {
@@ -72,6 +155,43 @@
       loading = false;
     }
   }
+
+  async function handleDeleteFlashcard(id: string) {
+    if (!confirm("Tem certeza de que deseja excluir este flashcard?")) return;
+    try {
+      const res = await fetch(`${API_URL}/flashcards/${id}`, {
+        method: "DELETE",
+        headers: { "X-User-ID": "default_user" }
+      });
+      if (res.ok) {
+        await fetchFlashcards();
+      } else {
+        alert("Erro ao excluir flashcard.");
+      }
+    } catch (e) {
+      console.error("Erro ao deletar flashcard:", e);
+    }
+  }
+
+  $: filteredFlashcards = flashcards.filter(c => {
+    const q = searchQuery.toLowerCase().trim();
+    const matchesSearch =
+      !q ||
+      c.front.toLowerCase().includes(q) ||
+      c.back.toLowerCase().includes(q) ||
+      (c.context_sentence && c.context_sentence.toLowerCase().includes(q)) ||
+      (c.explanation && c.explanation.toLowerCase().includes(q));
+
+    if (!matchesSearch) return false;
+
+    if (filterStatus === "due") {
+      return new Date(c.next_review) <= new Date();
+    }
+    if (filterStatus === "mastered") {
+      return c.repetitions >= 3;
+    }
+    return true;
+  });
 
   function flipCard() {
     isFlipped = !isFlipped;
@@ -234,43 +354,108 @@
         <p class="subtitle">Repetição Espaçada (SuperMemo-2)</p>
       </div>
 
-      <button class="btn-create" on:click={() => (showModal = true)}>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-          <path d="M12 5v14m7-7H5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-        <span>Criar Flashcard</span>
-      </button>
+      <div class="header-actions">
+        <button
+          class="btn-batch"
+          class:cooldown={isBatchOnCooldown}
+          disabled={isGeneratingBatch || isBatchOnCooldown}
+          on:click={handleGenerateBatch}
+          title={isBatchOnCooldown
+            ? `Você já gerou os 20 cards de hoje. Próximo lote disponível em ${timeUntilNextBatch}.`
+            : "Gerar 20 novos flashcards de vocabulário hoje"}
+        >
+          {#if isBatchOnCooldown}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <span>Disponível em {timeUntilNextBatch}</span>
+          {:else if isGeneratingBatch}
+            <svg class="btn-spinner" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="12"/>
+            </svg>
+            <span>Gerando...</span>
+          {:else}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+            </svg>
+            <span>+ 20 Cards do Dia</span>
+          {/if}
+        </button>
+
+        <button class="btn-create" on:click={() => (showModal = true)}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M12 5v14m7-7H5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span>Criar Flashcard</span>
+        </button>
+      </div>
     </header>
+
+    {#if batchNotification}
+      <div class="notification-banner">
+        <span>{batchNotification}</span>
+      </div>
+    {/if}
 
     <!-- Minimalist Stats Bar -->
     <div class="stats-bar">
-      <div class="stat-item">
+      <!-- svelte-ignore a11y_click_events_have_key_events -->
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <div class="stat-item clickable" on:click={() => { activeTab = "study"; }}>
         <span class="stat-label">Pendentes hoje</span>
         <span class="stat-value highlight">{dueCards.length}</span>
       </div>
       <div class="stat-divider"></div>
-      <div class="stat-item">
+      <!-- svelte-ignore a11y_click_events_have_key_events -->
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <div class="stat-item clickable" on:click={() => { activeTab = "library"; filterStatus = "all"; }}>
         <span class="stat-label">Total salvos</span>
         <span class="stat-value">{flashcards.length}</span>
       </div>
       <div class="stat-divider"></div>
-      <div class="stat-item">
+      <!-- svelte-ignore a11y_click_events_have_key_events -->
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <div class="stat-item clickable" on:click={() => { activeTab = "library"; filterStatus = "mastered"; }}>
         <span class="stat-label">Dominados</span>
         <span class="stat-value">{flashcards.filter(c => c.repetitions >= 3).length}</span>
       </div>
+    </div>
+
+    <!-- Segmented Control Tabs -->
+    <div class="segment-control">
+      <button
+        class="segment-btn"
+        class:active={activeTab === "study"}
+        on:click={() => (activeTab = "study")}
+      >
+        Modo Estudo ({dueCards.length})
+      </button>
+      <button
+        class="segment-btn"
+        class:active={activeTab === "library"}
+        on:click={() => (activeTab = "library")}
+      >
+        Meus Cards ({flashcards.length})
+      </button>
     </div>
 
     {#if loading}
       <div class="loading-state">
         <div class="spinner"></div>
       </div>
-    {:else}
+    {:else if activeTab === "study"}
       <!-- Minimalist Study View -->
       <div class="study-area">
         {#if dueCards.length === 0}
           <div class="empty-card">
             <h2>Revisões concluídas!</h2>
-            <p>Você revisou todos os flashcards de hoje. Volte mais tarde para novas surpresas!</p>
+            <p>Você revisou todos os flashcards pendentes para hoje. Excelente progresso!</p>
+            <div class="empty-card-actions">
+              <button class="btn-primary" on:click={() => (activeTab = "library")}>
+                Ver Meus Cards Salvos ({flashcards.length})
+              </button>
+            </div>
           </div>
         {:else}
           {@const card = dueCards[currentCardIndex]}
@@ -372,6 +557,126 @@
           {/if}
         {/if}
       </div>
+    {:else if activeTab === "library"}
+      <!-- Meus Cards Section (Library View) -->
+      <div class="library-section">
+        <div class="library-controls">
+          <div class="search-box">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="M21 21l-4.35-4.35"/>
+            </svg>
+            <input
+              type="text"
+              placeholder="Buscar por palavra em inglês, tradução ou frase..."
+              bind:value={searchQuery}
+            />
+            {#if searchQuery}
+              <button class="clear-search" on:click={() => (searchQuery = "")}>✕</button>
+            {/if}
+          </div>
+
+          <div class="filter-chips">
+            <button
+              class="chip"
+              class:active={filterStatus === "all"}
+              on:click={() => (filterStatus = "all")}
+            >
+              Todos ({flashcards.length})
+            </button>
+            <button
+              class="chip"
+              class:active={filterStatus === "due"}
+              on:click={() => (filterStatus = "due")}
+            >
+              Pendentes ({dueCards.length})
+            </button>
+            <button
+              class="chip"
+              class:active={filterStatus === "mastered"}
+              on:click={() => (filterStatus = "mastered")}
+            >
+              Dominados ({flashcards.filter(c => c.repetitions >= 3).length})
+            </button>
+          </div>
+        </div>
+
+        {#if filteredFlashcards.length === 0}
+          <div class="empty-card">
+            <h2>Nenhum flashcard encontrado</h2>
+            <p>
+              {#if searchQuery}
+                Nenhum resultado para "{searchQuery}". Tente buscar por outro termo.
+              {:else if filterStatus === "due"}
+                Nenhum flashcard pendente para revisão no momento.
+              {:else if filterStatus === "mastered"}
+                Nenhum flashcard atingiu o nível de dominado (3+ revisões) ainda.
+              {:else}
+                Você ainda não salvou nenhum flashcard.
+              {/if}
+            </p>
+            <button class="btn-create" on:click={() => (showModal = true)}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M12 5v14m7-7H5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <span>Criar Flashcard</span>
+            </button>
+          </div>
+        {:else}
+          <div class="library-grid">
+            {#each filteredFlashcards as card (card.id)}
+              <div class="library-card">
+                <div class="library-card-header">
+                  <div class="term-audio-group">
+                    <span class="front-text">{card.front}</span>
+                    <button
+                      class="btn-audio-small"
+                      on:click={() => speakText(card.front)}
+                      title="Ouvir pronúncia"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                      </svg>
+                    </button>
+                  </div>
+                  <button
+                    class="btn-delete"
+                    on:click={() => handleDeleteFlashcard(card.id)}
+                    title="Excluir flashcard"
+                  >
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="3 6 5 6 21 6"/>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                    </svg>
+                  </button>
+                </div>
+
+                <div class="back-text">{card.back}</div>
+
+                {#if card.context_sentence}
+                  <div class="context-text">"{card.context_sentence}"</div>
+                {/if}
+
+                {#if card.explanation}
+                  <div class="explanation-text">{card.explanation}</div>
+                {/if}
+
+                <div class="card-meta">
+                  {#if card.repetitions >= 3}
+                    <span class="status-badge badge-mastered">Dominado</span>
+                  {:else if new Date(card.next_review) <= new Date()}
+                    <span class="status-badge badge-due">Pendente</span>
+                  {:else}
+                    <span class="status-badge badge-learning">Em Aprendizado</span>
+                  {/if}
+                  <span class="rep-count">{card.repetitions} {card.repetitions === 1 ? 'revisão' : 'revisões'}</span>
+                </div>
+              </div>
+            {/each}
+          </div>
+        {/if}
+      </div>
     {/if}
   </main>
 
@@ -404,7 +709,7 @@
                 disabled={isGenerating || !newTerm.trim()}
                 on:click={handleGenerateAI}
               >
-                {isGenerating ? "Gerando..." : "🤖 IA"}
+                {isGenerating ? "Gerando" : "Gerar com IA"}
               </button>
             </div>
           </div>
@@ -560,6 +865,61 @@
     font-size: 0.9rem;
   }
 
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .btn-batch {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.1rem;
+    background-color: #5c6dff;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(92, 109, 255, 0.3);
+  }
+
+  .btn-batch:hover:not(:disabled) {
+    background-color: #4b5cf0;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(92, 109, 255, 0.4);
+  }
+
+  .btn-batch:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+
+  .btn-batch.cooldown {
+    background-color: #161616;
+    color: #777777;
+    border: 1px solid #262626;
+    box-shadow: none;
+    opacity: 0.85;
+    cursor: not-allowed;
+  }
+
+  .btn-batch.cooldown:hover {
+    background-color: #161616;
+    color: #777777;
+    border-color: #262626;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .btn-spinner {
+    animation: spin 1s linear infinite;
+  }
+
   .btn-create {
     display: inline-flex;
     align-items: center;
@@ -579,6 +939,25 @@
     background-color: #262626;
     border-color: #5c6dff;
     color: #ffffff;
+  }
+
+  .notification-banner {
+    background-color: rgba(92, 109, 255, 0.12);
+    border: 1px solid rgba(92, 109, 255, 0.3);
+    color: #ffffff;
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   /* Stats Bar */
@@ -857,7 +1236,28 @@
     color: #22c55e;
   }
 
-  /* Library Grid */
+  .stat-item.clickable {
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+
+  .stat-item.clickable:hover {
+    transform: translateY(-1px);
+    opacity: 0.9;
+  }
+
+  /* Library Grid & Controls */
+  .library-section {
+    width: 100%;
+  }
+
+  .library-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
   .search-box {
     display: flex;
     align-items: center;
@@ -866,7 +1266,11 @@
     border: 1px solid #222222;
     border-radius: 8px;
     padding: 0.6rem 1rem;
-    margin-bottom: 1.5rem;
+  }
+
+  .search-box svg {
+    color: #666666;
+    flex-shrink: 0;
   }
 
   .search-box input {
@@ -878,20 +1282,72 @@
     outline: none;
   }
 
+  .clear-search {
+    background: transparent;
+    border: none;
+    color: #666666;
+    cursor: pointer;
+    font-size: 0.85rem;
+    padding: 0.2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .clear-search:hover {
+    color: #ffffff;
+  }
+
+  .filter-chips {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .chip {
+    background-color: #121212;
+    border: 1px solid #222222;
+    color: #888888;
+    border-radius: 20px;
+    padding: 0.35rem 0.85rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .chip:hover {
+    border-color: #333333;
+    color: #cccccc;
+  }
+
+  .chip.active {
+    background-color: rgba(92, 109, 255, 0.15);
+    border-color: #5c6dff;
+    color: #ffffff;
+  }
+
   .library-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1rem;
   }
 
   .library-card {
     background-color: #121212;
     border: 1px solid #222222;
-    border-radius: 8px;
+    border-radius: 10px;
     padding: 1.1rem;
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
+    gap: 0.5rem;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .library-card:hover {
+    border-color: #333333;
+    transform: translateY(-2px);
   }
 
   .library-card-header {
@@ -900,10 +1356,35 @@
     align-items: center;
   }
 
+  .term-audio-group {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
   .front-text {
     font-weight: 700;
-    font-size: 1.05rem;
+    font-size: 1.1rem;
     color: #ffffff;
+    letter-spacing: -0.01em;
+  }
+
+  .btn-audio-small {
+    background: transparent;
+    border: none;
+    color: #666666;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease, background-color 0.2s ease;
+  }
+
+  .btn-audio-small:hover {
+    color: #5c6dff;
+    background-color: rgba(92, 109, 255, 0.1);
   }
 
   .btn-delete {
@@ -911,11 +1392,17 @@
     border: none;
     color: #555555;
     cursor: pointer;
-    padding: 0.2rem;
+    padding: 0.3rem;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease, background-color 0.2s ease;
   }
 
   .btn-delete:hover {
     color: #ef4444;
+    background-color: rgba(239, 68, 68, 0.1);
   }
 
   .back-text {
@@ -926,16 +1413,64 @@
 
   .context-text {
     font-size: 0.85rem;
-    color: #888888;
+    color: #aaaaaa;
     font-style: italic;
+    line-height: 1.4;
+  }
+
+  .explanation-text {
+    font-size: 0.8rem;
+    color: #777777;
+    line-height: 1.4;
+    background-color: rgba(255, 255, 255, 0.02);
+    padding: 0.4rem 0.6rem;
+    border-radius: 4px;
+    border-left: 2px solid #333333;
   }
 
   .card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     font-size: 0.75rem;
     color: #555555;
-    margin-top: 0.5rem;
+    margin-top: 0.4rem;
     padding-top: 0.5rem;
     border-top: 1px solid #1a1a1a;
+  }
+
+  .status-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+  }
+
+  .badge-mastered {
+    background-color: rgba(34, 197, 94, 0.12);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.25);
+  }
+
+  .badge-due {
+    background-color: rgba(92, 109, 255, 0.12);
+    color: #5c6dff;
+    border: 1px solid rgba(92, 109, 255, 0.25);
+  }
+
+  .badge-learning {
+    background-color: rgba(255, 255, 255, 0.04);
+    color: #888888;
+    border: 1px solid #222222;
+  }
+
+  .rep-count {
+    font-size: 0.75rem;
+    color: #666666;
+  }
+
+  .empty-card-actions {
+    margin-top: 1.25rem;
   }
 
   /* Modal */

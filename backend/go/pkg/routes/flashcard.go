@@ -10,6 +10,7 @@ func FlashcardRoutes(r *gin.Engine, handler *handlers.FlashcardHandler) {
 	api := r.Group("/api/flashcards")
 	{
 		api.POST("/generate", handler.GenerateFlashcard)
+		api.POST("/generate-batch", handler.GenerateDailyBatch)
 		api.POST("", handler.CreateFlashcard)
 		api.GET("", handler.GetFlashcards)
 		api.POST("/:id/review", handler.ReviewFlashcard)

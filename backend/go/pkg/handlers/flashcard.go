@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"math"
 	"net/http"
 	"os"
@@ -229,4 +230,79 @@ func (h *FlashcardHandler) DeleteFlashcard(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Flashcard removido com sucesso"})
+}
+
+func (h *FlashcardHandler) GenerateDailyBatch(c *gin.Context) {
+	userID := c.GetHeader("X-User-ID")
+	if userID == "" {
+		userID = "default_user"
+	}
+
+	aiProvider := c.GetHeader("X-AI-Provider")
+	if aiProvider == "" {
+		aiProvider = os.Getenv("AI_PROVIDER")
+	}
+	if aiProvider == "" {
+		aiProvider = "ollama"
+	}
+	ctx := context.WithValue(c.Request.Context(), "aiProvider", aiProvider)
+
+	// Fetch existing flashcards for user to avoid duplicate terms
+	existingCards, err := h.Repo.FindByUser(ctx, userID, false)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao carregar flashcards existentes: " + err.Error()})
+		return
+	}
+
+	existingMap := make(map[string]bool)
+	var existingTerms []string
+	for _, card := range existingCards {
+		termLower := strings.ToLower(strings.TrimSpace(card.Front))
+		existingMap[termLower] = true
+		existingTerms = append(existingTerms, card.Front)
+	}
+
+	batchItems, err := ai.GetBatchFlashcardsResponse(ctx, existingTerms, 20)
+	if err != nil || len(batchItems) == 0 {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao gerar lote de flashcards com IA: " + err.Error()})
+		return
+	}
+
+	var createdList []models.Flashcard
+	now := time.Now()
+	for _, item := range batchItems {
+		termClean := strings.TrimSpace(item.Front)
+		if termClean == "" {
+			continue
+		}
+		termLower := strings.ToLower(termClean)
+		if existingMap[termLower] {
+			continue
+		}
+		existingMap[termLower] = true
+
+		fc := models.Flashcard{
+			UserID:          userID,
+			Front:           termClean,
+			Back:            ai.FormatSingleWordTranslation(item.Back),
+			ContextSentence: item.ContextSentence,
+			Explanation:     item.Explanation,
+			EaseFactor:      2.5,
+			Interval:        1,
+			Repetitions:     0,
+			CreatedAt:       now,
+			NextReview:      now,
+		}
+
+		created, err := h.Repo.Create(ctx, fc)
+		if err == nil {
+			createdList = append(createdList, created)
+		}
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"message": fmt.Sprintf("%d novos flashcards gerados com sucesso!", len(createdList)),
+		"count":   len(createdList),
+		"cards":   createdList,
+	})
 }
