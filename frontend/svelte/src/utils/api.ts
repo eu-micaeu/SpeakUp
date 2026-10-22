@@ -159,7 +159,7 @@ export const addMessageToChat = async (chat_id: string, content: string, sender:
 const getAIProvider = (): string => {
     if (typeof window === 'undefined') return 'ollama';
     const stored = localStorage.getItem('aiProvider');
-    if (!stored || stored === 'gemini') {
+    if (!stored) {
         localStorage.setItem('aiProvider', 'ollama');
         return 'ollama';
     }

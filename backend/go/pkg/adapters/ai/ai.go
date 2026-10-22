@@ -29,12 +29,7 @@ func getConnector(ctx context.Context) connectors.AIConnector {
 	switch strings.ToLower(strings.TrimSpace(provider)) {
 	case "ollama":
 		return connectors.NewOllamaConnector()
-	case "gemini":
-		return connectors.NewGeminiConnector()
 	default:
-		if os.Getenv("GEMINI_API_KEY") != "" && strings.EqualFold(os.Getenv("AI_PROVIDER"), "gemini") {
-			return connectors.NewGeminiConnector()
-		}
 		return connectors.NewOllamaConnector()
 	}
 }
