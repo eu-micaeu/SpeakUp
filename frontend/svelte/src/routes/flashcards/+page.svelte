@@ -3,6 +3,9 @@
   import Cookies from "js-cookie";
   import { goto } from "$app/navigation";
   import { API_URL } from "../../utils/api";
+  import LogoutModal from "../../components/LogoutModal.svelte";
+
+  let showLogoutModal = false;
 
   interface Flashcard {
     id: string;
@@ -306,8 +309,7 @@
   }
 
   function handleLogout() {
-    Cookies.remove("authToken");
-    goto("/");
+    showLogoutModal = true;
   }
 </script>
 
@@ -761,6 +763,8 @@
     </div>
   {/if}
 </div>
+
+<LogoutModal bind:show={showLogoutModal} />
 
 <style>
   :global(body) {

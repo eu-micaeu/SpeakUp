@@ -8,6 +8,9 @@
     } from "../../utils/api";
     import { toast } from "svelte-sonner";
     import Cookies from "js-cookie";
+    import LogoutModal from "../../components/LogoutModal.svelte";
+
+    let showLogoutModal = false;
 
     interface User {
         id: string;
@@ -132,8 +135,7 @@
     }
 
     function handleLogout() {
-        Cookies.remove("authToken");
-        goto("/");
+        showLogoutModal = true;
     }
 
     onMount(() => {
@@ -286,6 +288,8 @@
         </div>
     </div>
 {/if}
+
+<LogoutModal bind:show={showLogoutModal} />
 
 <style>
     :global(body) {

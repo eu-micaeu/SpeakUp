@@ -15,10 +15,12 @@
         generateAIResponseTopic,
     } from "../../utils/api";
     import Cookies from "js-cookie";
+    import LogoutModal from "../../components/LogoutModal.svelte";
+
+    let showLogoutModal = false;
 
     function handleLogout() {
-        Cookies.remove("authToken");
-        goto("/");
+        showLogoutModal = true;
     }
 
     interface Chat {
@@ -313,29 +315,7 @@
     let showSelectionMenu = false;
 
     function handleTextSelection() {
-        if (typeof window === "undefined") return;
-        const selection = window.getSelection();
-        if (!selection || selection.isCollapsed) {
-            showSelectionMenu = false;
-            return;
-        }
-        const text = selection.toString().trim();
-        if (text.length > 0 && text.length < 60) {
-            selectedText = text;
-            try {
-                const range = selection.getRangeAt(0);
-                const rect = range.getBoundingClientRect();
-                selectionCoords = {
-                    x: rect.left + rect.width / 2,
-                    y: rect.top - 40
-                };
-                showSelectionMenu = true;
-            } catch (e) {
-                showSelectionMenu = false;
-            }
-        } else {
-            showSelectionMenu = false;
-        }
+        return;
     }
 
     function getPracticingLanguage(): string {
@@ -608,9 +588,9 @@
                                         {/if}
                                     </button>
                                     <button
-                                        class="flashcardAddBtn"
-                                        on:click={() => quickAddFlashcard(msg.text.split("\n\n")[1]?.replace("Correção: ", "") || "", msg.text.split("\n\n")[0])}
-                                        title="Salvar nos Flashcards"
+                                        class="flashcardAddBtn disabled"
+                                        disabled
+                                        title="Flashcards indisponível no momento"
                                         type="button"
                                     >
                                         +Flashcard
@@ -749,6 +729,8 @@
     </main>
     </div>
 </div>
+
+<LogoutModal bind:show={showLogoutModal} />
 
 <style>
     .Chat {
@@ -1285,9 +1267,15 @@
         transition: all 0.2s;
     }
 
-    .flashcardAddBtn:hover {
+    .flashcardAddBtn:hover:not(:disabled) {
         background: rgba(168, 85, 247, 0.4);
         color: white;
+    }
+
+    .flashcardAddBtn:disabled,
+    .flashcardAddBtn.disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
     }
 
     .selectionPopover {

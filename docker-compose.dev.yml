@@ -25,13 +25,13 @@ services:
     networks:
       - speakup_dev_network
     # Uncomment for NVIDIA GPU acceleration:
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: all
-    #           capabilities: [gpu]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
 
   backend:
     image: golang:1.24-alpine

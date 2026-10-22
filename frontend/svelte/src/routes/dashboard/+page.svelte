@@ -3,14 +3,15 @@
   import Cookies from "js-cookie";
   import { goto } from "$app/navigation";
   import { API_URL } from "../../utils/api";
+  import LogoutModal from "../../components/LogoutModal.svelte";
 
   let userName = "Estudante";
   let userLevel = "B1";
   let dueFlashcardsCount = 0;
+  let showLogoutModal = false;
 
   onMount(async () => {
     await fetchUserData();
-    await fetchFlashcardsCount();
   });
 
   async function fetchUserData() {
@@ -49,8 +50,7 @@
   }
 
   function handleLogout() {
-    Cookies.remove("authToken");
-    goto("/");
+    showLogoutModal = true;
   }
 </script>
 
@@ -122,8 +122,8 @@
         </div>
       </div>
 
-      <!-- Option 2: Flashcards SRS -->
-      <div class="hub-card" on:click={() => goto("/flashcards")} role="button" tabindex="0" on:keydown={(e) => e.key === 'Enter' && goto("/flashcards")}>
+      <!-- Option 2: Flashcards SRS (Disabled) -->
+      <div class="hub-card disabled" aria-disabled="true">
         <div class="card-top">
           <div class="icon-box">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -131,11 +131,7 @@
               <path d="M3 10h18M8 15h3" stroke-linecap="round"/>
             </svg>
           </div>
-          {#if dueFlashcardsCount > 0}
-            <span class="badge badge-due">{dueFlashcardsCount} PENDENTES</span>
-          {:else}
-            <span class="badge">REVISÃO ESPAÇADA</span>
-          {/if}
+          <span class="badge">REVISÃO ESPAÇADA</span>
         </div>
 
         <div class="card-content">
@@ -153,6 +149,8 @@
     </div>
   </main>
 </div>
+
+<LogoutModal bind:show={showLogoutModal} />
 
 <style>
   :global(body) {
@@ -288,6 +286,26 @@
   .hub-card:hover {
     border-color: #333333;
     background-color: #161616;
+  }
+
+  .hub-card.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    user-select: none;
+  }
+
+  .hub-card.disabled:hover {
+    border-color: #222222;
+    background-color: #121212;
+  }
+
+  .hub-card.disabled:hover .card-footer {
+    color: #777777;
+  }
+
+  .hub-card.disabled:hover .arrow-icon {
+    transform: none;
+    color: inherit;
   }
 
   .card-top {
