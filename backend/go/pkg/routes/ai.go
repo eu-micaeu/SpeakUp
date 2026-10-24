@@ -18,7 +18,6 @@ func AIRoutes(router *gin.Engine) {
 		aiRoutes.POST("/generate-response-translation", middlewares.AuthMiddleware(), handlers.GenerateResponseTranslate)
 		aiRoutes.POST("/generate-response-topic", middlewares.AuthMiddleware(), handlers.GenerateResponseTopic)
 		aiRoutes.POST("/transcribe-audio", middlewares.AuthMiddleware(), handlers.TranscribeAudio)
-		aiRoutes.GET("/usage", middlewares.AuthMiddleware(), handlers.GetAIUsage)
 
 	}
 

@@ -47,7 +47,6 @@ func main() {
 	chatHandler := handlers.NewChatHandler(chatRepo)
 	userHandler := handlers.NewUserHandler(userRepo)
 	messageHandler := handlers.NewMessageHandler(messageRepo)
-	billingHandler := handlers.NewBillingHandler(userRepo)
 	flashcardHandler := handlers.NewFlashcardHandler(flashcardRepo)
 
 	// Load routes
@@ -55,7 +54,6 @@ func main() {
 	routes.ChatRoutes(r, chatHandler)
 	routes.MessageRoutes(r, messageHandler)
 	routes.AIRoutes(r)
-	routes.BillingRoutes(r, billingHandler)
 	routes.FlashcardRoutes(r, flashcardHandler)
 
 	// Load Swagger

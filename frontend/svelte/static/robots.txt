@@ -1,6 +1,5 @@
 User-agent: *
 Allow: /
-Allow: /planos
 Disallow: /chat
 Disallow: /perfil
 

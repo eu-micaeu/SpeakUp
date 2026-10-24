@@ -14,15 +14,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetAIUsage(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"is_pro":      true,
-		"daily_limit": -1,
-		"used_today":  0,
-		"remaining":   -1,
-	})
-}
-
 func GenerateResponseDialog(c *gin.Context) {
 	var request struct {
 		Message string `json:"message"`

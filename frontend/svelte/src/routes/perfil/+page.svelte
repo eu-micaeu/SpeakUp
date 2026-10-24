@@ -145,11 +145,11 @@
 
 <svelte:head>
     <title>Meu Perfil | SpeakUp</title>
-    <meta name="description" content="Gerencie suas configurações de perfil, preferências de idioma, nível de aprendizado e assinatura na SpeakUp." />
+    <meta name="description" content="Gerencie suas configurações de perfil, preferências de idioma e nível de aprendizado na SpeakUp." />
     <meta property="og:title" content="Meu Perfil | SpeakUp" />
-    <meta property="og:description" content="Gerencie suas configurações de perfil, preferências de idioma, nível de aprendizado e assinatura na SpeakUp." />
+    <meta property="og:description" content="Gerencie suas configurações de perfil, preferências de idioma e nível de aprendizado na SpeakUp." />
     <meta name="twitter:title" content="Meu Perfil | SpeakUp" />
-    <meta name="twitter:description" content="Gerencie suas configurações de perfil, preferências de idioma, nível de aprendizado e assinatura na SpeakUp." />
+    <meta name="twitter:description" content="Gerencie suas configurações de perfil, preferências de idioma e nível de aprendizado na SpeakUp." />
 </svelte:head>
 
 <div class="profile-wrapper">
@@ -495,33 +495,6 @@
 
     /* Secondary Column */
     .secondary-columns { display: grid; gap: 2rem; }
-
-    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-    .section-header h3 { margin: 0; font-size: 1.2rem; font-weight: 700; }
-
-    .status-pill { padding: 0.3rem 0.8rem; border-radius: 999px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; }
-    .status-pill.active { background: #7ee5b3; color: #0a4d31; }
-    .status-pill.free { background: rgba(255, 255, 255, 0.1); color: #888; }
-
-    .sub-details { display: grid; gap: 1.25rem; }
-    .sub-row { display: flex; justify-content: space-between; font-size: 0.95rem; }
-    .sub-row .label { color: #888; }
-    .sub-row .value { font-weight: 600; }
-    .sub-row .value.active { color: #7ee5b3; }
-
-    .manage-btn, .upgrade-btn {
-        width: 100%;
-        padding: 0.9rem;
-        border-radius: 12px;
-        font-weight: 700;
-        text-align: center;
-        text-decoration: none;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .manage-btn { background: rgba(255, 255, 255, 0.05); color: #fff; border: 1px solid rgba(255, 255, 255, 0.1); }
-    .upgrade-btn { background: #5c6dff; color: #fff; border: none; }
 
     .danger-zone h3 { color: #ff6b6b; margin-top: 0; }
     .danger-zone p { font-size: 0.85rem; color: #888; line-height: 1.5; margin-bottom: 1.5rem; }

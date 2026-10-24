@@ -49,21 +49,6 @@ interface User {
     level: string;
 }
 
-export interface BillingStatus {
-    stripe_customer_id: string;
-    stripe_subscription_id: string;
-    stripe_price_id: string;
-    stripe_status: string;
-    stripe_current_period_end: number;
-}
-
-export interface AIUsageStatus {
-    is_pro: boolean;
-    daily_limit: number;
-    used_today: number;
-    remaining: number;
-}
-
 interface Word {
     id: string;
     word: string;
@@ -366,36 +351,5 @@ export const transcribeAudio = async (audioBlob: Blob): Promise<string> => {
         console.error('Erro ao transcrever áudio:', error);
         throw error;
     }
-}
-
-// Billing status
-export const getBillingStatus = async (): Promise<BillingStatus> => {
-    return {
-        stripe_customer_id: 'free_user',
-        stripe_subscription_id: 'free_subscription',
-        stripe_price_id: 'free_price',
-        stripe_status: 'active',
-        stripe_current_period_end: 9999999999
-    };
-}
-
-// Create Stripe checkout session
-export const createCheckoutSession = async (_plan: 'monthly' | 'annual'): Promise<{ url: string }> => {
-    throw new Error('O SpeakUp é 100% gratuito!');
-}
-
-// Create Stripe customer portal session
-export const createPortalSession = async (): Promise<{ url: string }> => {
-    throw new Error('O SpeakUp é 100% gratuito!');
-}
-
-// AI usage status
-export const getAIUsageStatus = async (): Promise<AIUsageStatus> => {
-    return {
-        is_pro: true,
-        daily_limit: -1,
-        used_today: 0,
-        remaining: -1
-    };
 }
 
