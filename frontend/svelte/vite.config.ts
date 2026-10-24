@@ -7,9 +7,16 @@ export default defineConfig({
 	plugins: [sveltekit()],
 	server: {
 		// Garante que o servidor escute fora do container
-		host: '0.0.0.0', 
+		host: '0.0.0.0',
 		port: 5175,
-		
-		allowedHosts: true
+		strictPort: true,
+		allowedHosts: true,
+		watch: {
+			usePolling: true,
+			interval: 100
+		},
+		hmr: {
+			clientPort: 5175
+		}
 	}
 });

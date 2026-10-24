@@ -1,10 +1,10 @@
-# Subir a aplicação
+# Subir a aplicação (dev)
 up:
-	docker-compose -f docker-compose.yml up -d
+	docker compose -f docker-compose.dev.yml up -d
 
-# Apagar a aplicação
+# Apagar a aplicação (dev)
 down:
-	docker-compose -f docker-compose.yml down
+	docker compose -f docker-compose.dev.yml down
 
 # Restartar a aplicação
 restart: down up
