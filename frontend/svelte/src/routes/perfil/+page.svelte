@@ -8,6 +8,7 @@
     } from "../../utils/api";
     import { toast } from "svelte-sonner";
     import Cookies from "js-cookie";
+    import { requireAuthOrRedirect } from "../../utils/cookies";
     import LogoutModal from "../../components/LogoutModal.svelte";
 
     let showLogoutModal = false;
@@ -57,17 +58,18 @@
 
     async function loadUserData() {
         try {
+            if (!requireAuthOrRedirect("Você precisa estar logado para acessar seu perfil.")) {
+                return;
+            }
             const token = Cookies.get("authToken");
             if (!token) {
-                toast.error("Você precisa estar logado");
-                goto("/login");
                 return;
             }
 
             const decoded = parseJwt(token);
             if (!decoded || !decoded.user_id) {
-                toast.error("Token inválido");
-                goto("/login");
+                Cookies.remove("authToken");
+                requireAuthOrRedirect("Token inválido. Faça login novamente.");
                 return;
             }
 
@@ -108,7 +110,7 @@
         try {
             const response: any = await updateUser(user.id, editForm);
             if (response && response.token) {
-                Cookies.set("authToken", response.token);
+                Cookies.set("authToken", response.token, { expires: 1 });
             }
             user = { ...user, ...editForm };
             editing = false;

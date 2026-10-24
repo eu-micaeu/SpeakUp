@@ -263,6 +263,15 @@
       goto("/dashboard");
       return;
     }
+
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("login") === "true") {
+        openAuthModal("login");
+        showToast("Faça login para acessar sua conta.", "error");
+        window.history.replaceState({}, "", "/");
+      }
+    }
   });
 </script>
 

@@ -3,6 +3,7 @@
   import Cookies from "js-cookie";
   import { goto } from "$app/navigation";
   import { API_URL } from "../../utils/api";
+  import { requireAuthOrRedirect } from "../../utils/cookies";
   import LogoutModal from "../../components/LogoutModal.svelte";
 
   let userName = "Estudante";
@@ -11,6 +12,7 @@
   let showLogoutModal = false;
 
   onMount(async () => {
+    if (!requireAuthOrRedirect()) return;
     await fetchUserData();
   });
 

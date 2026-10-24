@@ -1,14 +1,29 @@
 <script>
     import { onMount } from "svelte";
+    import { afterNavigate } from "$app/navigation";
     import { browser } from "$app/environment";
+    import { requireAuthOrRedirect } from "../utils/cookies";
 
     let Toaster;
+
+    function checkRouteAuth() {
+        if (!browser) return;
+        const path = window.location.pathname;
+        if (path !== "/") {
+            requireAuthOrRedirect("Você precisa fazer login para acessar esta página.");
+        }
+    }
 
     onMount(async () => {
         if (browser) {
             const module = await import("svelte-sonner");
             Toaster = module.Toaster;
+            checkRouteAuth();
         }
+    });
+
+    afterNavigate(() => {
+        checkRouteAuth();
     });
 </script>
 

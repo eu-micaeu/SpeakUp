@@ -1,8 +1,20 @@
 import axios, { AxiosError } from 'axios';
 import Cookies from 'js-cookie';
+import { requireAuthOrRedirect } from './cookies';
 
 // For Vite / SvelteKit projects, use environment variable VITE_API_URL or PUBLIC_API_URL
 export const API_URL = import.meta.env.VITE_API_URL || import.meta.env.PUBLIC_API_URL || '/api';
+
+axios.interceptors.response.use(
+    (response) => response,
+    (error: AxiosError) => {
+        const requestUrl = error.config?.url || '';
+        if (error.response?.status === 401 && !requestUrl.includes('/user/login')) {
+            requireAuthOrRedirect('Sua sessão expirou ou o token não foi encontrado. Faça login novamente.');
+        }
+        return Promise.reject(error);
+    }
+);
 
 // Types
 interface LoginResponse {
@@ -67,7 +79,7 @@ export const login = async (email: string, password: string): Promise<{ token: s
         const { token, message } = response.data;
 
         if (token) {
-            Cookies.set('authToken', token);
+            Cookies.set('authToken', token, { expires: 1 });
             return { token };
         }
 

@@ -15,6 +15,7 @@
         generateAIResponseTopic,
     } from "../../utils/api";
     import Cookies from "js-cookie";
+    import { requireAuthOrRedirect } from "../../utils/cookies";
     import LogoutModal from "../../components/LogoutModal.svelte";
 
     let showLogoutModal = false;
@@ -56,6 +57,8 @@
     let showTranscriptionNotice = false;
 
     onMount(() => {
+        if (!requireAuthOrRedirect()) return;
+
         (async () => {
             try {
                 const res: any = await getChatsByUserId();
