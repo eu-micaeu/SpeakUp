@@ -981,7 +981,6 @@
     background: rgba(255, 255, 255, 0.12);
     color: #ffffff;
     font-weight: 600;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   }
 
   .authTab:hover:not(.active) {
@@ -1029,7 +1028,6 @@
     outline: none;
     border-color: rgba(92, 109, 255, 0.6);
     background: rgba(255, 255, 255, 0.06);
-    box-shadow: 0 0 0 3px rgba(92, 109, 255, 0.15);
   }
 
   .inputGroup input::placeholder {
@@ -1088,7 +1086,6 @@
   .submitButton:hover:not(:disabled) {
     background: #f4f4f5;
     transform: translateY(-1px);
-    box-shadow: 0 4px 14px rgba(255, 255, 255, 0.15);
   }
 
   .submitButton:active:not(:disabled) {

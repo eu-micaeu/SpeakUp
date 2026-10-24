@@ -94,7 +94,6 @@
 
   .primaryLink:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 18px rgba(255, 255, 255, 0.18);
   }
 
   .column {
@@ -148,7 +147,6 @@
     height: 8px;
     border-radius: 50%;
     background: #53d688;
-    box-shadow: 0 0 0 4px rgba(83, 214, 136, 0.16);
   }
 
   .bottomBar {

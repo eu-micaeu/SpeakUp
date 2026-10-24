@@ -891,13 +891,11 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 2px 8px rgba(92, 109, 255, 0.3);
   }
 
   .btn-batch:hover:not(:disabled) {
     background-color: #4b5cf0;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(92, 109, 255, 0.4);
   }
 
   .btn-batch:disabled {
@@ -909,7 +907,6 @@
     background-color: #161616;
     color: #777777;
     border: 1px solid #262626;
-    box-shadow: none;
     opacity: 0.85;
     cursor: not-allowed;
   }
@@ -919,7 +916,6 @@
     color: #777777;
     border-color: #262626;
     transform: none;
-    box-shadow: none;
   }
 
   .btn-spinner {
@@ -1033,7 +1029,6 @@
   .segment-btn.active {
     background-color: #1a1a1a;
     color: #ffffff;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
   }
 
   /* Study Area */
