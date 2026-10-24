@@ -355,7 +355,7 @@
         <img src="/Ollama Logo - White - zonalogo.com.svg" alt="Ollama Logo" />
         <h3>Ollama</h3>
         <p>
-          Modelos de linguagem open-source rodando localmente para análise gramatical precisa, conversação fluida e privacidade completa dos seus dados.
+          Modelos de linguagem open-source rodando localmente para análise gramatical, conversação e privacidade dos seus dados.
         </p>
       </div>
     </div>

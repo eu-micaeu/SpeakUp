@@ -21,6 +21,7 @@ type OllamaRequest struct {
 	Model   string         `json:"model"`
 	Prompt  string         `json:"prompt"`
 	System  string         `json:"system,omitempty"`
+	Format  string         `json:"format,omitempty"`
 	Stream  bool           `json:"stream"`
 	Options map[string]any `json:"options,omitempty"`
 }
@@ -60,12 +61,28 @@ func (o *OllamaConnector) GenerateResponseWithOptions(ctx context.Context, messa
 }
 
 func (o *OllamaConnector) generate(ctx context.Context, message string, system string, options map[string]any) (string, error) {
+	var format string
+	var cleanOptions map[string]any
+	if len(options) > 0 {
+		cleanOptions = make(map[string]any, len(options))
+		for k, v := range options {
+			if k == "format" {
+				if fmtStr, ok := v.(string); ok {
+					format = fmtStr
+				}
+				continue
+			}
+			cleanOptions[k] = v
+		}
+	}
+
 	reqBody := OllamaRequest{
 		Model:   o.model,
 		Prompt:  message,
 		System:  system,
+		Format:  format,
 		Stream:  false,
-		Options: options,
+		Options: cleanOptions,
 	}
 
 	jsonData, err := json.Marshal(reqBody)

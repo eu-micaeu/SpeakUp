@@ -36,9 +36,82 @@ func getConnector(ctx context.Context) connectors.AIConnector {
 
 const maxDialogResponseChars = 128
 const maxDialogRewriteAttempts = 3
+const maxChatHistoryMessages = 10
+
+func cleanStoredMessageContent(msg models.Message) string {
+	content := strings.TrimSpace(msg.Content)
+	if content == "" {
+		return ""
+	}
+
+	if strings.EqualFold(msg.Sender, "user") {
+		// In MongoDB, user messages are stored as "<raw>\n\nCorreção: <corrected>"
+		if idx := strings.Index(content, "\n\nCorreção:"); idx != -1 {
+			corrected := strings.TrimSpace(content[idx+len("\n\nCorreção:"):])
+			if corrected != "" {
+				return corrected
+			}
+			return strings.TrimSpace(content[:idx])
+		}
+		return content
+	}
+
+	// In MongoDB, AI messages are stored as "<dialog>\n\n[TRANSLATION]: <pt>"
+	if idx := strings.Index(content, "\n\n[TRANSLATION]:"); idx != -1 {
+		return strings.TrimSpace(content[:idx])
+	}
+	return content
+}
+
+func formatChatHistory(messages []models.Message, currentMessage string) string {
+	if len(messages) == 0 {
+		return "(No previous messages)"
+	}
+
+	trimmedCurrent := strings.TrimSpace(currentMessage)
+
+	// Exclude the last stored user message if it duplicates currentMessage
+	endIdx := len(messages)
+	if endIdx > 0 && strings.EqualFold(messages[endIdx-1].Sender, "user") {
+		lastClean := cleanStoredMessageContent(messages[endIdx-1])
+		if strings.EqualFold(lastClean, trimmedCurrent) || strings.Contains(messages[endIdx-1].Content, trimmedCurrent) {
+			endIdx--
+		}
+	}
+
+	relevant := messages[:endIdx]
+	if len(relevant) == 0 {
+		return "(No previous messages)"
+	}
+	if len(relevant) > maxChatHistoryMessages {
+		relevant = relevant[len(relevant)-maxChatHistoryMessages:]
+	}
+
+	var b strings.Builder
+	for _, msg := range relevant {
+		clean := cleanStoredMessageContent(msg)
+		if clean == "" {
+			continue
+		}
+		role := "User"
+		if strings.EqualFold(msg.Sender, "ai") || strings.EqualFold(msg.Sender, "assistant") {
+			role = "Output"
+		}
+		b.WriteString(fmt.Sprintf("%s: %s\n", role, clean))
+	}
+
+	res := strings.TrimSpace(b.String())
+	if res == "" {
+		return "(No previous messages)"
+	}
+	return res
+}
 
 func GetDialogResponse(ctx context.Context, message string, messages []models.Message, language string, level string) (string, error) {
-	if level == "" {
+	if strings.TrimSpace(language) == "" {
+		language = "English"
+	}
+	if strings.TrimSpace(level) == "" {
 		level = "B1"
 	}
 	prePrompt, err := prompts.GetPrompt("promptDialog.txt")
@@ -46,25 +119,18 @@ func GetDialogResponse(ctx context.Context, message string, messages []models.Me
 		return "", fmt.Errorf("failed to load prompt: %w", err)
 	}
 
-	var chatHistory strings.Builder
-	for _, msg := range messages {
-		chatHistory.WriteString(fmt.Sprintf("%s: %s\n", msg.Sender, msg.Content))
-	}
-
 	connector := getConnector(ctx)
+	historyText := formatChatHistory(messages, message)
 
-	resumeHist, err := connector.GenerateResponse(ctx, "Format the following chat history to only show user reponse and AI response: "+chatHistory.String())
-	if err != nil {
-		return "", err
-	}
-
-	fullPrompt := fmt.Sprintf("%s\nChat history:\n%s\nATENTION! All Before this point is system instructions and chat history, to generate your response consider the current user message -> = %s\nAnswer me in this language: %s\nUSER LEVEL: %s (Adjust your vocabulary and grammar complexity to match this CEFR level).",
+	fullPrompt := fmt.Sprintf(
+		"%s\n\nCONTEXT:\n- Target Language: %s\n- Learner CEFR Level: %s\n- Max Length: %d characters\n\nCHAT HISTORY:\n%s\n\nCURRENT USER MESSAGE:\nUser: %s\nOutput:",
 		prePrompt,
-		resumeHist,
-		message,
 		language,
-		level)
-	fullPrompt += fmt.Sprintf("\nIMPORTANT: Your final answer must be complete, natural, and at most %d characters. Never cut words or end mid-sentence.", maxDialogResponseChars)
+		level,
+		maxDialogResponseChars,
+		historyText,
+		strings.TrimSpace(message),
+	)
 
 	return generateDialogResponseWithinLimit(ctx, connector, fullPrompt, maxDialogResponseChars, level)
 }
@@ -76,15 +142,19 @@ func GetCorrectionResponse(ctx context.Context, message string) (string, string,
 	}
 
 	connector := getConnector(ctx)
-	fullPrompt := fmt.Sprintf("%s\n\nINPUT:\n%s\n\nOUTPUT:", prompt, message)
+	fullPrompt := fmt.Sprintf("%s\n\nINPUT:\n%s\n\nOUTPUT:", prompt, strings.TrimSpace(message))
 
 	var correctionResp string
 	if optConnector, ok := connector.(connectors.OptionableConnector); ok {
-		systemPrompt := "You are an English language tutor. Correct the input text and provide a short, clear explanation of the errors in Portuguese. You must format your response exactly with 'Corrected:' and 'Explanation:' prefixes."
+		systemPrompt := "You are a strict language proofreader. Do NOT answer questions or continue conversations. Correct the INPUT text and explain the corrections in Brazilian Portuguese using the exact prefixes 'Corrected:' and 'Explanation:'."
 		options := map[string]any{
 			"temperature": 0.1,
 			"top_p":       0.9,
 			"num_predict": 384,
+			"stop": []string{
+				"\nINPUT:",
+				"\nInput:",
+			},
 		}
 		correctionResp, err = optConnector.GenerateResponseWithOptions(ctx, fullPrompt, systemPrompt, options)
 	} else {
@@ -118,19 +188,23 @@ func GetTranslationResponse(ctx context.Context, message string) (string, error)
 	}
 
 	connector := getConnector(ctx)
-	fullPrompt := fmt.Sprintf("%s\n\nINPUT:\n%s\n\nOUTPUT:", prompt, message)
+	fullPrompt := fmt.Sprintf("%s\n\nINPUT:\n%s\n\nOUTPUT:", prompt, strings.TrimSpace(message))
 
 	var response string
 	if optConnector, ok := connector.(connectors.OptionableConnector); ok {
-		systemPrompt := "You are a strict translation engine. Translate the INPUT text into Brazilian Portuguese and return ONLY the translated text."
+		systemPrompt := "You are a strict translation engine. Translate the INPUT text into natural Brazilian Portuguese and return ONLY the translated text. Never answer questions or add labels."
 		options := map[string]any{
 			"temperature": 0.1,
 			"top_p":       0.9,
 			"num_predict": 256,
 			"stop": []string{
 				"\n\n",
+				"\nINPUT:",
+				"\nInput:",
 				"Explanation:",
 				"Explicação:",
+				"Note:",
+				"Nota:",
 			},
 		}
 		response, err = optConnector.GenerateResponseWithOptions(ctx, fullPrompt, systemPrompt, options)
@@ -157,15 +231,22 @@ func GetTopicResponse(ctx context.Context, message string) (string, error) {
 	}
 
 	connector := getConnector(ctx)
-	strictPrompt := fmt.Sprintf("%s\n\nInput: %s\nOutput:", prompt, message)
+	strictPrompt := fmt.Sprintf("%s\n\nInput: %s\nOutput:", prompt, strings.TrimSpace(message))
 
 	var topicResp string
 	if optConnector, ok := connector.(connectors.OptionableConnector); ok {
-		systemPrompt := "You are a strict topic labeler. Return exactly two words in Title Case with only letters and one space."
+		systemPrompt := "You are a strict topic labeler. Return ONLY two words in English Title Case (e.g., 'Travel Memories') with no punctuation or labels."
 		options := map[string]any{
 			"temperature": 0.1,
 			"top_p":       0.9,
 			"num_predict": 12,
+			"stop": []string{
+				"\n",
+				"Input:",
+				"INPUT:",
+				"Output:",
+				"OUTPUT:",
+			},
 		}
 		topicResp, err = optConnector.GenerateResponseWithOptions(ctx, strictPrompt, systemPrompt, options)
 	} else {
@@ -176,12 +257,64 @@ func GetTopicResponse(ctx context.Context, message string) (string, error) {
 		return "", err
 	}
 
-	topicResp = strings.TrimSpace(topicResp)
-	if topicResp == "" {
-		topicResp = "New Topic"
+	return sanitizeTopicResponse(topicResp), nil
+}
+
+func sanitizeTopicResponse(raw string) string {
+	cleaned := strings.TrimSpace(raw)
+	if cleaned == "" {
+		return "New Topic"
 	}
 
-	return topicResp, nil
+	// Keep only the first non-empty line
+	for _, line := range strings.Split(cleaned, "\n") {
+		if t := strings.TrimSpace(line); t != "" {
+			cleaned = t
+			break
+		}
+	}
+
+	cleaned = strings.TrimLeft(cleaned, "*#-_ \t")
+	for _, prefix := range []string{"output:", "topic:", "category:", "tópico:", "theme:"} {
+		if strings.HasPrefix(strings.ToLower(cleaned), prefix) {
+			cleaned = strings.TrimSpace(cleaned[len(prefix):])
+		}
+	}
+
+	// Keep only letters, digits, and spaces
+	var filtered strings.Builder
+	for _, r := range cleaned {
+		if unicode.IsLetter(r) || unicode.IsDigit(r) || unicode.IsSpace(r) {
+			filtered.WriteRune(r)
+		} else if r == '-' || r == '/' {
+			filtered.WriteRune(' ')
+		}
+	}
+
+	words := strings.Fields(filtered.String())
+	if len(words) == 0 {
+		return "New Topic"
+	}
+	if len(words) > 3 {
+		words = words[:2]
+	}
+
+	for i, w := range words {
+		runes := []rune(strings.ToLower(w))
+		if len(runes) > 0 {
+			runes[0] = unicode.ToUpper(runes[0])
+		}
+		words[i] = string(runes)
+	}
+
+	res := strings.Join(words, " ")
+	if utf8.RuneCountInString(res) > 24 && len(words) > 1 {
+		res = strings.Join(words[:2], " ")
+	}
+	if strings.TrimSpace(res) == "" {
+		return "New Topic"
+	}
+	return res
 }
 
 func normalizeDialogResponse(raw string) string {
@@ -190,8 +323,61 @@ func normalizeDialogResponse(raw string) string {
 		return ""
 	}
 
+	// Strip leaked translation blocks or subsequent user turns if any
+	for _, cutMarker := range []string{"\n[TRANSLATION]", "[TRANSLATION]:", "\nUser:", "\nInput:"} {
+		if idx := strings.Index(cleaned, cutMarker); idx != -1 {
+			cleaned = strings.TrimSpace(cleaned[:idx])
+		}
+	}
+
+	// Remove common speaker prefixes
+	cleaned = strings.TrimLeft(cleaned, "*_ \t")
+	for _, prefix := range []string{"output:", "you:", "speakup:", "assistant:", "ai:", "response:"} {
+		if strings.HasPrefix(strings.ToLower(cleaned), prefix) {
+			cleaned = strings.TrimSpace(cleaned[len(prefix):])
+			break
+		}
+	}
+
+	cleaned = strings.TrimSpace(strings.Trim(cleaned, "\"'`"))
 	cleaned = strings.Join(strings.Fields(cleaned), " ")
 	return cleaned
+}
+
+func truncateDialogResponse(text string, maxChars int) string {
+	if utf8.RuneCountInString(text) <= maxChars {
+		return text
+	}
+	runes := []rune(text)
+	window := string(runes[:maxChars])
+
+	// 1. Prefer cutting at the last complete sentence punctuation (. ! ?)
+	lastPunct := -1
+	for i, r := range window {
+		if r == '.' || r == '!' || r == '?' {
+			lastPunct = i
+		}
+	}
+	if lastPunct >= maxChars/3 {
+		return strings.TrimSpace(window[:lastPunct+1])
+	}
+
+	// 2. Otherwise cut cleanly at the last word boundary and ensure ending punctuation
+	lastSpace := strings.LastIndex(window, " ")
+	if lastSpace > 0 {
+		trimmed := strings.TrimRight(strings.TrimSpace(window[:lastSpace]), ",;:-")
+		if trimmed != "" {
+			lastRune, _ := utf8.DecodeLastRuneInString(trimmed)
+			if lastRune != '.' && lastRune != '!' && lastRune != '?' {
+				if utf8.RuneCountInString(trimmed) < maxChars {
+					trimmed += "."
+				}
+			}
+			return trimmed
+		}
+	}
+
+	return strings.TrimSpace(window)
 }
 
 func generateDialogResponseWithinLimit(ctx context.Context, connector connectors.AIConnector, prompt string, maxChars int, level string) (string, error) {
@@ -203,13 +389,20 @@ func generateDialogResponseWithinLimit(ctx context.Context, connector connectors
 	options := map[string]any{
 		"temperature": 0.3,
 		"top_p":       0.9,
-		"num_predict": 96,
+		"num_predict": 80,
+		"stop": []string{
+			"\nUser:",
+			"\nYou:",
+			"\nInput:",
+			"\n[TRANSLATION]",
+		},
 	}
 	if level == "" {
 		level = "B1"
 	}
-	systemPrompt := fmt.Sprintf("You are a natural language exchange partner. The user has a language proficiency of %s. Keep coherence with chat context and user message. Return exactly one complete answer with at most %d characters. Adjust your language to be appropriate for a %s learner.", level, maxChars, level)
+	systemPrompt := fmt.Sprintf("You are SpeakUp, a friendly language exchange partner. The user's CEFR level is %s. Reply in the target language only, using 1-2 short sentences (at most %d characters total). Output only your reply without labels.", level, maxChars)
 
+	var lastCleaned string
 	for attempt := 0; attempt < maxDialogRewriteAttempts; attempt++ {
 		var (
 			rawResp string
@@ -230,17 +423,23 @@ func generateDialogResponseWithinLimit(ctx context.Context, connector connectors
 			currentPrompt = prompt
 			continue
 		}
+		lastCleaned = cleaned
 
 		if utf8.RuneCountInString(cleaned) <= maxChars {
 			return cleaned, nil
 		}
 
 		currentPrompt = fmt.Sprintf(
-			"%s\n\nIMPORTANT: Your previous answer exceeded %d characters. Answer again with one complete, natural sentence up to %d characters, keeping the same context and language.",
+			"%s\n\nIMPORTANT: Your previous draft was %d characters, which exceeds the %d-character limit. Rewrite it into ONE short sentence + ONE short question under %d characters.",
 			prompt,
+			utf8.RuneCountInString(cleaned),
 			maxChars,
 			maxChars,
 		)
+	}
+
+	if lastCleaned != "" {
+		return truncateDialogResponse(lastCleaned, maxChars), nil
 	}
 
 	return "", fmt.Errorf("failed to generate response within %d characters", maxChars)
@@ -252,9 +451,11 @@ func sanitizeTranslationResponse(raw string) string {
 		return ""
 	}
 
+	cleaned = strings.TrimLeft(cleaned, "*#-_ \t")
 	labels := []string{
 		"Translation:",
 		"Tradução:",
+		"Traducao:",
 		"Translated text:",
 		"OUTPUT:",
 		"Output:",
@@ -265,12 +466,23 @@ func sanitizeTranslationResponse(raw string) string {
 		labelLower := strings.ToLower(label)
 		if strings.HasPrefix(lower, labelLower) {
 			cleaned = strings.TrimSpace(cleaned[len(label):])
+			cleaned = strings.TrimLeft(cleaned, "*_ \t")
 			lower = strings.ToLower(cleaned)
 			break
 		}
 	}
 
-	for _, marker := range []string{"\ntranslation:", "\ntradução:", " translation:", " tradução:"} {
+	for _, marker := range []string{
+		"\ntranslation:",
+		"\ntradução:",
+		"\nnota:",
+		"\nnote:",
+		"\nobs:",
+		"\nexplicação:",
+		"\nexplanation:",
+		" translation:",
+		" tradução:",
+	} {
 		if idx := strings.Index(strings.ToLower(cleaned), marker); idx > 0 {
 			cleaned = strings.TrimSpace(cleaned[:idx])
 			break
@@ -281,40 +493,96 @@ func sanitizeTranslationResponse(raw string) string {
 	return cleaned
 }
 
+func stripMarkdownLabel(line string) string {
+	s := strings.TrimSpace(line)
+	s = strings.TrimLeft(s, "*-#> \t")
+	s = strings.ReplaceAll(s, "**", "")
+	s = strings.ReplaceAll(s, "__", "")
+	return strings.TrimSpace(s)
+}
+
 func parseCorrectionResponse(raw string) (string, string) {
 	lines := strings.Split(raw, "\n")
 	var corrected, explanation []string
 	isExplanation := false
 
+	correctedPrefixes := []string{"corrected:", "correction:", "corrigido:", "correção:", "correcao:"}
+	explanationPrefixes := []string{"explanation:", "explicação:", "explicacao:"}
+
 	for _, line := range lines {
-		trimmed := strings.TrimSpace(line)
-		if trimmed == "" {
+		normalized := stripMarkdownLabel(line)
+		if normalized == "" {
 			continue
 		}
-		if strings.HasPrefix(strings.ToLower(trimmed), "corrected:") {
-			corrected = append(corrected, strings.TrimSpace(line[len("corrected:"):]))
-			isExplanation = false
-		} else if strings.HasPrefix(strings.ToLower(trimmed), "explanation:") {
-			explanation = append(explanation, strings.TrimSpace(line[len("explanation:"):]))
-			isExplanation = true
-		} else if strings.HasPrefix(strings.ToLower(trimmed), "explicação:") {
-			explanation = append(explanation, strings.TrimSpace(line[len("explicação:"):]))
-			isExplanation = true
-		} else {
-			if isExplanation {
-				explanation = append(explanation, trimmed)
-			} else {
-				corrected = append(corrected, trimmed)
+
+		lower := strings.ToLower(normalized)
+
+		// Check if both Corrected: and Explanation: appear on the same line
+		matchedBoth := false
+		for _, cp := range correctedPrefixes {
+			if strings.HasPrefix(lower, cp) {
+				rest := strings.TrimSpace(normalized[len(cp):])
+				restLower := strings.ToLower(rest)
+				for _, ep := range explanationPrefixes {
+					if idx := strings.Index(restLower, ep); idx != -1 {
+						cPart := strings.TrimSpace(rest[:idx])
+						ePart := strings.TrimSpace(rest[idx+len(ep):])
+						if cPart != "" {
+							corrected = append(corrected, cPart)
+						}
+						if ePart != "" {
+							explanation = append(explanation, ePart)
+						}
+						isExplanation = true
+						matchedBoth = true
+						break
+					}
+				}
+				if !matchedBoth {
+					if rest != "" {
+						corrected = append(corrected, rest)
+					}
+					isExplanation = false
+					matchedBoth = true
+				}
+				break
 			}
+		}
+		if matchedBoth {
+			continue
+		}
+
+		matchedExpl := false
+		for _, ep := range explanationPrefixes {
+			if strings.HasPrefix(lower, ep) {
+				rest := strings.TrimSpace(normalized[len(ep):])
+				if rest != "" {
+					explanation = append(explanation, rest)
+				}
+				isExplanation = true
+				matchedExpl = true
+				break
+			}
+		}
+		if matchedExpl {
+			continue
+		}
+
+		if isExplanation {
+			explanation = append(explanation, normalized)
+		} else {
+			corrected = append(corrected, normalized)
 		}
 	}
 
-	correctedText := strings.TrimSpace(strings.Join(corrected, "\n"))
-	explanationText := strings.TrimSpace(strings.Join(explanation, "\n"))
+	// Join corrected with spaces so it never introduces "\n\n" which would break frontend splitting
+	correctedText := strings.TrimSpace(strings.Join(corrected, " "))
+	correctedText = strings.TrimSpace(strings.Trim(correctedText, "\"'`"))
+	explanationText := strings.TrimSpace(strings.Join(explanation, " "))
 
 	// Fallback if no tags were matched
 	if correctedText == "" && explanationText == "" {
-		correctedText = strings.TrimSpace(raw)
+		correctedText = strings.TrimSpace(strings.Join(strings.Fields(raw), " "))
 	}
 
 	return correctedText, explanationText
@@ -326,6 +594,21 @@ type GeneratedFlashcardData struct {
 	Explanation     string `json:"explanation"`
 }
 
+func extractJSONObject(raw string) string {
+	cleaned := strings.TrimSpace(raw)
+	cleaned = strings.TrimPrefix(cleaned, "```json")
+	cleaned = strings.TrimPrefix(cleaned, "```")
+	cleaned = strings.TrimSuffix(cleaned, "```")
+	cleaned = strings.TrimSpace(cleaned)
+
+	start := strings.Index(cleaned, "{")
+	end := strings.LastIndex(cleaned, "}")
+	if start != -1 && end != -1 && end > start {
+		return cleaned[start : end+1]
+	}
+	return cleaned
+}
+
 func GetFlashcardGenerateResponse(ctx context.Context, term string, contextSentence string) (GeneratedFlashcardData, error) {
 	var result GeneratedFlashcardData
 
@@ -335,12 +618,13 @@ func GetFlashcardGenerateResponse(ctx context.Context, term string, contextSente
 	}
 
 	connector := getConnector(ctx)
-	fullPrompt := fmt.Sprintf("%s\n\nWORD/PHRASE:\n%s\n\nCONTEXT SENTENCE:\n%s\n\nOUTPUT (JSON ONLY):", prompt, term, contextSentence)
+	fullPrompt := fmt.Sprintf("%s\n\nWORD/PHRASE:\n%s\n\nCONTEXT SENTENCE:\n%s\n\nOUTPUT (JSON ONLY):", prompt, strings.TrimSpace(term), strings.TrimSpace(contextSentence))
 
 	var resp string
 	if optConnector, ok := connector.(connectors.OptionableConnector); ok {
-		systemPrompt := "You are a strict language flashcard generator. Output raw JSON only."
+		systemPrompt := "You are a strict language flashcard generator. Output a raw JSON object only with keys 'back', 'context_sentence', and 'explanation'."
 		options := map[string]any{
+			"format":      "json",
 			"temperature": 0.2,
 			"top_p":       0.9,
 			"num_predict": 256,
@@ -354,20 +638,15 @@ func GetFlashcardGenerateResponse(ctx context.Context, term string, contextSente
 		return result, err
 	}
 
-	cleaned := strings.TrimSpace(resp)
-	cleaned = strings.TrimPrefix(cleaned, "```json")
-	cleaned = strings.TrimPrefix(cleaned, "```")
-	cleaned = strings.TrimSuffix(cleaned, "```")
-	cleaned = strings.TrimSpace(cleaned)
-
+	cleaned := extractJSONObject(resp)
 	if err := json.Unmarshal([]byte(cleaned), &result); err != nil {
-		// Fallback if parsing fails
-		result.Back = term
-		result.ContextSentence = contextSentence
-		result.Explanation = "Tradução/Explicação automática."
+		return result, fmt.Errorf("failed to parse flashcard JSON: %w", err)
 	}
 
 	result.Back = FormatSingleWordTranslation(result.Back)
+	if result.Back == "" {
+		return result, fmt.Errorf("empty flashcard back translation")
+	}
 
 	return result, nil
 }
