@@ -19,5 +19,6 @@ func ChatRoutes(router *gin.Engine, chatHandler *handlers.ChatHandler) {
 
         // special routes
         chatRoutes.GET("/user", middlewares.AuthMiddleware(), chatHandler.GetChatsByUserId)
+        chatRoutes.POST("/send", middlewares.AuthMiddleware(), chatHandler.SendTurn)
     }
 }

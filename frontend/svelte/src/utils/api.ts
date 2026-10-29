@@ -34,17 +34,28 @@ interface UserData {
     level: string;
 }
 
-interface Chat {
+export interface Chat {
     id: string;
     topic: string;
+    start_time?: string;
 }
 
-interface Message {
+export interface Message {
     id: string;
     chat_id: string;
     content: string;
+    corrected_content?: string;
+    explanation?: string;
+    translation?: string;
     sender: string;
     type: string;
+    created_at?: string;
+}
+
+export interface ChatTurnResponse {
+    chat: Chat;
+    user_message: Message;
+    ai_message: Message;
 }
 
 interface AIResponse {
@@ -161,6 +172,20 @@ const getAIProvider = (): string => {
         return 'ollama';
     }
     return stored;
+};
+
+// Send complete chat turn (backend orchestrates topic, correction, dialog, translation, and DB persistence)
+export const sendChatTurn = async (message: string, chatId?: string | null): Promise<ChatTurnResponse> => {
+    const response = await axios.post<ChatTurnResponse>(API_URL + `/chat/send`, {
+        chat_id: chatId || "",
+        message
+    }, {
+        headers: {
+            Authorization: `Bearer ${Cookies.get('authToken')}`,
+            'X-AI-Provider': getAIProvider()
+        }
+    });
+    return response.data;
 };
 
 // generate AI response dialog

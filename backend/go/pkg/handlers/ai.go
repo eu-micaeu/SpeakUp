@@ -9,7 +9,7 @@ import (
 	"speakup/pkg/adapters/ai"
 	"speakup/pkg/config"
 	"speakup/pkg/middlewares"
-	"speakup/pkg/models"
+	"speakup/pkg/repositories"
 
 	"github.com/gin-gonic/gin"
 )
@@ -25,16 +25,10 @@ func GenerateResponseDialog(c *gin.Context) {
 		return
 	}
 
-	db := config.GetMongoClient()
-	collection := db.Database("speakup").Collection("messages")
-	cursor, err := collection.Find(c, map[string]string{"chat_id": request.ChatID})
+	db := config.GetMongoClient().Database(config.GetDBName())
+	msgRepo := repositories.NewMongoMessageRepository(db)
+	messages, err := msgRepo.FindRecentByChatID(c, request.ChatID, 10)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get chat history"})
-		return
-	}
-
-	var messages []models.Message
-	if err := cursor.All(c, &messages); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get chat history"})
 		return
 	}

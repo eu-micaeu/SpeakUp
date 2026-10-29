@@ -51,7 +51,8 @@ func (h *MessageHandler) CreateMessage(c *gin.Context) {
 	}
 
 	message.ID = uuid.New().String()
-	message.CreatedAt = time.Now().Format(time.RFC3339)
+	message.CreatedAt = time.Now().UTC().Format(time.RFC3339Nano)
+	message.Normalize()
 
 	if err := h.Repo.Create(c, message); err != nil {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to create message")
@@ -133,6 +134,15 @@ func (h *MessageHandler) UpdateMessage(c *gin.Context) {
 	updateDoc := bson.M{}
 	if message.Content != "" {
 		updateDoc["content"] = message.Content
+	}
+	if message.CorrectedContent != "" {
+		updateDoc["corrected_content"] = message.CorrectedContent
+	}
+	if message.Explanation != "" {
+		updateDoc["explanation"] = message.Explanation
+	}
+	if message.Translation != "" {
+		updateDoc["translation"] = message.Translation
 	}
 	if message.Type != "" {
 		updateDoc["type"] = message.Type

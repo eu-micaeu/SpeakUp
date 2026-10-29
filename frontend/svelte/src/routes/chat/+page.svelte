@@ -5,14 +5,10 @@
     import Sidebar from "../../components/Sidebar.svelte";
     import AudioRecorder from "../../components/AudioRecorder.svelte";
     import {
+        API_URL,
         getChatsByUserId,
-        createChat,
         getMessagesByChatId,
-        addMessageToChat,
-        generateAIResponseDialog,
-        generateAIResponseCorrection,
-        generateAIResponseTranslation,
-        generateAIResponseTopic,
+        sendChatTurn,
     } from "../../utils/api";
     import Cookies from "js-cookie";
     import { requireAuthOrRedirect } from "../../utils/cookies";
@@ -34,13 +30,40 @@
     interface Message {
         id: string;
         text: string;
+        correctedText?: string;
+        explanation?: string;
+        translation?: string;
         sender: "user" | "ai";
         type: "request" | "response";
+        pending?: boolean;
     }
 
-    interface ApiResponse {
-        response: string;
-        explanation?: string;
+    function mapApiMessage(m: any): Message {
+        let rawContent: string = m.content || "";
+        let correctedText: string | undefined = m.corrected_content;
+        let explanation: string | undefined = m.explanation;
+        let translation: string | undefined = m.translation;
+
+        // Backward compatibility if legacy concatenated string is encountered
+        if (m.sender === "user" && !correctedText && rawContent.includes("\n\nCorreção:")) {
+            const parts = rawContent.split("\n\nCorreção:");
+            rawContent = parts[0].trim();
+            correctedText = parts[1]?.trim();
+        } else if (m.sender === "ai" && !translation && rawContent.includes("[TRANSLATION]:")) {
+            const parts = rawContent.split("[TRANSLATION]:");
+            rawContent = parts[0].trim();
+            translation = parts[1]?.trim();
+        }
+
+        return {
+            id: m.id,
+            text: rawContent,
+            correctedText,
+            explanation,
+            translation,
+            sender: m.sender,
+            type: m.type,
+        };
     }
 
     let chats: Chat[] = [];
@@ -113,87 +136,47 @@
         const userInput = inputMessage.trim();
         inputMessage = "";
 
+        const tempId = `temp-${Date.now()}`;
+        messages = [
+            ...messages,
+            {
+                id: tempId,
+                text: userInput,
+                sender: "user",
+                type: "request",
+                pending: true,
+            },
+        ];
+
         try {
-            let chatId = currentChatId;
+            const turnRes = await sendChatTurn(userInput, currentChatId);
 
-            if (!chatId) {
-                const topicRes: ApiResponse | undefined =
-                    await generateAIResponseTopic(userInput);
-                if (!topicRes?.response) {
-                    throw new Error("Failed to generate topic");
-                }
-                const newChatRaw = await createChat(topicRes.response);
+            if (turnRes.chat?.id) {
+                currentChatId = turnRes.chat.id;
                 const newChat: Chat = {
-                    id: newChatRaw.id,
-                    title: (newChatRaw as any).title ?? topicRes.response,
-                    topic: (newChatRaw as any).topic ?? topicRes.response,
+                    id: turnRes.chat.id,
+                    title: (turnRes.chat as any).title ?? turnRes.chat.topic,
+                    topic: turnRes.chat.topic,
                     createdAt:
-                        (newChatRaw as any).createdAt ??
-                        new Date().toISOString(),
+                        turnRes.chat.start_time ?? new Date().toISOString(),
                 };
-                chatId = newChat.id;
-                currentChatId = chatId;
-                // Only add if not already in the list
+                selectedChat = newChat;
                 if (!chats.some((c) => c.id === newChat.id)) {
-                    chats = [...chats, newChat];
+                    chats = [newChat, ...chats];
                 }
             }
 
-            const correction: ApiResponse | undefined =
-                await generateAIResponseCorrection(userInput);
-            if (!correction?.response) {
-                throw new Error("Failed to generate correction");
-            }
+            const savedUserMsg = mapApiMessage(turnRes.user_message);
+            const savedAiMsg = mapApiMessage(turnRes.ai_message);
 
-            let fullUserMsg = `${userInput}\n\nCorreção: ${correction.response}`;
-
-            const savedUserMsg = await addMessageToChat(
-                chatId,
-                fullUserMsg,
-                "user",
-                "request",
-            );
             messages = [
-                ...messages,
-                {
-                    id: savedUserMsg.id,
-                    text: fullUserMsg,
-                    sender: "user",
-                    type: "request",
-                },
-            ];
-
-            const dialogRes: ApiResponse | undefined =
-                await generateAIResponseDialog(correction.response, chatId);
-            if (!dialogRes?.response) {
-                throw new Error("Failed to generate dialog response");
-            }
-
-            const translation: ApiResponse | undefined =
-                await generateAIResponseTranslation(dialogRes.response);
-            if (!translation?.response) {
-                throw new Error("Failed to generate translation");
-            }
-
-            const fullAIResponse = `${dialogRes.response}\n\n[TRANSLATION]: ${translation.response}`;
-
-            const savedBotMsg = await addMessageToChat(
-                chatId,
-                fullAIResponse,
-                "ai",
-                "response",
-            );
-            messages = [
-                ...messages,
-                {
-                    id: savedBotMsg.id,
-                    text: fullAIResponse,
-                    sender: "ai",
-                    type: "response",
-                },
+                ...messages.filter((m) => m.id !== tempId),
+                savedUserMsg,
+                savedAiMsg,
             ];
         } catch (err) {
             console.error("Error sending message:", err);
+            messages = messages.filter((m) => m.id !== tempId);
             inputMessage = userInput;
         } finally {
             isSending = false;
@@ -207,12 +190,7 @@
         selectedChat = chat || null;
         try {
             const res = await getMessagesByChatId(chatId);
-            messages = res.map((m: any) => ({
-                id: m.id,
-                text: m.content,
-                sender: m.sender,
-                type: m.type,
-            }));
+            messages = res.map(mapApiMessage);
         } catch (error) {
             console.error("Error loading messages:", error);
             messages = [];
@@ -545,7 +523,7 @@
                             <button
                                 class="ttsButton botBubbleTts"
                                 class:speaking={playingMsgId === msg.id}
-                                on:click={() => playTTS(msg.id, msg.text.split("\n\n")[0])}
+                                on:click={() => playTTS(msg.id, msg.text)}
                                 title="Ouvir pronúncia"
                                 type="button"
                             >
@@ -561,52 +539,61 @@
                                 {/if}
                             </button>
                         {/if}
-                        <p>{msg.text.split("\n\n")[0]}</p>
+                        <p>{msg.text}</p>
 
-                        {#if msg.type === "request"}
+                        {#if msg.type === "request" && (msg.correctedText || msg.pending)}
                             <div class="responseExtras">
-                                <p class="correctionTextLine">
-                                    <span>
-                                        <strong>Correção:</strong>
-                                        {msg.text
-                                            .split("\n\n")[1]
-                                            ?.replace("Correção: ", "") || ""}
-                                    </span>
-                                    <button
-                                        class="ttsButton inlineTts"
-                                        class:speaking={playingMsgId === `${msg.id}-corr`}
-                                        on:click={() => playTTS(`${msg.id}-corr`, msg.text.split("\n\n")[1]?.replace("Correção: ", "") || "")}
-                                        title="Ouvir pronúncia da correção"
-                                        type="button"
-                                    >
-                                        {#if playingMsgId === `${msg.id}-corr`}
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                                <rect x="4" y="4" width="16" height="16" rx="2" ry="2"/>
-                                            </svg>
-                                        {:else}
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-                                                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
-                                            </svg>
-                                        {/if}
-                                    </button>
-                                    <button
-                                        class="flashcardAddBtn disabled"
-                                        disabled
-                                        title="Flashcards indisponível no momento"
-                                        type="button"
-                                    >
-                                        +Flashcard
-                                    </button>
-                                </p>
-
+                                {#if msg.pending}
+                                    <p class="correctionTextLine">
+                                        <span><em>Analisando gramática e gerando resposta...</em></span>
+                                    </p>
+                                {:else if msg.correctedText}
+                                    <p class="correctionTextLine">
+                                        <span>
+                                            <strong>Correção:</strong>
+                                            {msg.correctedText}
+                                        </span>
+                                        <button
+                                            class="ttsButton inlineTts"
+                                            class:speaking={playingMsgId === `${msg.id}-corr`}
+                                            on:click={() => playTTS(`${msg.id}-corr`, msg.correctedText || "")}
+                                            title="Ouvir pronúncia da correção"
+                                            type="button"
+                                        >
+                                            {#if playingMsgId === `${msg.id}-corr`}
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                    <rect x="4" y="4" width="16" height="16" rx="2" ry="2"/>
+                                                </svg>
+                                            {:else}
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                                                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                                                </svg>
+                                            {/if}
+                                        </button>
+                                        <button
+                                            class="flashcardAddBtn disabled"
+                                            disabled
+                                            title="Flashcards indisponível no momento"
+                                            type="button"
+                                        >
+                                            +Flashcard
+                                        </button>
+                                    </p>
+                                    {#if msg.explanation}
+                                        <p class="explanationTextLine">
+                                            <strong>Explicação:</strong>
+                                            {msg.explanation}
+                                        </p>
+                                    {/if}
+                                {/if}
                             </div>
                         {/if}
-                        {#if msg.type === "response"}
+                        {#if msg.type === "response" && msg.translation}
                             <div class="responseExtras">
                                 <p>
                                     <strong>Tradução:</strong>
-                                    {msg.text.split("[TRANSLATION]: ")[1] || ""}
+                                    {msg.translation}
                                 </p>
                             </div>
                         {/if}
@@ -927,6 +914,12 @@
         justify-content: space-between;
         gap: 1rem;
         margin-bottom: 0.25rem;
+    }
+
+    .explanationTextLine {
+        margin-top: 0.35rem;
+        color: #bbb;
+        line-height: 1.4;
     }
 
     .inlineTts {

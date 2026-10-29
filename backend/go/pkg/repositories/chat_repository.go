@@ -4,8 +4,9 @@ import (
 	"context"
 	"speakup/pkg/models"
 
-	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type ChatRepository interface {
@@ -39,36 +40,38 @@ func (r *MongoChatRepository) FindByID(ctx context.Context, id string) (models.C
 }
 
 func (r *MongoChatRepository) FindAll(ctx context.Context) ([]models.Chat, error) {
-	cursor, err := r.Collection.Find(ctx, bson.M{})
+	opts := options.Find().SetSort(bson.D{{Key: "start_time", Value: -1}})
+	cursor, err := r.Collection.Find(ctx, bson.M{}, opts)
 	if err != nil {
 		return nil, err
 	}
+	defer cursor.Close(ctx)
+
 	var chats []models.Chat
 	err = cursor.All(ctx, &chats)
+	if chats == nil {
+		chats = []models.Chat{}
+	}
 	return chats, err
 }
 
 func (r *MongoChatRepository) FindAllByUserID(ctx context.Context, userID string) ([]models.Chat, error) {
-	cursor, err := r.Collection.Find(ctx, bson.M{"user_id": userID})
+	opts := options.Find().SetSort(bson.D{{Key: "start_time", Value: -1}})
+	cursor, err := r.Collection.Find(ctx, bson.M{"user_id": userID}, opts)
 	if err != nil {
 		return nil, err
 	}
+	defer cursor.Close(ctx)
+
 	var chats []models.Chat
 	err = cursor.All(ctx, &chats)
+	if chats == nil {
+		chats = []models.Chat{}
+	}
 	return chats, err
 }
 
 func (r *MongoChatRepository) Update(ctx context.Context, id string, chat models.Chat) error {
-	// Note: We might want to use $set here instead of replacing the whole document to avoid overwriting fields unintentionally,
-	// but sticking to original logic for now which seemed to replace.
-	// However, usually UpdateOne takes an update document. The original code used UpdateOne with 'chat' as the update?
-	// Let's double check the original code logic.
-	// "collection.UpdateOne(c, map[string]string{"_id": id}, chat)" in original code might be wrong if 'chat' is a struct?
-	// UpdateOne usually expects a '$set' operator or similar if passing a struct directly it might fail or replace.
-	// Actually, ReplaceOne is for replacing. UpdateOne expects atomic operators.
-	// If the original code was working with UpdateOne(..., chat), maybe the driver handles it if 'chat' has bson tags?
-	// But usually UpdateOne expects {$set: ...}.
-	// Let's assume the intention is to update fields. I will use $set.
 	update := bson.M{"$set": chat}
 	_, err := r.Collection.UpdateOne(ctx, bson.M{"_id": id}, update)
 	return err
@@ -78,3 +81,4 @@ func (r *MongoChatRepository) Delete(ctx context.Context, id string) error {
 	_, err := r.Collection.DeleteOne(ctx, bson.M{"_id": id})
 	return err
 }
+

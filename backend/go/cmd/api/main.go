@@ -36,6 +36,7 @@ func main() {
 	dbClient := config.GetMongoClient()
 	dbName := config.GetDBName()
 	db := dbClient.Database(dbName)
+	config.EnsureIndexes(db)
 
 	// Repositories
 	chatRepo := repositories.NewMongoChatRepository(db)
@@ -44,7 +45,7 @@ func main() {
 	flashcardRepo := repositories.NewMongoFlashcardRepository(db)
 
 	// Handlers
-	chatHandler := handlers.NewChatHandler(chatRepo)
+	chatHandler := handlers.NewChatHandler(chatRepo, messageRepo)
 	userHandler := handlers.NewUserHandler(userRepo)
 	messageHandler := handlers.NewMessageHandler(messageRepo)
 	flashcardHandler := handlers.NewFlashcardHandler(flashcardRepo)

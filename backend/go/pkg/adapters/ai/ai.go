@@ -39,28 +39,16 @@ const maxDialogRewriteAttempts = 3
 const maxChatHistoryMessages = 10
 
 func cleanStoredMessageContent(msg models.Message) string {
-	content := strings.TrimSpace(msg.Content)
-	if content == "" {
-		return ""
-	}
+	msg.Normalize()
 
 	if strings.EqualFold(msg.Sender, "user") {
-		// In MongoDB, user messages are stored as "<raw>\n\nCorreção: <corrected>"
-		if idx := strings.Index(content, "\n\nCorreção:"); idx != -1 {
-			corrected := strings.TrimSpace(content[idx+len("\n\nCorreção:"):])
-			if corrected != "" {
-				return corrected
-			}
-			return strings.TrimSpace(content[:idx])
+		if strings.TrimSpace(msg.CorrectedContent) != "" {
+			return strings.TrimSpace(msg.CorrectedContent)
 		}
-		return content
+		return strings.TrimSpace(msg.Content)
 	}
 
-	// In MongoDB, AI messages are stored as "<dialog>\n\n[TRANSLATION]: <pt>"
-	if idx := strings.Index(content, "\n\n[TRANSLATION]:"); idx != -1 {
-		return strings.TrimSpace(content[:idx])
-	}
-	return content
+	return strings.TrimSpace(msg.Content)
 }
 
 func formatChatHistory(messages []models.Message, currentMessage string) string {
