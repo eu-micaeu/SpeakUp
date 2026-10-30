@@ -1,179 +1,138 @@
-<script>
-  export let imgSrc = "",
-    svg = "",
-    alt = "",
+<script lang="ts">
+  export let svg = "",
+    tag = "",
     title = "",
     content = "",
     index = 0;
+
+  let isVisible = false;
+
+  function revealOnScroll(node: HTMLElement) {
+    if (typeof IntersectionObserver === "undefined") {
+      isVisible = true;
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            isVisible = true;
+            observer.unobserve(node);
+          }
+        });
+      },
+      { threshold: 0.15, rootMargin: "0px 0px -40px 0px" }
+    );
+
+    observer.observe(node);
+
+    return {
+      destroy() {
+        observer.disconnect();
+      },
+    };
+  }
 </script>
 
-<div class="feature" style="animation-delay: {index * 0.2}s">
-  <div class="iconWrapper">
-    {#if svg}
+<div
+  class="featureCard"
+  class:visible={isVisible}
+  style="transition-delay: {index * 90}ms"
+  use:revealOnScroll
+>
+  <div class="cardTop">
+    <div class="iconBox">
       {@html svg}
-    {:else}
-      <img src={imgSrc} {alt} />
+    </div>
+    {#if tag}
+      <span class="cardTag">{tag}</span>
     {/if}
-    <div class="iconGlow"></div>
   </div>
-  <div class="content">
+
+  <div class="cardBody">
     <h2>{title}</h2>
     <p>{content}</p>
   </div>
 </div>
 
 <style>
-  .feature {
+  .featureCard {
+    background-color: #111111;
+    border: 1px solid #222222;
+    border-radius: 12px;
+    padding: 1.75rem;
     display: flex;
-    gap: 2rem;
-    align-items: center;
-    width: 100%;
-    max-width: 900px;
-    margin: 0 auto 2rem;
-    padding: 2.5rem;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
+    flex-direction: column;
+    justify-content: flex-start;
+    text-align: left;
     opacity: 0;
-    animation: fadeInUp 0.8s ease-out forwards;
+    transition:
+      opacity 0.55s ease,
+      border-color 0.25s ease,
+      background-color 0.25s ease;
   }
 
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  .featureCard.visible {
+    opacity: 1;
   }
 
-  .feature::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.05),
-      transparent
-    );
-    transition: left 0.5s;
+  .featureCard.visible:hover {
+    border-color: #333333;
+    background-color: #151515;
   }
 
-  .feature:hover::before {
-    left: 100%;
+  .cardTop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.35rem;
   }
 
-  .feature:hover {
-    transform: translateY(-8px);
-    border-color: rgba(255, 255, 255, 0.2);
-    background: rgba(255, 255, 255, 0.06);
-  }
-
-  .iconWrapper {
-    position: relative;
-    flex-shrink: 0;
-    width: 120px;
-    height: 120px;
+  .iconBox {
+    width: 40px;
+    height: 40px;
+    background-color: #181818;
+    border: 1px solid #262626;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.1),
-      rgba(255, 255, 255, 0.05)
-    );
-    border-radius: 6px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    transition: all 0.4s ease;
+    color: #e4e4e7;
+    transition: border-color 0.25s ease, color 0.25s ease;
   }
 
-  .iconGlow {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    border-radius: 6px;
-    opacity: 0;
-  }
-
-  .feature:hover .iconGlow {
-    opacity: 1;
-  }
-
-  .iconWrapper img {
-    width: 70px;
-    height: 70px;
-    object-fit: contain;
-    transition: all 0.4s ease;
-    position: relative;
-    z-index: 1;
-  }
-
-  .content {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .content h2 {
-    margin-bottom: 1rem;
-    font-size: 1.3rem;
-    font-weight: 700;
-    line-height: 1.4;
+  .featureCard:hover .iconBox {
+    border-color: #3a3a3a;
     color: #ffffff;
-    transition: color 0.3s;
   }
 
-  .feature:hover .content h2 {
-    background: linear-gradient(90deg, #ffffff, #e0e0e0);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+  .cardTag {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #777777;
+    background-color: #181818;
+    border: 1px solid #242424;
+    padding: 0.22rem 0.55rem;
+    border-radius: 4px;
   }
 
-  .content p {
-    font-size: 1.05rem;
-    line-height: 1.7;
-    opacity: 0.85;
-    color: #e0e0e0;
-    transition: opacity 0.3s;
+  .cardBody h2 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.35;
+    color: #ffffff;
+    letter-spacing: -0.01em;
   }
 
-  .feature:hover .content p {
-    opacity: 1;
-  }
-
-  @media screen and (max-width: 768px) {
-    .feature {
-      flex-direction: column;
-      text-align: center;
-      padding: 2rem 1.5rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .iconWrapper {
-      width: 100px;
-      height: 100px;
-    }
-
-    .iconWrapper img {
-      width: 60px;
-      height: 60px;
-    }
-
-    .content h2 {
-      font-size: 1.1rem;
-    }
-
-    .content p {
-      font-size: 0.95rem;
-    }
+  .cardBody p {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #888888;
   }
 </style>
+
