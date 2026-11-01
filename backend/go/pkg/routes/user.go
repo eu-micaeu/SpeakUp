@@ -19,5 +19,7 @@ func UserRoutes(router *gin.Engine, userHandler *handlers.UserHandler) {
 
 		// Custom routes
 		userRoutes.POST("/login", userHandler.Login)
+		userRoutes.POST("/forgot-password", userHandler.ForgotPassword)
+		userRoutes.POST("/reset-password", userHandler.ResetPassword)
 	}
 }

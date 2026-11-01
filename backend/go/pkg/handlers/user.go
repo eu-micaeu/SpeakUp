@@ -1,7 +1,12 @@
 package handlers
 
 import (
+	"crypto/rand"
+	"fmt"
+	"math/big"
 	"net/http"
+	"strings"
+	"time"
 
 	"speakup/pkg/middlewares"
 	"speakup/pkg/models"
@@ -230,3 +235,117 @@ func (h *UserHandler) DeleteUser(c *gin.Context) {
 	}
 	utils.RespondWithJSON(c, http.StatusOK, gin.H{"message": "User deleted successfully"})
 }
+
+func generateSixDigitCode() (string, error) {
+	n, err := rand.Int(rand.Reader, big.NewInt(900000))
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%06d", n.Int64()+100000), nil
+}
+
+// ForgotPassword generates a 6-digit recovery code, saves its hash + expiration, and sends it via email
+func (h *UserHandler) ForgotPassword(c *gin.Context) {
+	var req struct {
+		Email string `json:"email" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.RespondWithError(c, http.StatusBadRequest, "Informe um email válido.")
+		return
+	}
+
+	email := strings.TrimSpace(req.Email)
+	user, err := h.Repo.FindByEmail(c, email)
+	if err != nil {
+		// Return generic success message to avoid leaking registered emails
+		utils.RespondWithJSON(c, http.StatusOK, gin.H{
+			"message": "Se o email estiver cadastrado, enviamos um código de 6 dígitos para ele.",
+		})
+		return
+	}
+
+	code, err := generateSixDigitCode()
+	if err != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Erro ao gerar código de recuperação.")
+		return
+	}
+
+	codeHash, err := bcrypt.GenerateFromPassword([]byte(code), bcrypt.DefaultCost)
+	if err != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Erro ao processar código de recuperação.")
+		return
+	}
+
+	expiresAt := time.Now().UTC().Add(15 * time.Minute)
+	updateDoc := bson.M{
+		"reset_code_hash":  string(codeHash),
+		"reset_expires_at": expiresAt,
+	}
+
+	if err := h.Repo.Update(c, user.ID, updateDoc); err != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Erro ao salvar código de recuperação.")
+		return
+	}
+
+	if err := utils.SendPasswordResetEmail(user.Email, user.Name, code); err != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Falha ao enviar o email de recuperação. Verifique as configurações de SMTP.")
+		return
+	}
+
+	utils.RespondWithJSON(c, http.StatusOK, gin.H{
+		"message": "Se o email estiver cadastrado, enviamos um código de 6 dígitos para ele.",
+	})
+}
+
+// ResetPassword validates the 6-digit code and updates the user's password
+func (h *UserHandler) ResetPassword(c *gin.Context) {
+	var req struct {
+		Email       string `json:"email" binding:"required"`
+		Code        string `json:"code" binding:"required"`
+		NewPassword string `json:"new_password" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.RespondWithError(c, http.StatusBadRequest, "Preencha email, código e nova senha.")
+		return
+	}
+
+	email := strings.TrimSpace(req.Email)
+	code := strings.TrimSpace(req.Code)
+	user, err := h.Repo.FindByEmail(c, email)
+	if err != nil || user.ResetCodeHash == "" {
+		utils.RespondWithError(c, http.StatusBadRequest, "Código inválido ou expirado.")
+		return
+	}
+
+	if time.Now().UTC().After(user.ResetExpiresAt) {
+		utils.RespondWithError(c, http.StatusBadRequest, "O código de recuperação expirou. Solicite um novo código.")
+		return
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.ResetCodeHash), []byte(code)); err != nil {
+		utils.RespondWithError(c, http.StatusBadRequest, "Código de verificação incorreto.")
+		return
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
+	if err != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Erro ao criptografar nova senha.")
+		return
+	}
+
+	updateDoc := bson.M{
+		"password":         string(hashedPassword),
+		"reset_code_hash":  "",
+		"reset_expires_at": time.Time{},
+	}
+
+	if err := h.Repo.Update(c, user.ID, updateDoc); err != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Erro ao atualizar a senha.")
+		return
+	}
+
+	utils.RespondWithJSON(c, http.StatusOK, gin.H{
+		"message": "Senha redefinida com sucesso!",
+	})
+}
+

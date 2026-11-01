@@ -4,7 +4,12 @@
   import Footer from "../components/Footer.svelte";
   import { isAuthTokenValid } from "../utils/cookies";
   import { goto } from "$app/navigation";
-  import { login as loginApi, register as registerApi } from "../utils/api";
+  import {
+    login as loginApi,
+    register as registerApi,
+    forgotPassword as forgotPasswordApi,
+    resetPassword as resetPasswordApi,
+  } from "../utils/api";
 
   const cardData = [
     {
@@ -32,7 +37,8 @@
 
   // Auth modal state
   let showAuthModal = false;
-  let authMode = "login"; // "login" or "register"
+  let authMode = "login"; // "login", "register", "forgot", or "reset"
+  let recoveryEmail = "";
   let isLoading = false;
   let toastMessage = "";
   let toastType = "";
@@ -255,6 +261,71 @@
     }
   }
 
+  async function handleForgotPassword(event: Event) {
+    event.preventDefault();
+    isLoading = true;
+    error = "";
+
+    const formData = new FormData(event.target as HTMLFormElement);
+    const email = (formData.get("email") as string)?.trim();
+
+    if (!email) {
+      error = "Informe seu email.";
+      isLoading = false;
+      return;
+    }
+
+    try {
+      await forgotPasswordApi(email);
+      recoveryEmail = email;
+      showToast("Código de 6 dígitos enviado para o seu email!", "success");
+      authMode = "reset";
+    } catch (err: any) {
+      error =
+        err?.response?.data?.error ||
+        "Não foi possível enviar o código de recuperação.";
+    } finally {
+      isLoading = false;
+    }
+  }
+
+  async function handleResetPassword(event: Event) {
+    event.preventDefault();
+    isLoading = true;
+    error = "";
+
+    const formData = new FormData(event.target as HTMLFormElement);
+    const code = (formData.get("code") as string)?.trim();
+    const newPassword = formData.get("new-password") as string;
+    const confirmPassword = formData.get("confirm-password") as string;
+
+    if (newPassword !== confirmPassword) {
+      error = "As senhas não coincidem.";
+      isLoading = false;
+      return;
+    }
+
+    if (!isValidPassword(newPassword)) {
+      error =
+        "A senha deve ter pelo menos 8 caracteres, uma letra maiúscula, uma minúscula, um número e um caractere especial.";
+      isLoading = false;
+      return;
+    }
+
+    try {
+      await resetPasswordApi(recoveryEmail, code, newPassword);
+      showToast("Senha redefinida com sucesso! Faça login.", "success");
+      authMode = "login";
+      error = "";
+    } catch (err: any) {
+      error =
+        err?.response?.data?.error ||
+        "Código inválido ou expirado. Tente novamente.";
+    } finally {
+      isLoading = false;
+    }
+  }
+
   // Live preview animation state in Hero
   let previewStep = 0;
   let previewInterval: ReturnType<typeof setInterval> | null = null;
@@ -383,7 +454,7 @@
             </div>
             <div class="previewTitle">
               <span class="onlineDot"></span>
-              SpeakUp • llama3.2:latest
+              SpeakUp • llama3.2
             </div>
             <div class="stepPills">
               {#each [1, 2, 3] as step}
@@ -492,7 +563,7 @@
           <span class="sectionEyebrow">Tecnologia</span>
           <h2>Potencializado por Inteligência Artificial</h2>
           <p class="sectionSubtitle">
-            Executamos o modelo <strong>llama3.2:latest</strong> via Ollama diretamente em nosso servidor local — entregando correções instantâneas e conversação adaptativa sem exigir nada da sua máquina.
+            Executamos o modelo <strong>llama3.2</strong> via Ollama diretamente em nosso servidor local — entregando correções instantâneas e conversação adaptativa sem exigir nada da sua máquina.
           </p>
         </div>
 
@@ -502,12 +573,12 @@
               <img src="/Ollama Logo - White - zonalogo.com.svg" alt="Ollama Logo" />
             </div>
             <div>
-              <h3>Ollama • llama3.2:latest</h3>
+              <h3>Ollama • llama3.2</h3>
               <span class="apiMeta">Hospedado no Servidor SpeakUp</span>
             </div>
           </div>
           <p>
-            Toda a inferência do <code>llama3.2:latest</code> roda no nosso servidor próprio, garantindo respostas rápidas e privacidade direto no seu navegador, sem pesar no seu computador ou celular.
+            Toda a inferência do <code>llama3.2</code> roda no nosso servidor próprio, garantindo respostas rápidas e privacidade direto no seu navegador, sem pesar no seu computador ou celular.
           </p>
         </div>
       </div>
@@ -539,37 +610,49 @@
 
         <div class="modalHeader">
           <h2>
-            {authMode === "login" ? "Bem-vindo de volta!" : "Crie sua conta"}
+            {authMode === "login"
+              ? "Bem-vindo de volta!"
+              : authMode === "register"
+                ? "Crie sua conta"
+                : authMode === "forgot"
+                  ? "Recuperar senha"
+                  : "Redefinir senha"}
           </h2>
           <p class="modalSubtitle">
             {authMode === "login"
               ? "Entre para continuar a conversa"
-              : "Junte-se a nós e comece a aprender"}
+              : authMode === "register"
+                ? "Junte-se a nós e comece a aprender"
+                : authMode === "forgot"
+                  ? "Enviaremos um código de 6 dígitos para o seu email"
+                  : `Digite o código enviado para ${recoveryEmail}`}
           </p>
         </div>
 
-        <div class="authTabs">
-          <button
-            class="authTab"
-            class:active={authMode === "login"}
-            on:click={() => {
-              authMode = "login";
-              error = "";
-            }}
-          >
-            Login
-          </button>
-          <button
-            class="authTab"
-            class:active={authMode === "register"}
-            on:click={() => {
-              authMode = "register";
-              error = "";
-            }}
-          >
-            Registrar
-          </button>
-        </div>
+        {#if authMode === "login" || authMode === "register"}
+          <div class="authTabs">
+            <button
+              class="authTab"
+              class:active={authMode === "login"}
+              on:click={() => {
+                authMode = "login";
+                error = "";
+              }}
+            >
+              Login
+            </button>
+            <button
+              class="authTab"
+              class:active={authMode === "register"}
+              on:click={() => {
+                authMode = "register";
+                error = "";
+              }}
+            >
+              Registrar
+            </button>
+          </div>
+        {/if}
 
         {#if error}
           <div class="errorMessage">
@@ -591,7 +674,19 @@
             </div>
 
             <div class="inputGroup">
-              <label for="login-password">Senha</label>
+              <div class="labelRow">
+                <label for="login-password">Senha</label>
+                <button
+                  type="button"
+                  class="forgotPasswordLink"
+                  on:click={() => {
+                    authMode = "forgot";
+                    error = "";
+                  }}
+                >
+                  Esqueceu sua senha?
+                </button>
+              </div>
               <input
                 id="login-password"
                 type="password"
@@ -603,6 +698,86 @@
 
             <button type="submit" disabled={isLoading} class="submitButton">
               {isLoading ? "Entrando..." : "Entrar"}
+            </button>
+          </form>
+        {:else if authMode === "forgot"}
+          <form on:submit={handleForgotPassword}>
+            <div class="inputGroup">
+              <label for="forgot-email">Email da sua conta</label>
+              <input
+                id="forgot-email"
+                type="email"
+                name="email"
+                bind:value={recoveryEmail}
+                placeholder="seu@email.com"
+                required
+              />
+            </div>
+
+            <button type="submit" disabled={isLoading} class="submitButton">
+              {isLoading ? "Enviando código..." : "Enviar código"}
+            </button>
+
+            <button
+              type="button"
+              class="secondaryActionBtn"
+              on:click={() => {
+                authMode = "login";
+                error = "";
+              }}
+            >
+              Voltar para o login
+            </button>
+          </form>
+        {:else if authMode === "reset"}
+          <form on:submit={handleResetPassword}>
+            <div class="inputGroup">
+              <label for="reset-code">Código de 6 dígitos</label>
+              <input
+                id="reset-code"
+                type="text"
+                name="code"
+                maxlength="6"
+                placeholder="000000"
+                required
+              />
+            </div>
+
+            <div class="inputGroup">
+              <label for="reset-new-password">Nova senha</label>
+              <input
+                id="reset-new-password"
+                type="password"
+                name="new-password"
+                placeholder="Digite a nova senha"
+                required
+              />
+            </div>
+
+            <div class="inputGroup">
+              <label for="reset-confirm-password">Confirmar nova senha</label>
+              <input
+                id="reset-confirm-password"
+                type="password"
+                name="confirm-password"
+                placeholder="Confirme a nova senha"
+                required
+              />
+            </div>
+
+            <button type="submit" disabled={isLoading} class="submitButton">
+              {isLoading ? "Redefinindo..." : "Redefinir senha"}
+            </button>
+
+            <button
+              type="button"
+              class="secondaryActionBtn"
+              on:click={() => {
+                authMode = "forgot";
+                error = "";
+              }}
+            >
+              Reenviar código / Trocar email
             </button>
           </form>
         {:else}
@@ -1732,6 +1907,52 @@
   .levelTestButton:disabled {
     opacity: 0.4;
     cursor: not-allowed;
+  }
+
+  .labelRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.35rem;
+  }
+
+  .labelRow label {
+    margin-bottom: 0;
+  }
+
+  .forgotPasswordLink {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.76rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.2s ease;
+  }
+
+  .forgotPasswordLink:hover {
+    color: #ffffff;
+    text-decoration: underline;
+  }
+
+  .secondaryActionBtn {
+    width: 100%;
+    padding: 0.65rem;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.84rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 0.35rem;
+  }
+
+  .secondaryActionBtn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
   }
 
   .testOverlay {

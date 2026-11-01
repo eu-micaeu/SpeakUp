@@ -107,6 +107,28 @@ export const register = async (userData: UserData): Promise<RegisterResponse> =>
     return response.data;
 }
 
+// Forgot password (sends 6-digit recovery code via email)
+export const forgotPassword = async (email: string): Promise<{ message: string }> => {
+    const response = await axios.post<{ message: string }>(API_URL + '/user/forgot-password', {
+        email
+    });
+    return response.data;
+}
+
+// Reset password using 6-digit code
+export const resetPassword = async (
+    email: string,
+    code: string,
+    new_password: string
+): Promise<{ message: string }> => {
+    const response = await axios.post<{ message: string }>(API_URL + '/user/reset-password', {
+        email,
+        code,
+        new_password
+    });
+    return response.data;
+}
+
 // Create chat
 export const createChat = async (topic: string): Promise<Chat> => {
     const response = await axios.post<Chat>(API_URL + '/chat', {
