@@ -11,7 +11,7 @@ type User struct {
 }
 
 func (u *User) Normalize() {
-	if u.ID == "" && u.LegacyID != "" {
+	if u.LegacyID != "" {
 		u.ID = u.LegacyID
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"speakup/pkg/models"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -27,12 +28,14 @@ func NewMongoUserRepository(db *mongo.Database) *MongoUserRepository {
 }
 
 func userIDFilter(id string) bson.M {
-	return bson.M{
-		"$or": []bson.M{
-			{"_id": id},
-			{"id": id},
-		},
+	or := []bson.M{
+		{"_id": id},
+		{"id": id},
 	}
+	if oid, err := primitive.ObjectIDFromHex(id); err == nil {
+		or = append(or, bson.M{"_id": oid})
+	}
+	return bson.M{"$or": or}
 }
 
 func (r *MongoUserRepository) Create(ctx context.Context, user models.User) error {

@@ -18,7 +18,7 @@ type Message struct {
 // Normalize ensures backward compatibility with legacy documents where ID was stored in "id"
 // and correction/translation were concatenated inside Content.
 func (m *Message) Normalize() {
-	if m.ID == "" && m.LegacyID != "" {
+	if m.LegacyID != "" {
 		m.ID = m.LegacyID
 	}
 

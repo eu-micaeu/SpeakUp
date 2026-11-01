@@ -5,6 +5,7 @@ import (
 	"speakup/pkg/models"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -28,6 +29,27 @@ func NewMongoChatRepository(db *mongo.Database) *MongoChatRepository {
 	}
 }
 
+func chatIDFilter(id string) bson.M {
+	or := []bson.M{
+		{"_id": id},
+		{"id": id},
+	}
+	if oid, err := primitive.ObjectIDFromHex(id); err == nil {
+		or = append(or, bson.M{"_id": oid})
+	}
+	return bson.M{"$or": or}
+}
+
+func normalizeChats(chats []models.Chat) []models.Chat {
+	if chats == nil {
+		return []models.Chat{}
+	}
+	for i := range chats {
+		chats[i].Normalize()
+	}
+	return chats
+}
+
 func (r *MongoChatRepository) Create(ctx context.Context, chat models.Chat) error {
 	_, err := r.Collection.InsertOne(ctx, chat)
 	return err
@@ -35,7 +57,10 @@ func (r *MongoChatRepository) Create(ctx context.Context, chat models.Chat) erro
 
 func (r *MongoChatRepository) FindByID(ctx context.Context, id string) (models.Chat, error) {
 	var chat models.Chat
-	err := r.Collection.FindOne(ctx, bson.M{"_id": id}).Decode(&chat)
+	err := r.Collection.FindOne(ctx, chatIDFilter(id)).Decode(&chat)
+	if err == nil {
+		chat.Normalize()
+	}
 	return chat, err
 }
 
@@ -49,10 +74,7 @@ func (r *MongoChatRepository) FindAll(ctx context.Context) ([]models.Chat, error
 
 	var chats []models.Chat
 	err = cursor.All(ctx, &chats)
-	if chats == nil {
-		chats = []models.Chat{}
-	}
-	return chats, err
+	return normalizeChats(chats), err
 }
 
 func (r *MongoChatRepository) FindAllByUserID(ctx context.Context, userID string) ([]models.Chat, error) {
@@ -65,20 +87,17 @@ func (r *MongoChatRepository) FindAllByUserID(ctx context.Context, userID string
 
 	var chats []models.Chat
 	err = cursor.All(ctx, &chats)
-	if chats == nil {
-		chats = []models.Chat{}
-	}
-	return chats, err
+	return normalizeChats(chats), err
 }
 
 func (r *MongoChatRepository) Update(ctx context.Context, id string, chat models.Chat) error {
 	update := bson.M{"$set": chat}
-	_, err := r.Collection.UpdateOne(ctx, bson.M{"_id": id}, update)
+	_, err := r.Collection.UpdateOne(ctx, chatIDFilter(id), update)
 	return err
 }
 
 func (r *MongoChatRepository) Delete(ctx context.Context, id string) error {
-	_, err := r.Collection.DeleteOne(ctx, bson.M{"_id": id})
+	_, err := r.Collection.DeleteOne(ctx, chatIDFilter(id))
 	return err
 }
 

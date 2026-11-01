@@ -5,6 +5,7 @@ import (
 	"speakup/pkg/models"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -31,12 +32,14 @@ func NewMongoMessageRepository(db *mongo.Database) *MongoMessageRepository {
 }
 
 func messageIDFilter(id string) bson.M {
-	return bson.M{
-		"$or": []bson.M{
-			{"_id": id},
-			{"id": id},
-		},
+	or := []bson.M{
+		{"_id": id},
+		{"id": id},
 	}
+	if oid, err := primitive.ObjectIDFromHex(id); err == nil {
+		or = append(or, bson.M{"_id": oid})
+	}
+	return bson.M{"$or": or}
 }
 
 func normalizeMessages(messages []models.Message) []models.Message {
