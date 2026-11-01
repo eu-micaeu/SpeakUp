@@ -19,7 +19,7 @@
       tag: "Gramática",
       title: "Correção em Tempo Real",
       content:
-        "Identifica erros gramaticais e de digitação instantaneamente, fornecendo explicações claras em português.",
+        "Identifica e corrige erros gramaticais, de ortografia e digitação instantaneamente a cada mensagem enviada.",
     },
     {
       svg: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 10h18M8 15h4"/></svg>`,
@@ -357,7 +357,7 @@
         </h1>
 
         <p class="heroSubtitle heroAnim3">
-          Pratique diálogos adaptados ao seu nível CEFR, receba correções gramaticais instantâneas explicadas em português e memorize vocabulário com flashcards inteligentes.
+          Pratique diálogos adaptados ao seu nível CEFR, receba correções gramaticais e traduções instantâneas e memorize vocabulário com flashcards inteligentes.
         </p>
 
         <div class="heroActions heroAnim4">
@@ -404,15 +404,12 @@
               <div class="demoMsgHeader">Você escreveu</div>
               <p class="demoMsgText">Yesterday I <span class="errHighlight">go</span> to the cinema with my friends.</p>
 
-              <!-- Etapa 2: Correção + Explicação -->
+              <!-- Etapa 2: Correção -->
               <div class="demoCorrectionBox" class:expanded={previewStep >= 2}>
                 <div class="demoCorrLine">
                   <span class="corrBadge">✓ Correção</span>
                   <span>Yesterday I <strong>went</strong> to the cinema with my friends.</span>
                 </div>
-                <p class="demoExplLine">
-                  <strong>Explicação:</strong> Para ações concluídas no passado (<em>"Yesterday"</em>), usamos o passado simples (<strong>went</strong>) em vez de "go".
-                </p>
               </div>
             </div>
 

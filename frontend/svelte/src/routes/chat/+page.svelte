@@ -580,12 +580,6 @@
                                             +Flashcard
                                         </button>
                                     </p>
-                                    {#if msg.explanation}
-                                        <p class="explanationTextLine">
-                                            <strong>Explicação:</strong>
-                                            {msg.explanation}
-                                        </p>
-                                    {/if}
                                 {/if}
                             </div>
                         {/if}
