@@ -600,19 +600,33 @@ func extractJSONObject(raw string) string {
 func GetFlashcardGenerateResponse(ctx context.Context, term string, contextSentence string) (GeneratedFlashcardData, error) {
 	var result GeneratedFlashcardData
 
+	termTrimmed := strings.TrimSpace(term)
+	for _, item := range fallbackFlashcardsPool {
+		if strings.EqualFold(strings.TrimSpace(item.Front), termTrimmed) {
+			ctxSent := strings.TrimSpace(contextSentence)
+			if ctxSent == "" {
+				ctxSent = item.ContextSentence
+			}
+			return GeneratedFlashcardData{
+				Back:            FormatSingleWordTranslation(item.Back),
+				ContextSentence: ctxSent,
+				Explanation:     item.Explanation,
+			}, nil
+		}
+	}
+
 	prompt, err := prompts.GetPrompt("promptFlashcard.txt")
 	if err != nil {
 		return result, fmt.Errorf("failed to load prompt: %w", err)
 	}
 
 	connector := getConnector(ctx)
-	fullPrompt := fmt.Sprintf("%s\n\nWORD/PHRASE:\n%s\n\nCONTEXT SENTENCE:\n%s\n\nOUTPUT (JSON ONLY):", prompt, strings.TrimSpace(term), strings.TrimSpace(contextSentence))
+	fullPrompt := fmt.Sprintf("%s\n\nWORD/PHRASE:\n%s\n\nCONTEXT SENTENCE:\n%s\n\nOUTPUT (JSON ONLY):", prompt, termTrimmed, strings.TrimSpace(contextSentence))
 
 	var resp string
 	if optConnector, ok := connector.(connectors.OptionableConnector); ok {
 		systemPrompt := "You are a strict language flashcard generator. Output a raw JSON object only with keys 'back', 'context_sentence', and 'explanation'."
 		options := map[string]any{
-			"format":      "json",
 			"temperature": 0.2,
 			"top_p":       0.9,
 			"num_predict": 256,
@@ -629,6 +643,37 @@ func GetFlashcardGenerateResponse(ctx context.Context, term string, contextSente
 	cleaned := extractJSONObject(resp)
 	if err := json.Unmarshal([]byte(cleaned), &result); err != nil {
 		return result, fmt.Errorf("failed to parse flashcard JSON: %w", err)
+	}
+
+	// Fallback if the model used alternative JSON key names
+	if result.Back == "" || result.ContextSentence == "" || result.Explanation == "" {
+		var rawMap map[string]any
+		if err := json.Unmarshal([]byte(cleaned), &rawMap); err == nil {
+			if result.Back == "" {
+				for _, k := range []string{"translation", "tradução", "traducao", "portuguese", "pt", "Back"} {
+					if v, ok := rawMap[k].(string); ok && strings.TrimSpace(v) != "" {
+						result.Back = v
+						break
+					}
+				}
+			}
+			if result.ContextSentence == "" {
+				for _, k := range []string{"example", "sentence", "example_sentence", "context", "ContextSentence"} {
+					if v, ok := rawMap[k].(string); ok && strings.TrimSpace(v) != "" {
+						result.ContextSentence = v
+						break
+					}
+				}
+			}
+			if result.Explanation == "" {
+				for _, k := range []string{"meaning", "definition", "explicacao", "explicação", "note", "Explanation"} {
+					if v, ok := rawMap[k].(string); ok && strings.TrimSpace(v) != "" {
+						result.Explanation = v
+						break
+					}
+				}
+			}
+		}
 	}
 
 	result.Back = FormatSingleWordTranslation(result.Back)

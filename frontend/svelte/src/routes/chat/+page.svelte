@@ -247,57 +247,6 @@
             topic: chat.title || chat.topic || "Untitled Chat",
         }));
     let playingMsgId: string | null = null;
-    let toastMessage = "";
-
-    async function quickAddFlashcard(term: string, context: string) {
-        if (!term) return;
-        toastMessage = "🤖 Gerando Flashcard com IA...";
-        try {
-            const resGen = await fetch(`${API_URL}/flashcards/generate`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ term, context_sentence: context })
-            });
-            const genData = resGen.ok ? await resGen.json() : { back: term, explanation: "" };
-
-            const resSave = await fetch(`${API_URL}/flashcards`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-User-ID": "default_user"
-                },
-                body: JSON.stringify({
-                    front: term,
-                    back: genData.back || term,
-                    context_sentence: context || genData.context_sentence,
-                    explanation: genData.explanation || ""
-                })
-            });
-
-            if (resSave.ok) {
-                toastMessage = "Flashcard adicionado com sucesso!";
-                setTimeout(() => { toastMessage = ""; }, 3000);
-            } else if (resSave.status === 409) {
-                toastMessage = `⚠️ O flashcard para "${term.trim()}" já existe!`;
-                setTimeout(() => { toastMessage = ""; }, 4000);
-            } else {
-                toastMessage = "Erro ao adicionar flashcard";
-                setTimeout(() => { toastMessage = ""; }, 3000);
-            }
-        } catch (e) {
-            console.error("Erro ao adicionar flashcard:", e);
-            toastMessage = "Erro ao adicionar flashcard";
-            setTimeout(() => { toastMessage = ""; }, 3000);
-        }
-    }
-
-    let selectedText = "";
-    let selectionCoords = { x: 0, y: 0 };
-    let showSelectionMenu = false;
-
-    function handleTextSelection() {
-        return;
-    }
 
     function getPracticingLanguage(): string {
         try {
@@ -381,8 +330,7 @@
     <meta name="twitter:description" content="Pratique conversação com Inteligência Artificial na SpeakUp. Melhore sua pronúncia, vocabulário e entonação de forma dinâmica e interativa." />
 </svelte:head>
 
-<!-- svelte-ignore a11y_no_static_element_interactions -->
-<div class="Chat" on:mouseup={handleTextSelection}>
+<div class="Chat">
     <!-- Top Navbar Padronizado ocupando 100% da largura da página -->
     <nav class="top-nav">
         <div class="nav-brand" on:click={() => goto("/dashboard")} role="button" tabindex="0">
@@ -416,23 +364,6 @@
             </button>
         </div>
     </nav>
-
-    {#if showSelectionMenu}
-        <div
-            class="selectionPopover"
-            style="top: {selectionCoords.y}px; left: {selectionCoords.x}px;"
-        >
-            <button
-                type="button"
-                on:click={() => {
-                    quickAddFlashcard(selectedText, "");
-                    showSelectionMenu = false;
-                }}
-            >
-                Salvar "{selectedText}" em Flashcards
-            </button>
-        </div>
-    {/if}
 
     <div class="chatContent">
         <Sidebar
@@ -571,14 +502,6 @@
                                                 </svg>
                                             {/if}
                                         </button>
-                                        <button
-                                            class="flashcardAddBtn disabled"
-                                            disabled
-                                            title="Flashcards indisponível no momento"
-                                            type="button"
-                                        >
-                                            +Flashcard
-                                        </button>
                                     </p>
                                 {/if}
                             </div>
@@ -633,12 +556,6 @@
                 <span
                     >Transcrição indisponível. Digite sua mensagem abaixo.</span
                 >
-            </div>
-        {/if}
-
-        {#if toastMessage}
-            <div class="transcriptionNotice">
-                <span>{toastMessage}</span>
             </div>
         {/if}
 
@@ -1241,56 +1158,5 @@
         to {
             transform: rotate(360deg);
         }
-    }
-
-    .flashcardAddBtn {
-        background: rgba(168, 85, 247, 0.2);
-        color: #c084fc;
-        border: 1px solid rgba(168, 85, 247, 0.4);
-        border-radius: 6px;
-        padding: 2px 8px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        cursor: pointer;
-        margin-left: 8px;
-        transition: all 0.2s;
-    }
-
-    .flashcardAddBtn:hover:not(:disabled) {
-        background: rgba(168, 85, 247, 0.4);
-        color: white;
-    }
-
-    .flashcardAddBtn:disabled,
-    .flashcardAddBtn.disabled {
-        opacity: 0.35;
-        cursor: not-allowed;
-    }
-
-    .selectionPopover {
-        position: fixed;
-        transform: translateX(-50%);
-        background: linear-gradient(135deg, #1e1e2e, #2d1b4e);
-        border: 1px solid rgba(168, 85, 247, 0.6);
-        border-radius: 8px;
-        padding: 4px;
-        z-index: 9999;
-        animation: fadeIn 0.15s ease-out;
-    }
-
-    .selectionPopover button {
-        background: #8b5cf6;
-        color: white;
-        border: none;
-        padding: 6px 12px;
-        border-radius: 6px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        cursor: pointer;
-        white-space: nowrap;
-    }
-
-    .selectionPopover button:hover {
-        background: #7c3aed;
     }
 </style>

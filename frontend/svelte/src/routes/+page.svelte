@@ -31,7 +31,7 @@
       tag: "Memória",
       title: "Flashcards SuperMemo-2",
       content:
-        "Salve termos diretamente do chat e revise no momento ideal com repetição espaçada e pronúncia em áudio.",
+        "Crie seus próprios cartões de vocabulário e revise no momento ideal com repetição espaçada e pronúncia em áudio.",
     },
   ];
 

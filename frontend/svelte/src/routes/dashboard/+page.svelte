@@ -14,6 +14,7 @@
   onMount(async () => {
     if (!requireAuthOrRedirect()) return;
     await fetchUserData();
+    await fetchFlashcardsCount();
   });
 
   async function fetchUserData() {
@@ -124,8 +125,8 @@
         </div>
       </div>
 
-      <!-- Option 2: Flashcards SRS (Disabled) -->
-      <div class="hub-card disabled" aria-disabled="true">
+      <!-- Option 2: Flashcards SRS -->
+      <div class="hub-card" on:click={() => goto("/flashcards")} role="button" tabindex="0" on:keydown={(e) => e.key === 'Enter' && goto("/flashcards")}>
         <div class="card-top">
           <div class="icon-box">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -133,7 +134,11 @@
               <path d="M3 10h18M8 15h3" stroke-linecap="round"/>
             </svg>
           </div>
-          <span class="badge">REVISÃO ESPAÇADA</span>
+          {#if dueFlashcardsCount > 0}
+            <span class="badge badge-due">{dueFlashcardsCount} PENDENTES</span>
+          {:else}
+            <span class="badge">REVISÃO ESPAÇADA</span>
+          {/if}
         </div>
 
         <div class="card-content">

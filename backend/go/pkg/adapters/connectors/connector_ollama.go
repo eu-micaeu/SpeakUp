@@ -107,6 +107,11 @@ func (o *OllamaConnector) generate(ctx context.Context, message string, system s
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
+		// Fallback to llama3.2:latest if configured model is not found in Ollama
+		if resp.StatusCode == http.StatusNotFound && o.model != "llama3.2:latest" {
+			o.model = "llama3.2:latest"
+			return o.generate(ctx, message, system, options)
+		}
 		return "", fmt.Errorf("ollama API error: status %d, body: %s", resp.StatusCode, string(body))
 	}
 
