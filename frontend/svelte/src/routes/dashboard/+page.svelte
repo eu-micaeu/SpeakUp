@@ -113,7 +113,7 @@
         </div>
 
         <div class="card-content">
-          <h2>Tutor de IA</h2>
+          <h2>Tutor</h2>
           <p>Conversação em tempo real com correções e sugestões gramaticais instantâneas.</p>
         </div>
 
